@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+body {
+  /* font-family: "Inter" */
+}
+
+.button--submit {
+  background-color: var(--color-yellow-400);
+  color: var(--color-black);
+  border-radius: 8px;
+  padding: 5px 10px;
+  cursor: pointer;
+  min-height: 52px;
+  font-weight: 700;
+}
+
+.button--submit:hover {
+  background-color: var(--color-orange-600);
+  color: var(--color-red-50);
+}
+
+.input {
+  background-color: #151B2D;
+  border-radius: 8px;
+  padding: 5px 10px;
+  min-height: 52px;
+  color: var(--color-neutral-200);
+}
+
+.input::placeholder {
+  color: var(--color-white);
+  opacity: 0.6;
+}
+
+.error {
+  color: red;
+  font-weight: 600;
+}

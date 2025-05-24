@@ -1,0 +1,174 @@
+{
+  "transactions": [],
+  "users": [],
+  "currencies": [
+    {
+      "code": "USD",
+      "name": "US Dollar",
+      "symbol": "$",
+      "id": "d96e"
+    },
+    {
+      "code": "EUR",
+      "name": "Euro",
+      "symbol": "€",
+      "id": "b116"
+    },
+    {
+      "code": "GBP",
+      "name": "British Pound",
+      "symbol": "£",
+      "id": "78bd"
+    },
+    {
+      "code": "JPY",
+      "name": "Japanese Yen",
+      "symbol": "¥",
+      "id": "1a0e"
+    },
+    {
+      "code": "AUD",
+      "name": "Australian Dollar",
+      "symbol": "A$",
+      "id": "79aa"
+    },
+    {
+      "code": "CAD",
+      "name": "Canadian Dollar",
+      "symbol": "C$",
+      "id": "795c"
+    },
+    {
+      "code": "CHF",
+      "name": "Swiss Franc",
+      "symbol": "CHF",
+      "id": "563a"
+    },
+    {
+      "code": "CNY",
+      "name": "Chinese Yuan",
+      "symbol": "¥",
+      "id": "2bfb"
+    },
+    {
+      "code": "HKD",
+      "name": "Hong Kong Dollar",
+      "symbol": "HK$",
+      "id": "7ba0"
+    },
+    {
+      "code": "SGD",
+      "name": "Singapore Dollar",
+      "symbol": "S$",
+      "id": "c610"
+    },
+    {
+      "code": "NZD",
+      "name": "New Zealand Dollar",
+      "symbol": "NZ$",
+      "id": "0b78"
+    },
+    {
+      "code": "SEK",
+      "name": "Swedish Krona",
+      "symbol": "kr",
+      "id": "b751"
+    },
+    {
+      "code": "NOK",
+      "name": "Norwegian Krone",
+      "symbol": "kr",
+      "id": "3a0a"
+    },
+    {
+      "code": "DKK",
+      "name": "Danish Krone",
+      "symbol": "kr",
+      "id": "0b70"
+    },
+    {
+      "code": "INR",
+      "name": "Indian Rupee",
+      "symbol": "₹",
+      "id": "18d8"
+    },
+    {
+      "code": "BRL",
+      "name": "Brazilian Real",
+      "symbol": "R$",
+      "id": "0b0b"
+    },
+    {
+      "code": "ZAR",
+      "name": "South African Rand",
+      "symbol": "R",
+      "id": "ad38"
+    },
+    {
+      "code": "MXN",
+      "name": "Mexican Peso",
+      "symbol": "$",
+      "id": "d1e3"
+    },
+    {
+      "code": "RUB",
+      "name": "Russian Ruble",
+      "symbol": "₽",
+      "id": "3aeb"
+    },
+    {
+      "code": "KRW",
+      "name": "South Korean Won",
+      "symbol": "₩",
+      "id": "7364"
+    },
+    {
+      "code": "RSD",
+      "name": "Serbian Dinar",
+      "symbol": "дин",
+      "id": "544b"
+    },
+    {
+      "code": "HRK",
+      "name": "Croatian Kuna",
+      "symbol": "kn",
+      "id": "411f"
+    },
+    {
+      "code": "BAM",
+      "name": "Bosnia and Herzegovina Convertible Mark",
+      "symbol": "KM",
+      "id": "f2d1"
+    },
+    {
+      "code": "MKD",
+      "name": "Macedonian Denar",
+      "symbol": "ден",
+      "id": "98e7"
+    },
+    {
+      "code": "ALL",
+      "name": "Albanian Lek",
+      "symbol": "L",
+      "id": "f3c6"
+    },
+    {
+      "code": "RON",
+      "name": "Romanian Leu",
+      "symbol": "lei",
+      "id": "f661"
+    },
+    {
+      "code": "BGN",
+      "name": "Bulgarian Lev",
+      "symbol": "лв",
+      "id": "2cc9"
+    },
+    {
+      "code": "TRY",
+      "name": "Turkish Lira",
+      "symbol": "₺",
+      "id": "2272"
+    }
+  ]
+}
