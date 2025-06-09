@@ -4,14 +4,11 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        maypactYellow: "#FFD700",
-        maypactOrange: "#FF4500",
-        maypactWhite: "#FFFFFF",
-        maypactGray: "#ccc",
-        link: "#1E90FF",
-        linkHover: "#00BFFF",
-        maypactNavy: "#0B0F1A",
-        maypactBlack: "#151B2D",
+        brand: {
+          coal: "#0f0d0e",
+          coalMuted: "#1b1918",
+          sand: "#f9f4da",
+        },
       },
     },
   },

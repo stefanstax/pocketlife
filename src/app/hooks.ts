@@ -1,13 +1,17 @@
 import { useQueries, useQuery } from "@tanstack/react-query";
 
-export const useLocalApi = (resource: string) =>
+export const useLocalApi = (resource: string, id?: number) =>
   useQuery({
-    queryKey: [resource],
+    queryKey: id ? [resource, id] : [resource],
     queryFn: async () => {
-      const response = await fetch(`http://localhost:3000/${resource}`);
+      const url = id
+        ? `http://localhost:3000/${resource}/${id}`
+        : `http://localhost:3000/${resource}`;
+
+      const response = await fetch(url);
 
       if (!response.ok) {
-        throw new Error("There was a problem to load currencies");
+        throw new Error(`There was a problem loading ${resource}`);
       }
 
       return response.json();

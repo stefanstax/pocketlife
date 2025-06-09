@@ -1,27 +1,30 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
-import transactionReducer from "../features/transactions/transactionsSlice";
-import {
-  FLUSH,
-  PAUSE,
-  PERSIST,
-  PURGE,
-  REGISTER,
-  REHYDRATE,
-} from "redux-persist";
+import transactionsReducer from "../features/transactions/transactionsSlice";
+import authReducer from "../features/auth/authSlice";
+import { persistStore, persistReducer } from "redux-persist";
+import storage from "redux-persist/lib/storage"; // defaults to localStorage
+
+const persistConfig = {
+  key: "root",
+  storage,
+  whiteList: ["auth"],
+};
 
 const rootReducer = combineReducers({
-  transactions: transactionReducer,
+  transactions: transactionsReducer,
+  auth: authReducer,
 });
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 export const store = configureStore({
-  reducer: rootReducer,
+  reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: {
-        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-      },
+      serializableCheck: false,
     }),
 });
+
+export const persistor = persistStore(store);
 
 export type AppStore = typeof store;
 export type RootState = ReturnType<AppStore["getState"]>;

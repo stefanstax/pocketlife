@@ -1,7 +1,7 @@
-import type { RegistrationState } from "../registrationTypes";
+import type { Currency } from "../currencyTypes";
 
-export const register = async (data: RegistrationState) => {
-  const res = await fetch("http://localhost:3000/users", {
+export const currency = async (data: Currency) => {
+  const res = await fetch("http://localhost:3000/currencies", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -20,7 +20,9 @@ export const register = async (data: RegistrationState) => {
   }
 
   if (!res.ok) {
-    throw new Error(errorData.message || "Registration failed.");
+    throw new Error(
+      errorData.message || "Currency could not be added at this time."
+    );
   }
 
   return res;

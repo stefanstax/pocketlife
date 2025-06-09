@@ -1,6 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState, type FormEvent } from "react";
-import { addTransaction } from "./mutations/addTransaction";
 import { transactionSchema } from "./transactionSchemas";
 import {
   buttonSolid,
@@ -11,24 +10,52 @@ import {
 import { useSelector } from "react-redux";
 import type { RootState } from "../../app/store";
 import { useLocalApi } from "../../app/hooks";
+import { useParams } from "react-router";
+import { editTransaction } from "./mutations/editTransaction";
 import { transactionType } from "./transactionTypes";
-import type { CurrencyState } from "../currency/currencyTypes";
+import { type Currency, type CurrencyState } from "../currency/currencyTypes";
 
-const AddTransaction = () => {
-  const { user } = useSelector((state: RootState) => state.auth);
+const EditTransaction = () => {
   const [title, setTitle] = useState<string>("");
   const [amount, setAmount] = useState<string>("");
-  const [currencyId, setCurrencyId] = useState<number | "">("");
+  const [currency, setCurrency] = useState<CurrencyState>("EUR");
   const [note, setNote] = useState<string>("");
-  const [type, setType] = useState<"INCOME" | "EXPENSE" | "SAVINGS">("INCOME");
-  const [currencies, setCurrencies] = useState<CurrencyState[]>([]);
+  const [type, setType] = useState<"INCOME" | "EXPENSE" | "SAVINGS">("EXPENSE");
+  const [currencies, setCurrencies] = useState<Currency[]>([]);
+
+  const { user } = useSelector((state: RootState) => state.auth);
+
+  //   Grab ID from url
+  const { id } = useParams();
+  const numericId = id ? Number(id) : undefined;
+
+  const {
+    data: transactions,
+    isLoading,
+    isPending,
+  } = useLocalApi("transactions", numericId);
+  const { data: countryCurrencies } = useLocalApi("currencies");
+
+  useEffect(() => {
+    if (transactions) {
+      setTitle(transactions?.title);
+      setAmount(transactions?.amount);
+      setCurrency(transactions?.currency);
+      setType(transactions?.type);
+      setNote(transactions?.note);
+    }
+  }, [transactions]);
+
+  useEffect(() => {
+    setCurrencies(countryCurrencies);
+  }, [countryCurrencies]);
 
   const mutation = useMutation({
-    mutationFn: addTransaction,
+    mutationFn: editTransaction,
     onSuccess: () => {
       setTitle("");
       setAmount("");
-      setCurrencyId("");
+      setCurrency("EUR");
       setNote("");
       setType("INCOME");
     },
@@ -37,30 +64,25 @@ const AddTransaction = () => {
     },
   });
 
+  const currencyActiveClass = (value: CurrencyState) =>
+    currency === value ? "bg-[#5152fb]" : "";
+
   const typeActiveClass = (value: "EXPENSE" | "INCOME" | "SAVINGS") =>
     type === value ? "bg-[#5152fb]" : "";
-
-  const { data } = useLocalApi("currencies");
-
-  useEffect(() => {
-    if (data) {
-      setCurrencies(data);
-    }
-  }, [data]);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
 
     const result = transactionSchema.safeParse({
-      id: Math.floor(Math.random() * 100),
+      id: transactions?.id,
+      userId: user?.id,
+      date: new Date().toLocaleDateString(),
       title: formData.get("title"),
       amount: formData.get("amount"),
-      currencyId: Number(formData.get("currencyId")),
+      currency: formData.get("currency"),
       note: formData.get("note"),
-      date: new Date().toLocaleDateString(),
       type: formData.get("type"),
-      userId: user?.id,
     });
 
     if (!result.success) {
@@ -68,15 +90,16 @@ const AddTransaction = () => {
       return;
     }
 
-    mutation.mutate(result.data);
+    mutation.mutate({
+      ...result.data,
+      currency: result.data.currency as CurrencyState,
+    });
   };
 
+  if (isLoading || isPending) return <h1>We're loading your transaction...</h1>;
+
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="w-full bg-[#1b1918] p-4 rounded-lg flex flex-col gap-4"
-    >
-      {/* Title */}
+    <form onSubmit={handleSubmit} className="w-full flex flex-col gap-4">
       <div className={formDiv}>
         <label htmlFor="title" className={labelClasses}>
           Title
@@ -90,7 +113,6 @@ const AddTransaction = () => {
           onChange={(e) => setTitle(e.target.value)}
         />
       </div>
-      {/* Amount */}
       <div className={formDiv}>
         <label htmlFor="amount" className={labelClasses}>
           Amount
@@ -134,19 +156,19 @@ const AddTransaction = () => {
           Select Currency
         </label>
         <div className="flex-wrap w-full flex gap-2 border-1 px-4 py-2 border-t-0 border-white rounded-b-lg">
-          {currencies.map((curr) => {
-            console.log(curr);
+          {currencies?.map((currency) => {
+            const { code } = currency;
 
             return (
               <button
-                key={curr.code}
-                className={`${
-                  currencyId === curr.id ? "bg-[#5152fb]" : ""
-                } w-fit grow-0 rounded-lg cursor-pointer p-2 border-white flex-1 text-white border-dotted border-2  flex-1`}
+                key={Math.random()}
+                className={`w-fit grow-0 rounded-lg cursor-pointer p-2 border-white flex-1 text-white border-dotted border-2  flex-1 ${currencyActiveClass(
+                  code
+                )}`}
                 type="button"
-                onClick={() => setCurrencyId(Number(curr.id))}
+                onClick={() => setCurrency(code)}
               >
-                {curr.code}
+                {code}
               </button>
             );
           })}
@@ -154,11 +176,10 @@ const AddTransaction = () => {
         <input
           className={input}
           type="hidden"
-          name="currencyId"
-          value={currencyId ?? ""}
+          name="currency"
+          value={currency}
         />
       </div>
-      {/* Note */}
       <div className={formDiv}>
         <label htmlFor="note" className={labelClasses}>
           Note
@@ -173,11 +194,12 @@ const AddTransaction = () => {
         />
       </div>
       <input type="hidden" value={type} name="type" />
+
       <button type="submit" className={buttonSolid}>
-        Add transaction
+        Update transaction
       </button>
     </form>
   );
 };
 
-export default AddTransaction;
+export default EditTransaction;

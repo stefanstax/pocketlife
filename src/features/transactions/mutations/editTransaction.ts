@@ -1,10 +1,12 @@
 import type { Transaction } from "../transactionTypes";
 
-export const addTransaction = async (
+export const editTransaction = async (
   data: Transaction
 ): Promise<Transaction> => {
-  const res = await fetch("http://localhost:3000/transactions", {
-    method: "POST",
+  console.log(data);
+
+  const res = await fetch(`http://localhost:3000/transactions/${data.id}`, {
+    method: "PUT",
     headers: {
       "Content-Type": "application/json",
     },
@@ -20,7 +22,7 @@ export const addTransaction = async (
   }
 
   if (!res.ok) {
-    throw new Error("Failed to add new transaction");
+    throw new Error("Failed to update transaction");
   }
 
   return result;
