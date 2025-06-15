@@ -10,8 +10,9 @@ import GuestRoute from "./features/auth/GuestRoute";
 import TransactionList from "./features/transactions/TransactionList";
 import AddTransaction from "./features/transactions/AddTransaction";
 import EditTransaction from "./features/transactions/EditTransaction";
-import Currencies from "./features/currency/CurrencyAdd";
 import CurrenciesAdd from "./features/currency/CurrencyAdd";
+import CurrencyList from "./features/currency/CurrencyList";
+import CurrencyEdit from "./features/currency/CurrencyEdit";
 
 const queryClient = new QueryClient();
 
@@ -23,16 +24,19 @@ const App = () => {
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
             <Route element={<ProtectedRoute />}>
-              {/* Logged in Accessible Routes */}
+              {/* Protected Routes */}
               <Route path="transactions">
                 <Route index element={<TransactionList />} />
                 <Route path="add" element={<AddTransaction />} />
                 <Route path=":id" element={<EditTransaction />} />
               </Route>
               <Route path="currencies">
-                <Route index element={<CurrenciesAdd />} />
+                <Route index element={<CurrencyList />} />
+                <Route path="add" element={<CurrenciesAdd />} />
+                <Route path=":id" element={<CurrencyEdit />} />
               </Route>
             </Route>
+            {/* Guest Routes */}
             <Route element={<GuestRoute />}>
               <Route path="authentication">
                 <Route index element={<Authentication />} />

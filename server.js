@@ -58,11 +58,42 @@ app.get("/currencies", async (req, res) => {
   }
 });
 
+app.get(`/currencies/:id`, async (req, res) => {
+  const id = Number(req.params.id);
+  try {
+    const currencies = readCurrencies();
+    const currency = currencies.find((currency) => currency.id === id);
+    res.json(currency);
+  } catch {
+    res.status(500).json({ error: "Failed to read database" });
+  }
+});
+
 app.post("/currencies", async (req, res) => {
   const currencies = readCurrencies();
   currencies.push(req.body);
   writeCurrencies(currencies);
   res.status(201).json({ message: "Currency successfully created!" });
+});
+
+app.put("/currencies/:id", (req, res) => {
+  const { id } = req.params;
+  const updatedBody = req.body;
+
+  const currencies = readCurrencies();
+  const index = currencies.findIndex((k) => k.id === Number(id));
+
+  if (index === -1) {
+    return res.status(404).json({ error: "Currency not found" });
+  }
+
+  currencies[index] = {
+    ...currencies[index],
+    ...updatedBody,
+  };
+
+  writeCurrencies(currencies);
+  res.json(currencies[index]);
 });
 
 // Users
@@ -139,15 +170,30 @@ app.get("/transactions", async (req, res) => {
   }
 });
 
-app.get(`/transactions/:id`, async (req, res) => {
+app.get("/transactions/:id", async (req, res) => {
   const id = Number(req.params.id);
+
   try {
     const transactions = readTransactions();
     const transaction = transactions.find(
       (transaction) => transaction.id === id
     );
-    res.json(transaction);
-  } catch {
+
+    if (!transaction) {
+      return res.status(404).json({ error: "Transaction not found" });
+    }
+
+    const currencies = readCurrencies();
+    const currency = currencies.find((c) => c.id === transaction.currencyId);
+
+    const transactionWithCurrency = {
+      ...transaction,
+      currency: currency || null,
+    };
+
+    res.json(transactionWithCurrency);
+  } catch (error) {
+    console.error("Error fetching transaction:", error);
     res.status(500).json({ error: "Failed to read database" });
   }
 });

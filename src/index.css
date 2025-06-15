@@ -14,6 +14,11 @@ h2 {
   font-weight: 800;
 }
 
+a,
+button {
+  cursor: pointer;
+}
+
 .button--submit {
   background-color: var(--color-yellow-400);
   color: var(--color-black);

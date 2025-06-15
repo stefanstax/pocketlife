@@ -1,27 +1,29 @@
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState, type FormEvent } from "react";
 import { transactionSchema } from "./transactionSchemas";
-import {
-  buttonSolid,
-  formDiv,
-  input,
-  labelClasses,
-} from "../../app/globalClasses";
+import { formDiv, input, labelClasses } from "../../app/globalClasses";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../app/store";
 import { useLocalApi } from "../../app/hooks";
-import { useParams } from "react-router";
+import { redirect, useParams } from "react-router";
 import { editTransaction } from "./mutations/editTransaction";
-import { transactionType } from "./transactionTypes";
-import { type Currency, type CurrencyState } from "../currency/currencyTypes";
+import { type CurrencyState } from "../currency/currencyTypes";
+import {
+  type TransactionContext,
+  transactionTypes,
+  type TransactionType,
+  transactionContexts,
+} from "./transactionTypes";
+import SubmitButton from "../../components/SubmitButton";
 
 const EditTransaction = () => {
   const [title, setTitle] = useState<string>("");
   const [amount, setAmount] = useState<string>("");
-  const [currency, setCurrency] = useState<CurrencyState>("EUR");
+  const [currencyId, setCurrencyId] = useState<number | "">("");
   const [note, setNote] = useState<string>("");
-  const [type, setType] = useState<"INCOME" | "EXPENSE" | "SAVINGS">("EXPENSE");
-  const [currencies, setCurrencies] = useState<Currency[]>([]);
+  const [type, setType] = useState<TransactionType | "">("");
+  const [context, setContext] = useState<TransactionContext | "">("");
+  const [currencies, setCurrencies] = useState<CurrencyState[]>([]);
 
   const { user } = useSelector((state: RootState) => state.auth);
 
@@ -36,13 +38,18 @@ const EditTransaction = () => {
   } = useLocalApi("transactions", numericId);
   const { data: countryCurrencies } = useLocalApi("currencies");
 
+  const findCurrencyId = countryCurrencies?.find(
+    (currency: CurrencyState) => currency.id === transactions?.currencyId
+  );
+
   useEffect(() => {
     if (transactions) {
       setTitle(transactions?.title);
       setAmount(transactions?.amount);
-      setCurrency(transactions?.currency);
+      setCurrencyId(Number(findCurrencyId.id));
       setType(transactions?.type);
       setNote(transactions?.note);
+      setContext(transactions?.context);
     }
   }, [transactions]);
 
@@ -53,19 +60,12 @@ const EditTransaction = () => {
   const mutation = useMutation({
     mutationFn: editTransaction,
     onSuccess: () => {
-      setTitle("");
-      setAmount("");
-      setCurrency("EUR");
-      setNote("");
-      setType("INCOME");
+      redirect("/transactions/");
     },
     onError: (error) => {
       console.error("Submission error:", error);
     },
   });
-
-  const currencyActiveClass = (value: CurrencyState) =>
-    currency === value ? "bg-[#5152fb]" : "";
 
   const typeActiveClass = (value: "EXPENSE" | "INCOME" | "SAVINGS") =>
     type === value ? "bg-[#5152fb]" : "";
@@ -80,9 +80,10 @@ const EditTransaction = () => {
       date: new Date().toLocaleDateString(),
       title: formData.get("title"),
       amount: formData.get("amount"),
-      currency: formData.get("currency"),
+      currencyId: Number(formData.get("currency")),
       note: formData.get("note"),
       type: formData.get("type"),
+      context: formData.get("context"),
     });
 
     if (!result.success) {
@@ -90,10 +91,7 @@ const EditTransaction = () => {
       return;
     }
 
-    mutation.mutate({
-      ...result.data,
-      currency: result.data.currency as CurrencyState,
-    });
+    mutation.mutate(result.data);
   };
 
   if (isLoading || isPending) return <h1>We're loading your transaction...</h1>;
@@ -133,15 +131,15 @@ const EditTransaction = () => {
           Transaction Type
         </label>
         <div className="flex-wrap w-full flex gap-2 border-1 px-4 py-2 border-t-0 border-white rounded-b-lg">
-          {transactionType.map((type) => {
+          {transactionTypes.map((type) => {
             return (
               <button
-                key={Math.random()}
-                className={`w-fit grow-0 rounded-lg cursor-pointer p-2 border-white flex-1 text-white border-dotted border-2  flex-1 ${typeActiveClass(
-                  type.name
-                )}`}
+                key={type.name}
                 type="button"
-                onClick={() => setType(type.name)}
+                className={`w-fit grow-0 rounded-lg cursor-pointer p-2 border-white flex-1 text-white border-dotted border-2  flex-1 ${typeActiveClass(
+                  type.name as TransactionType
+                )}`}
+                onClick={() => setType(type.name as TransactionType)}
               >
                 {type.name}
               </button>
@@ -157,16 +155,16 @@ const EditTransaction = () => {
         </label>
         <div className="flex-wrap w-full flex gap-2 border-1 px-4 py-2 border-t-0 border-white rounded-b-lg">
           {currencies?.map((currency) => {
-            const { code } = currency;
+            const { id, code } = currency;
 
             return (
               <button
-                key={Math.random()}
-                className={`w-fit grow-0 rounded-lg cursor-pointer p-2 border-white flex-1 text-white border-dotted border-2  flex-1 ${currencyActiveClass(
-                  code
-                )}`}
+                key={id}
                 type="button"
-                onClick={() => setCurrency(code)}
+                className={`${
+                  currencyId === id ? "bg-[#5152fb]" : ""
+                } w-fit grow-0 rounded-lg cursor-pointer p-2 border-white flex-1 text-white border-dotted border-2  flex-1`}
+                onClick={() => setCurrencyId(Number(id))}
               >
                 {code}
               </button>
@@ -177,8 +175,31 @@ const EditTransaction = () => {
           className={input}
           type="hidden"
           name="currency"
-          value={currency}
+          value={currencyId}
         />
+      </div>
+      {/* Business or Personal Toggle */}
+      <div className={formDiv}>
+        <label className={labelClasses} htmlFor="variant">
+          Transaction Context
+        </label>
+        <div className={`${input} flex gap-2 text-xs`}>
+          {transactionContexts.map((option) => {
+            return (
+              <button
+                key={option.name}
+                type="button"
+                className={`border-2 border-dotted border-white px-4 rounded-lg py-2 ${
+                  option.name === context ? "bg-[#5152fb]" : ""
+                }`}
+                onClick={() => setContext(option.name as TransactionContext)}
+              >
+                {option.name}
+              </button>
+            );
+          })}
+          <input type="hidden" value={context} name="context" />
+        </div>
       </div>
       <div className={formDiv}>
         <label htmlFor="note" className={labelClasses}>
@@ -195,9 +216,7 @@ const EditTransaction = () => {
       </div>
       <input type="hidden" value={type} name="type" />
 
-      <button type="submit" className={buttonSolid}>
-        Update transaction
-      </button>
+      <SubmitButton aria="Update transaction" label="Update Transaction" />
     </form>
   );
 };

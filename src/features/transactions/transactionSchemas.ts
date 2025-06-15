@@ -9,4 +9,5 @@ export const transactionSchema = z.object({
   note: z.string(),
   date: z.string(),
   type: z.enum(["INCOME", "EXPENSE", "SAVINGS"]),
+  context: z.enum(["PERSONAL", "BUSINESS"]),
 });

@@ -1,28 +1,45 @@
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { formDiv, input, labelClasses } from "../../app/globalClasses";
 import { currenciesSchema } from "./currenciesSchema";
 import { useMutation } from "@tanstack/react-query";
-import { addCurrency } from "./mutations/addCurrency";
 import type { CurrencyState } from "./currencyTypes";
+import { useLocalApi } from "../../app/hooks";
+import { useParams } from "react-router";
+import { editCurrency } from "./mutations/editCurrency";
 import SubmitButton from "../../components/SubmitButton";
-import { useSelector } from "react-redux";
-import type { RootState } from "../../app/store";
 
-const CurrenciesAdd = () => {
-  const { user } = useSelector((state: RootState) => state.auth);
+const CurrencyEdit = () => {
   const [formData, setFormData] = useState<CurrencyState>({
     code: "",
     name: "",
     symbol: "",
   });
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
+  const { id } = useParams();
+
+  const {
+    data: currencies,
+    isLoading,
+    isPending,
+  } = useLocalApi("currencies", Number(id));
+
+  useEffect(() => {
+    if (currencies) {
+      setFormData({
+        code: currencies?.code,
+        name: currencies?.name,
+        symbol: currencies?.symbol,
+      });
+    }
+  }, [currencies]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const mutation = useMutation({
-    mutationFn: addCurrency,
+    mutationFn: editCurrency,
     onSuccess: () => {
       setFormData({
         code: "",
@@ -41,11 +58,10 @@ const CurrenciesAdd = () => {
     const formData = new FormData(event.currentTarget);
 
     const verifyData = currenciesSchema.safeParse({
-      id: Math.floor(Math.random() * 10000),
+      id: Number(id),
       code: formData.get("code"),
       name: formData.get("name"),
       symbol: formData.get("symbol"),
-      userId: user?.id,
     });
 
     if (!verifyData.success) {
@@ -60,6 +76,8 @@ const CurrenciesAdd = () => {
     }
   };
 
+  if (isLoading || isPending) return <h1>Loading Currency...</h1>;
+
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <div className={formDiv}>
@@ -71,7 +89,7 @@ const CurrenciesAdd = () => {
           type="text"
           name="code"
           placeholder="Currency code"
-          value={formData.code}
+          value={formData.code ?? ""}
           onChange={handleChange}
         />
       </div>
@@ -84,7 +102,7 @@ const CurrenciesAdd = () => {
           type="text"
           name="name"
           placeholder="Currency name"
-          value={formData.name}
+          value={formData.name ?? ""}
           onChange={handleChange}
         />
       </div>
@@ -97,13 +115,13 @@ const CurrenciesAdd = () => {
           type="text"
           name="symbol"
           placeholder="Currency symbol"
-          value={formData.symbol}
+          value={formData.symbol ?? ""}
           onChange={handleChange}
         />
       </div>
-      <SubmitButton aria="Create currency" label="Create currency" />
+      <SubmitButton aria="Update Currency" label="Update Currency" />
     </form>
   );
 };
 
-export default CurrenciesAdd;
+export default CurrencyEdit;

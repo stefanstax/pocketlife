@@ -1,6 +1,6 @@
-import type { Currency } from "../currencyTypes";
+import type { CurrencyState } from "../currencyTypes";
 
-export const currency = async (data: Currency) => {
+export const addCurrency = async (data: CurrencyState) => {
   const res = await fetch("http://localhost:3000/currencies", {
     method: "POST",
     headers: {

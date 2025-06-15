@@ -18,7 +18,6 @@ const TransactionList = () => {
   const filteredTransactions = data.filter(
     (transaction: Transaction) => transaction.userId === user?.id
   );
-
   return (
     <section className="bg-[#1b1918] text-white rounded-lg p-4">
       <div className="flex gap-4 flex-wrap items-stretch justify-start">
@@ -36,39 +35,58 @@ const TransactionList = () => {
         )}
         {filteredTransactions.map(
           (transaction: Transaction & { currency: CurrencyState }) => {
-            const { id, title, type, currency, amount, note, date } =
+            const { id, title, type, currency, amount, note, date, context } =
               transaction;
             return (
               <div
                 key={id}
-                className="flex w-[200px] justify-start items-start flex-col gap-2 border-2 border-dotted rounded-lg px-4 py-2"
+                className={`${
+                  context === "BUSINESS" ? "bg-black" : "bg-transparent"
+                } flex min-w-[200px] max-w-fit flex-1 flex-col gap-2 border-2 border-solid rounded-lg`}
               >
-                <p
-                  className={`${
-                    type === "EXPENSE"
-                      ? "bg-red-500"
-                      : type === "INCOME"
-                      ? "bg-green-500"
-                      : type === "SAVINGS"
-                      ? "bg-blue-500"
-                      : ""
-                  } w-full text-xs text-center text-white rounded-lg py-1`}
-                >
-                  {date}
+                <p className="w-full bg-white font-bold text-xs text-black text-center">
+                  {context ?? "PERSONAL"}
                 </p>
-                <p className="font-black">{title}</p>
-                <p>
-                  {currency?.symbol}
-                  {amount}
-                </p>
-                <span className="text-xs">Aprox in Eur: {amount * 1.19}</span>
-                <p className="text-sm">{note}</p>
-                <Link
-                  className={buttonSecondary}
-                  to={`http://localhost:5173/transactions/${id}`}
-                >
-                  🖊️
-                </Link>
+                <div className="flex flex-col flex-1 flex-wrap items-stretch justify-between gap-4 px-4 py-2">
+                  {/* Date */}
+                  <p className="text-xs">{date}</p>
+                  {/* Title */}
+                  <p className="font-black flex items-center gap-2">
+                    <span
+                      className={`w-[10px] h-[10px] rounded-full ${
+                        type === "EXPENSE"
+                          ? "bg-red-500"
+                          : type === "INCOME"
+                          ? "bg-green-500"
+                          : type === "SAVINGS"
+                          ? "bg-blue-500"
+                          : ""
+                      }`}
+                    ></span>
+                    {title}
+                  </p>
+                  {/* Currency & Amount */}
+                  <p>
+                    {currency?.symbol}
+                    {amount}
+                  </p>
+                  {/* Note */}
+                  <p className="text-sm">{note.trim() ? note : "No note"}</p>
+                  {/* Edit Button */}
+                  <Link
+                    className={buttonSecondary}
+                    to={`http://localhost:5173/transactions/${id}`}
+                  >
+                    Edit
+                  </Link>
+                  {/* Reserve special errors for business transactions which are missing key details for accurate business expense */}
+                  {/* {context === "BUSINESS" && (
+                    <>
+                      <p className="text-red-600">* Receipt required</p>
+                      <p className="text-red-600">* Category required</p>
+                    </>
+                  )} */}
+                </div>
               </div>
             );
           }

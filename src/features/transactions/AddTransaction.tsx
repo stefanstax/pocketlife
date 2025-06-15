@@ -2,25 +2,27 @@ import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState, type FormEvent } from "react";
 import { addTransaction } from "./mutations/addTransaction";
 import { transactionSchema } from "./transactionSchemas";
-import {
-  buttonSolid,
-  formDiv,
-  input,
-  labelClasses,
-} from "../../app/globalClasses";
+import { formDiv, input, labelClasses } from "../../app/globalClasses";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../app/store";
 import { useLocalApi } from "../../app/hooks";
-import { transactionType } from "./transactionTypes";
+import {
+  transactionContexts,
+  transactionTypes,
+  type TransactionContext,
+  type TransactionType,
+} from "./transactionTypes";
 import type { CurrencyState } from "../currency/currencyTypes";
+import SubmitButton from "../../components/SubmitButton";
 
 const AddTransaction = () => {
   const { user } = useSelector((state: RootState) => state.auth);
   const [title, setTitle] = useState<string>("");
   const [amount, setAmount] = useState<string>("");
+  const [context, setContext] = useState<TransactionContext | "">("");
   const [currencyId, setCurrencyId] = useState<number | "">("");
   const [note, setNote] = useState<string>("");
-  const [type, setType] = useState<"INCOME" | "EXPENSE" | "SAVINGS">("INCOME");
+  const [type, setType] = useState<TransactionType | "">("");
   const [currencies, setCurrencies] = useState<CurrencyState[]>([]);
 
   const mutation = useMutation({
@@ -30,15 +32,13 @@ const AddTransaction = () => {
       setAmount("");
       setCurrencyId("");
       setNote("");
-      setType("INCOME");
+      setType("");
+      setContext("");
     },
     onError: (error) => {
       console.error("Submission error:", error);
     },
   });
-
-  const typeActiveClass = (value: "EXPENSE" | "INCOME" | "SAVINGS") =>
-    type === value ? "bg-[#5152fb]" : "";
 
   const { data } = useLocalApi("currencies");
 
@@ -60,8 +60,12 @@ const AddTransaction = () => {
       note: formData.get("note"),
       date: new Date().toLocaleDateString(),
       type: formData.get("type"),
+      context: formData.get("context"),
       userId: user?.id,
     });
+
+    const tipio = formData.get("context");
+    console.log(tipio);
 
     if (!result.success) {
       console.log("Validation error:", result.error.flatten());
@@ -111,17 +115,17 @@ const AddTransaction = () => {
           Transaction Type
         </label>
         <div className="flex-wrap w-full flex gap-2 border-1 px-4 py-2 border-t-0 border-white rounded-b-lg">
-          {transactionType.map((type) => {
+          {transactionTypes.map((option) => {
             return (
               <button
-                key={Math.random()}
-                className={`w-fit grow-0 rounded-lg cursor-pointer p-2 border-white flex-1 text-white border-dotted border-2  flex-1 ${typeActiveClass(
-                  type.name
-                )}`}
+                key={option.name}
+                className={`${
+                  option.name === type ? "bg-[#5152fb]" : ""
+                } w-fit grow-0 text-xs rounded-lg cursor-pointer p-2 border-white flex-1 text-white border-dotted border-2  flex-1`}
                 type="button"
-                onClick={() => setType(type.name)}
+                onClick={() => setType(option.name as TransactionType)}
               >
-                {type.name}
+                {option.name}
               </button>
             );
           })}
@@ -135,15 +139,13 @@ const AddTransaction = () => {
         </label>
         <div className="flex-wrap w-full flex gap-2 border-1 px-4 py-2 border-t-0 border-white rounded-b-lg">
           {currencies.map((curr) => {
-            console.log(curr);
-
             return (
               <button
                 key={curr.code}
+                type="button"
                 className={`${
                   currencyId === curr.id ? "bg-[#5152fb]" : ""
-                } w-fit grow-0 rounded-lg cursor-pointer p-2 border-white flex-1 text-white border-dotted border-2  flex-1`}
-                type="button"
+                } w-fit text-xs grow-0 rounded-lg cursor-pointer p-2 border-white flex-1 text-white border-dotted border-2 flex-1`}
                 onClick={() => setCurrencyId(Number(curr.id))}
               >
                 {curr.code}
@@ -157,6 +159,29 @@ const AddTransaction = () => {
           name="currencyId"
           value={currencyId ?? ""}
         />
+      </div>
+      {/* Business or Personal Toggle */}
+      <div className={formDiv}>
+        <label className={labelClasses} htmlFor="variant">
+          Transaction Context
+        </label>
+        <div className={`${input} flex gap-2 text-xs`}>
+          {transactionContexts.map((option) => {
+            return (
+              <button
+                key={option.name}
+                type="button"
+                className={`border-2 border-dotted border-white px-4 rounded-lg py-2 ${
+                  option.name === context ? "bg-[#5152fb]" : ""
+                }`}
+                onClick={() => setContext(option.name as TransactionContext)}
+              >
+                {option.name}
+              </button>
+            );
+          })}
+          <input type="hidden" value={context} name="context" />
+        </div>
       </div>
       {/* Note */}
       <div className={formDiv}>
@@ -173,9 +198,7 @@ const AddTransaction = () => {
         />
       </div>
       <input type="hidden" value={type} name="type" />
-      <button type="submit" className={buttonSolid}>
-        Add transaction
-      </button>
+      <SubmitButton aria="Create transaction" label="Create Transaction" />
     </form>
   );
 };

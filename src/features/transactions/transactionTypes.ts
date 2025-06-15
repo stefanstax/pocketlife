@@ -6,11 +6,17 @@ export interface Transaction {
   currencyId: number;
   title: string;
   note: string;
-  type: "INCOME" | "EXPENSE" | "SAVINGS";
+  type: TransactionType;
+  context: TransactionContext;
 }
 
-export const transactionType: { name: "INCOME" | "EXPENSE" | "SAVINGS" }[] = [
+export type TransactionType = "INCOME" | "EXPENSE" | "SAVINGS";
+export type TransactionContext = "PERSONAL" | "BUSINESS";
+
+export const transactionTypes = [
   { name: "EXPENSE" },
   { name: "INCOME" },
   { name: "SAVINGS" },
 ];
+
+export const transactionContexts = [{ name: "BUSINESS" }, { name: "PERSONAL" }];

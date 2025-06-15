@@ -1,14 +1,67 @@
 {
   "transactions": [
     {
-      "id": 5,
-      "title": "dwddawd",
-      "amount": 20,
+      "id": 24,
+      "title": "HeroesArk savings",
+      "amount": 900,
       "userId": 977,
       "currencyId": 3968,
-      "note": "djawdja",
-      "date": "09/06/2025",
+      "note": "HeroesArk invoice remaining balance",
+      "date": "15/06/2025",
+      "type": "SAVINGS"
+    },
+    {
+      "id": 53,
+      "title": "random",
+      "amount": 100,
+      "userId": 977,
+      "currencyId": 3968,
+      "note": "",
+      "date": "15/06/2025",
       "type": "EXPENSE"
+    },
+    {
+      "id": 85,
+      "title": "Fuel",
+      "amount": 972.45,
+      "userId": 977,
+      "currencyId": 2471,
+      "note": "company car fuel",
+      "date": "15/06/2025",
+      "type": "EXPENSE",
+      "context": "PERSONAL"
+    },
+    {
+      "id": 76,
+      "title": "Invoice",
+      "amount": 78,
+      "userId": 977,
+      "currencyId": 8222,
+      "note": "Business - Griffith Accountants #0003",
+      "date": "15/06/2025",
+      "type": "INCOME"
+    },
+    {
+      "id": 40,
+      "title": "Voda za trening x2",
+      "amount": 200,
+      "userId": 977,
+      "currencyId": 2471,
+      "note": "",
+      "date": "15/06/2025",
+      "type": "EXPENSE",
+      "context": "BUSINESS"
+    },
+    {
+      "id": 99,
+      "title": "Sladoled + parking",
+      "amount": 263.33,
+      "userId": 977,
+      "currencyId": 2471,
+      "note": "",
+      "date": "15/06/2025",
+      "type": "EXPENSE",
+      "context": "PERSONAL"
     }
   ],
   "users": [
@@ -16,8 +69,7 @@
       "id": 977,
       "username": "stefanstax",
       "email": "stefanstax@gmail.com",
-      "password": "$2b$10$zGzXu37m1VBAc0d5aGOUte0VCB4WT1Ipba60yw0fvDhgB7huie6Ga",
-      "defaultCurrency": "EUR"
+      "password": "$2b$10$zGzXu37m1VBAc0d5aGOUte0VCB4WT1Ipba60yw0fvDhgB7huie6Ga"
     },
     {
       "id": 284,
@@ -44,6 +96,18 @@
       "code": "GBP",
       "name": "UK Pound",
       "symbol": "£"
+    },
+    {
+      "id": 2471,
+      "code": "RSD",
+      "name": "Serbian Dinar",
+      "symbol": "rsd"
+    },
+    {
+      "id": 6532,
+      "code": "EUR",
+      "name": "EUR",
+      "symbol": "€"
     }
   ]
 }

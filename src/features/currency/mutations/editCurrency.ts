@@ -1,9 +1,9 @@
-import type { Transaction } from "../transactionTypes";
+import type { CurrencyState } from "../currencyTypes";
 
-export const editTransaction = async (
-  data: Transaction
-): Promise<Transaction> => {
-  const res = await fetch(`http://localhost:3000/transactions/${data.id}`, {
+export const editCurrency = async (
+  data: CurrencyState
+): Promise<CurrencyState> => {
+  const res = await fetch(`http://localhost:3000/currencies/${data.id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",

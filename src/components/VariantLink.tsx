@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 import { buttonSecondary, buttonSolid } from "../app/globalClasses";
 
+// Revise at one point
 const VariantLink = ({
   aria,
   type,
