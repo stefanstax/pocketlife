@@ -102,7 +102,18 @@ app.get("/users", async (req, res) => {
     const users = readUsers();
     res.json(users); // assuming your JSON has a "users" array
   } catch (err) {
-    res.status(500).json({ error: "Failed to read database" });
+    res.status(500).json({ error: "Failed to acquire users" });
+  }
+});
+
+app.get("/users/:id", async (req, res) => {
+  const id = Number(req.params.id);
+  try {
+    const users = readUsers();
+    const userFound = users.find((user) => user.id === id);
+    res.json(userFound);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to acquire user" });
   }
 });
 
@@ -127,6 +138,25 @@ app.post("/users", async (req, res) => {
 
   writeUsers(users);
   res.status(201).json({ message: "User created" });
+});
+
+app.put("/users/:id", async (req, res) => {
+  const { currencies, userId } = req.body;
+
+  const users = readUsers();
+  const userPosition = users.findIndex((u) => u.id === userId);
+
+  const existingUser = users[userPosition];
+
+  users[userPosition] = {
+    ...users[userPosition],
+    currencies,
+  };
+
+  writeUsers(users);
+  res.json(200).json({
+    message: "You have successfully updated your favorite currencies.",
+  });
 });
 
 app.post("/login", async (req, res) => {

@@ -4,3 +4,8 @@ export interface CurrencyState {
   name: string;
   symbol: string;
 }
+
+export interface FavoriteCurrenciesState {
+  currencies: number[];
+  userId: number;
+}
