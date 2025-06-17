@@ -216,9 +216,23 @@ app.get("/transactions/:id", async (req, res) => {
     const currencies = readCurrencies();
     const currency = currencies.find((c) => c.id === transaction.currencyId);
 
+    const users = readUsers();
+    const findTransactionUser = users.find(
+      (user) => user.id === transaction.userId
+    );
+
+    let addonCurrencies = [];
+
+    currencies.forEach((element) => {
+      if (findTransactionUser.currencies.includes(element.id)) {
+        addonCurrencies.push(element);
+      }
+    });
+
     const transactionWithCurrency = {
       ...transaction,
-      currency: currency || null,
+      transactionCurrency: currency || null,
+      availableCurrencies: addonCurrencies,
     };
 
     res.json(transactionWithCurrency);

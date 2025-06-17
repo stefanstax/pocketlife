@@ -11,7 +11,7 @@ const Navigation = () => {
       <p className="text-2xl text-[#f9f4da] font-black">Transactions App</p>
       <div className="flex gap-5 text-[#5152fb]">
         <Link to="/transactions/">Transactions</Link>
-        <Link to="/currencies/">Currencies</Link>
+        <Link to="/select-currencies/">Toggle Currencies</Link>
         <Link to="/links/">Links</Link>
       </div>
       <div className="flex gap-5 items-center justify between">

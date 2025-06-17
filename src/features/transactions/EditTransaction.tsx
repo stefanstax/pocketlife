@@ -2,8 +2,6 @@ import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState, type FormEvent } from "react";
 import { transactionSchema } from "./transactionSchemas";
 import { formDiv, input, labelClasses } from "../../app/globalClasses";
-import { useSelector } from "react-redux";
-import type { RootState } from "../../app/store";
 import { useLocalApi } from "../../app/hooks";
 import { redirect, useParams } from "react-router";
 import { editTransaction } from "./mutations/editTransaction";
@@ -15,6 +13,7 @@ import {
   transactionContexts,
 } from "./transactionTypes";
 import SubmitButton from "../../components/SubmitButton";
+import VariantLink from "../../components/VariantLink";
 
 const EditTransaction = () => {
   const [title, setTitle] = useState<string>("");
@@ -23,39 +22,38 @@ const EditTransaction = () => {
   const [note, setNote] = useState<string>("");
   const [type, setType] = useState<TransactionType | "">("");
   const [context, setContext] = useState<TransactionContext | "">("");
-  const [currencies, setCurrencies] = useState<CurrencyState[]>([]);
-
-  const { user } = useSelector((state: RootState) => state.auth);
-
+  const [formErrors, setFormErrors] = useState<Partial<Record<string, string>>>(
+    {}
+  );
   //   Grab ID from url
   const { id } = useParams();
   const numericId = id ? Number(id) : undefined;
 
   const {
-    data: transactions,
+    data: transactionData,
     isLoading,
     isPending,
   } = useLocalApi("transactions", numericId);
-  const { data: countryCurrencies } = useLocalApi("currencies");
 
-  const findCurrencyId = countryCurrencies?.find(
-    (currency: CurrencyState) => currency.id === transactions?.currencyId
+  const currenciesMatch = transactionData?.availableCurrencies?.some(
+    (currency: CurrencyState) =>
+      currency.id === transactionData.transactionCurrency.id
   );
 
   useEffect(() => {
-    if (transactions) {
-      setTitle(transactions?.title);
-      setAmount(transactions?.amount);
-      setCurrencyId(Number(findCurrencyId.id));
-      setType(transactions?.type);
-      setNote(transactions?.note);
-      setContext(transactions?.context);
+    if (transactionData) {
+      setTitle(transactionData?.title);
+      setAmount(transactionData?.amount);
+      if (currenciesMatch) {
+        setCurrencyId(transactionData?.transactionCurrency.id);
+      } else {
+        setCurrencyId("");
+      }
+      setType(transactionData?.type);
+      setNote(transactionData?.note);
+      setContext(transactionData?.context);
     }
-  }, [transactions]);
-
-  useEffect(() => {
-    setCurrencies(countryCurrencies);
-  }, [countryCurrencies]);
+  }, [transactionData]);
 
   const mutation = useMutation({
     mutationFn: editTransaction,
@@ -67,7 +65,7 @@ const EditTransaction = () => {
     },
   });
 
-  const typeActiveClass = (value: "EXPENSE" | "INCOME" | "SAVINGS") =>
+  const typeActiveClass = (value: TransactionType) =>
     type === value ? "bg-[#5152fb]" : "";
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -75,18 +73,28 @@ const EditTransaction = () => {
     const formData = new FormData(event.currentTarget);
 
     const result = transactionSchema.safeParse({
-      id: transactions?.id,
-      userId: user?.id,
+      id: transactionData?.id,
+      userId: transactionData.userId,
       date: new Date().toLocaleDateString(),
       title: formData.get("title"),
       amount: formData.get("amount"),
-      currencyId: Number(formData.get("currency")),
+      currencyId: formData.get("currencyId"),
       note: formData.get("note"),
       type: formData.get("type"),
       context: formData.get("context"),
     });
 
     if (!result.success) {
+      const flattened = result.error.flatten();
+
+      const fieldErrors = Object.fromEntries(
+        Object.entries(flattened.fieldErrors).map(([key, val]) => [
+          key,
+          val?.[0],
+        ])
+      );
+
+      setFormErrors(fieldErrors);
       console.log("Validation error:", result.error.flatten());
       return;
     }
@@ -98,6 +106,24 @@ const EditTransaction = () => {
 
   return (
     <form onSubmit={handleSubmit} className="w-full flex flex-col gap-4">
+      {!transactionData?.availableCurrencies?.some(
+        (currency: CurrencyState) =>
+          currency.id === transactionData.transactionCurrency.id
+      ) && (
+        <>
+          <p className="text-red-400">
+            *Your transaction currency (
+            {transactionData.transactionCurrency.code}) is not among your
+            available currencies
+          </p>
+          <VariantLink
+            aria="Go to Currency modification page"
+            variant="PRIMARY"
+            link="/select-currencies/"
+            label="Modify available currencies"
+          />
+        </>
+      )}
       <div className={formDiv}>
         <label htmlFor="title" className={labelClasses}>
           Title
@@ -136,7 +162,7 @@ const EditTransaction = () => {
               <button
                 key={type.name}
                 type="button"
-                className={`w-fit grow-0 rounded-lg cursor-pointer p-2 border-white flex-1 text-white border-dotted border-2  flex-1 ${typeActiveClass(
+                className={`w-fit text-xs grow-0 rounded-lg cursor-pointer p-2 border-white flex-1 text-white border-dotted border-2  flex-1 ${typeActiveClass(
                   type.name as TransactionType
                 )}`}
                 onClick={() => setType(type.name as TransactionType)}
@@ -153,28 +179,34 @@ const EditTransaction = () => {
         <label className={labelClasses} htmlFor="currency">
           Select Currency
         </label>
-        <div className="flex-wrap w-full flex gap-2 border-1 px-4 py-2 border-t-0 border-white rounded-b-lg">
-          {currencies?.map((currency) => {
-            const { id, code } = currency;
 
-            return (
-              <button
-                key={id}
-                type="button"
-                className={`${
-                  currencyId === id ? "bg-[#5152fb]" : ""
-                } w-fit grow-0 rounded-lg cursor-pointer p-2 border-white flex-1 text-white border-dotted border-2  flex-1`}
-                onClick={() => setCurrencyId(Number(id))}
-              >
-                {code}
-              </button>
-            );
-          })}
+        <div className="flex-wrap w-full flex gap-2 border-1 px-4 py-2 border-t-0 border-white rounded-b-lg">
+          {transactionData.availableCurrencies?.map(
+            (currency: CurrencyState) => {
+              const { id, code } = currency;
+
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  className={`${
+                    currencyId === id ? "bg-[#5152fb]" : ""
+                  } w-fit grow-0 text-xs rounded-lg cursor-pointer p-2 border-white flex-1 text-white border-dotted border-2  flex-1`}
+                  onClick={() => setCurrencyId(Number(id))}
+                >
+                  {code}
+                </button>
+              );
+            }
+          )}
         </div>
+        {formErrors.currencyId && (
+          <p className="my-2 text-red-400">{formErrors.currencyId}</p>
+        )}
         <input
           className={input}
           type="hidden"
-          name="currency"
+          name="currencyId"
           value={currencyId}
         />
       </div>

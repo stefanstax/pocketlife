@@ -8,7 +8,7 @@
 - [] Add ability to open mobile camera to capture a receipt
 - [] Add ability to delete transaction / for business with each delete also remove images which were previously uploaded to the cloud \*somewhere
 - Add validation errors for each form
-- [] Add ability to pick favorite currencies as a user / Select DONE - Fetching options thrhgout the app remaining
+- [X] Add ability to pick favorite currencies as a user / Select DONE - Fetching options thrhgout the app remaining
 
 / Maybe(s)
 

@@ -15,10 +15,11 @@
       "title": "random",
       "amount": 100,
       "userId": 977,
-      "currencyId": 3968,
+      "currencyId": 8222,
       "note": "",
-      "date": "15/06/2025",
-      "type": "EXPENSE"
+      "date": "17/06/2025",
+      "type": "EXPENSE",
+      "context": "PERSONAL"
     },
     {
       "id": 85,
@@ -36,10 +37,11 @@
       "title": "Invoice",
       "amount": 78,
       "userId": 977,
-      "currencyId": 8222,
+      "currencyId": 3968,
       "note": "Business - Griffith Accountants #0003",
-      "date": "15/06/2025",
-      "type": "INCOME"
+      "date": "17/06/2025",
+      "type": "INCOME",
+      "context": "BUSINESS"
     },
     {
       "id": 40,
@@ -71,6 +73,7 @@
       "email": "stefanstax@gmail.com",
       "password": "$2b$10$zGzXu37m1VBAc0d5aGOUte0VCB4WT1Ipba60yw0fvDhgB7huie6Ga",
       "currencies": [
+        2471,
         8222
       ]
     },
