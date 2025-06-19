@@ -9,11 +9,13 @@ import { useLocalApi } from "../../app/hooks";
 import {
   transactionContexts,
   transactionTypes,
+  type Receipt,
   type TransactionContext,
   type TransactionType,
 } from "./transactionTypes";
 import type { CurrencyState } from "../currency/currencyTypes";
 import SubmitButton from "../../components/SubmitButton";
+import UploadField from "../../components/UploadFile";
 
 const AddTransaction = () => {
   const { user } = useSelector((state: RootState) => state.auth);
@@ -24,6 +26,7 @@ const AddTransaction = () => {
   const [note, setNote] = useState<string>("");
   const [type, setType] = useState<TransactionType | "">("");
   const [currencies, setCurrencies] = useState<CurrencyState[]>([]);
+  const [receipt, setReceipt] = useState<Receipt | null>(null);
 
   const mutation = useMutation({
     mutationFn: addTransaction,
@@ -61,14 +64,13 @@ const AddTransaction = () => {
       date: new Date().toLocaleDateString(),
       type: formData.get("type"),
       context: formData.get("context"),
+      receipt: receipt,
       userId: user?.id,
     });
 
-    const tipio = formData.get("context");
-    console.log(tipio);
-
     if (!result.success) {
       console.log("Validation error:", result.error.flatten());
+
       return;
     }
 
@@ -198,6 +200,19 @@ const AddTransaction = () => {
         />
       </div>
       <input type="hidden" value={type} name="type" />
+      {context === "BUSINESS" && (
+        <>
+          <UploadField
+            receipt={receipt}
+            setReceipt={setReceipt}
+            username={user?.username as string}
+          />
+          <a className="text-white" href={receipt?.url}>
+            Open {receipt?.name}
+          </a>
+        </>
+      )}
+
       <SubmitButton aria="Create transaction" label="Create Transaction" />
     </form>
   );

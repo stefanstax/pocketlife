@@ -11,9 +11,13 @@ import {
   transactionTypes,
   type TransactionType,
   transactionContexts,
+  type Receipt,
 } from "./transactionTypes";
 import SubmitButton from "../../components/SubmitButton";
 import VariantLink from "../../components/VariantLink";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../app/store";
+import UploadField from "../../components/UploadFile";
 
 const EditTransaction = () => {
   const [title, setTitle] = useState<string>("");
@@ -22,12 +26,15 @@ const EditTransaction = () => {
   const [note, setNote] = useState<string>("");
   const [type, setType] = useState<TransactionType | "">("");
   const [context, setContext] = useState<TransactionContext | "">("");
+  const [receipt, setReceipt] = useState<Receipt | null>(null);
   const [formErrors, setFormErrors] = useState<Partial<Record<string, string>>>(
     {}
   );
   //   Grab ID from url
   const { id } = useParams();
   const numericId = id ? Number(id) : undefined;
+
+  const { user } = useSelector((state: RootState) => state.auth);
 
   const {
     data: transactionData,
@@ -49,6 +56,7 @@ const EditTransaction = () => {
       } else {
         setCurrencyId("");
       }
+      setReceipt(transactionData?.receipt);
       setType(transactionData?.type);
       setNote(transactionData?.note);
       setContext(transactionData?.context);
@@ -82,6 +90,7 @@ const EditTransaction = () => {
       note: formData.get("note"),
       type: formData.get("type"),
       context: formData.get("context"),
+      receipt: receipt,
     });
 
     if (!result.success) {
@@ -95,11 +104,12 @@ const EditTransaction = () => {
       );
 
       setFormErrors(fieldErrors);
-      console.log("Validation error:", result.error.flatten());
       return;
     }
 
-    mutation.mutate(result.data);
+    if (result.success) {
+      mutation.mutate(result.data);
+    }
   };
 
   if (isLoading || isPending) return <h1>We're loading your transaction...</h1>;
@@ -247,6 +257,31 @@ const EditTransaction = () => {
         />
       </div>
       <input type="hidden" value={type} name="type" />
+
+      {context !== null && (
+        <>
+          <UploadField
+            receipt={receipt}
+            setReceipt={setReceipt}
+            username={user?.username as string}
+            hasFile={
+              <a
+                target="_blank"
+                className={`border-2 border-dotted border-white px-4 rounded-lg py-2 text-xs ${
+                  receipt?.url && "bg-[#5152fb]"
+                }`}
+                href={receipt?.url}
+              >
+                View Receipt: {receipt?.name}
+              </a>
+            }
+          />
+
+          {formErrors.receipt && (
+            <p className="my-2 text-red-400">{formErrors.receipt}</p>
+          )}
+        </>
+      )}
 
       <SubmitButton aria="Update transaction" label="Update Transaction" />
     </form>

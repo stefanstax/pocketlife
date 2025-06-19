@@ -26,9 +26,9 @@
       "title": "Fuel",
       "amount": 972.45,
       "userId": 977,
-      "currencyId": 2471,
+      "currencyId": 8222,
       "note": "company car fuel",
-      "date": "15/06/2025",
+      "date": "19/06/2025",
       "type": "EXPENSE",
       "context": "PERSONAL"
     },
@@ -37,33 +37,59 @@
       "title": "Invoice",
       "amount": 78,
       "userId": 977,
-      "currencyId": 3968,
+      "currencyId": 8222,
       "note": "Business - Griffith Accountants #0003",
-      "date": "17/06/2025",
+      "date": "19/06/2025",
       "type": "INCOME",
-      "context": "BUSINESS"
+      "context": "BUSINESS",
+      "receipt": {
+        "id": "QAINug3zPE",
+        "name": "IMG_7363.JPG",
+        "url": "https://maypact-transactions.b-cdn.net/stefanstax/IMG_7363.JPG"
+      }
     },
     {
       "id": 40,
       "title": "Voda za trening x2",
       "amount": 200,
       "userId": 977,
-      "currencyId": 2471,
+      "currencyId": 8222,
       "note": "",
-      "date": "15/06/2025",
+      "date": "19/06/2025",
       "type": "EXPENSE",
-      "context": "BUSINESS"
+      "context": "BUSINESS",
+      "receipt": {
+        "id": "W0ZZV_6Qt1",
+        "name": "IMG_7363.JPG",
+        "url": "https://maypact-transactions.b-cdn.net/stefanstax/IMG_7363.JPG"
+      }
     },
     {
       "id": 99,
       "title": "Sladoled + parking",
       "amount": 263.33,
       "userId": 977,
-      "currencyId": 2471,
+      "currencyId": 8222,
       "note": "",
-      "date": "15/06/2025",
+      "date": "19/06/2025",
       "type": "EXPENSE",
       "context": "PERSONAL"
+    },
+    {
+      "id": 46,
+      "title": "dawdawdwad",
+      "amount": 23,
+      "userId": 977,
+      "currencyId": 9665,
+      "note": "dawdawdawd",
+      "date": "19/06/2025",
+      "type": "EXPENSE",
+      "context": "BUSINESS",
+      "receipt": {
+        "id": "qT_d19yhLs",
+        "name": "hostinger-elsia-domain.pdf",
+        "url": "https://maypact-transactions.b-cdn.net/stefanstax/hostinger-elsia-domain.pdf"
+      }
     }
   ],
   "users": [
@@ -73,7 +99,6 @@
       "email": "stefanstax@gmail.com",
       "password": "$2b$10$zGzXu37m1VBAc0d5aGOUte0VCB4WT1Ipba60yw0fvDhgB7huie6Ga",
       "currencies": [
-        2471,
         8222
       ]
     },

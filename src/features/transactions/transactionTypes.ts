@@ -20,3 +20,13 @@ export const transactionTypes = [
 ];
 
 export const transactionContexts = [{ name: "BUSINESS" }, { name: "PERSONAL" }];
+
+export interface Receipt {
+  id: string;
+  name: string;
+  url: string;
+}
+
+export interface File {
+  name: string;
+}

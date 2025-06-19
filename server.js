@@ -2,12 +2,16 @@ import express from "express";
 import bcrypt from "bcryptjs";
 import fs, { write } from "fs";
 import cors from "cors";
+import multer from "multer";
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 
 const DB_PATH = "./db.json";
+import dotenv from "dotenv";
+import axios from "axios";
+dotenv.config();
 
 const readUsers = () => {
   const data = fs.readFileSync(DB_PATH);
@@ -146,8 +150,6 @@ app.put("/users/:id", async (req, res) => {
   const users = readUsers();
   const userPosition = users.findIndex((u) => u.id === userId);
 
-  const existingUser = users[userPosition];
-
   users[userPosition] = {
     ...users[userPosition],
     currencies,
@@ -271,6 +273,53 @@ app.put("/transactions/:id", (req, res) => {
 
   writeTransactions(transactions);
   res.json(transactions[index]);
+});
+
+// Upload files to Bunny
+
+app.post("/upload", async (req, res) => {
+  console.log(req);
+
+  const file = req.file;
+  const userId = req.body.userId;
+  const id = req.body.id;
+
+  if (!file) {
+    console.log("❌ No file received");
+    return res.status(400).json({ error: "No file uploaded" });
+  }
+
+  const filePath = file.path;
+  const fileStream = fs.createReadStream(filePath);
+
+  const uploadUrl = `https://storage.bunnycdn.com/${process.env.BUNNY_STORAGE_ZONE}/${userId}/${file.originalname}`;
+
+  try {
+    const response = await axios.put(uploadUrl, fileStream, {
+      headers: {
+        AccessKey: process.env.BUNNY_API_KEY,
+        "Content-Type": file.mimetype,
+      },
+    });
+
+    fs.unlinkSync(filePath); // clean up
+
+    const publicUrl = `${process.env.BUNNY_CDN_URL}/${userId}/${file.originalname}`;
+
+    res.json({ id, name: file.originalname, url: publicUrl });
+  } catch (err) {
+    console.error("❌ Upload Failed:", {
+      message: err.message,
+      data: err.response?.data,
+      status: err.response?.status,
+      headers: err.response?.headers,
+    });
+
+    res.status(500).json({
+      error: "Upload failed",
+      details: err.response?.data || err.message,
+    });
+  }
 });
 
 app.listen(3000, () => {
