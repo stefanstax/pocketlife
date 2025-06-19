@@ -187,6 +187,14 @@ app.get("/transactions", async (req, res) => {
     const transactions = readTransactions();
     const currencies = readCurrencies();
 
+    const userId = Number(req.query.userId);
+
+    if (!userId) {
+      return res
+        .status(200)
+        .json({ message: "Please login first to see your transactions." });
+    }
+
     const transactionsWithCurrency = transactions.map((transaction) => {
       const currency = currencies.find((c) => c.id === transaction.currencyId);
 
@@ -196,7 +204,11 @@ app.get("/transactions", async (req, res) => {
       };
     });
 
-    res.json(transactionsWithCurrency);
+    const userSpecificTransactions = transactionsWithCurrency.filter(
+      (transaction) => transaction.userId === userId
+    );
+
+    res.json(userSpecificTransactions);
   } catch {
     res.status(500).json({ error: "Failed to read database" });
   }
@@ -277,11 +289,10 @@ app.put("/transactions/:id", (req, res) => {
 
 // Upload files to Bunny
 
-app.post("/upload", async (req, res) => {
-  console.log(req);
-
+const upload = multer({ storage: multer.memoryStorage() });
+app.post("/upload", upload.single("file"), async (req, res) => {
   const file = req.file;
-  const userId = req.body.userId;
+  const username = req.body.username;
   const id = req.body.id;
 
   if (!file) {
@@ -290,21 +301,18 @@ app.post("/upload", async (req, res) => {
   }
 
   const filePath = file.path;
-  const fileStream = fs.createReadStream(filePath);
 
-  const uploadUrl = `https://storage.bunnycdn.com/${process.env.BUNNY_STORAGE_ZONE}/${userId}/${file.originalname}`;
+  const uploadUrl = `https://storage.bunnycdn.com/${process.env.BUNNY_STORAGE_ZONE}/${username}/${file.originalname}`;
 
   try {
-    const response = await axios.put(uploadUrl, fileStream, {
+    await axios.put(uploadUrl, file.buffer, {
       headers: {
         AccessKey: process.env.BUNNY_API_KEY,
         "Content-Type": file.mimetype,
       },
     });
 
-    fs.unlinkSync(filePath); // clean up
-
-    const publicUrl = `${process.env.BUNNY_CDN_URL}/${userId}/${file.originalname}`;
+    const publicUrl = `${process.env.BUNNY_CDN_URL}/${username}/${file.originalname}`;
 
     res.json({ id, name: file.originalname, url: publicUrl });
   } catch (err) {

@@ -5,6 +5,7 @@
 / New Features
 
 - [x] Add ability to add documents to business transactions
+- [x] Load only user related transactions no filter on the frontend
 - [] Add ability to open mobile camera to capture a receipt
 - [] Add ability to delete transaction / for business with each delete also remove images which were previously uploaded to the cloud \*somewhere
 - Add validation errors for each form

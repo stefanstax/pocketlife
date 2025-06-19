@@ -29,7 +29,7 @@ const UploadField = ({
 
     const result = await uploadFileToBunny({
       file,
-      userId: username,
+      username,
     });
 
     if (result?.url) {

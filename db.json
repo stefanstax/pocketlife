@@ -90,6 +90,22 @@
         "name": "hostinger-elsia-domain.pdf",
         "url": "https://maypact-transactions.b-cdn.net/stefanstax/hostinger-elsia-domain.pdf"
       }
+    },
+    {
+      "id": 60,
+      "title": "Lunch with a client",
+      "amount": 172.33,
+      "userId": 662,
+      "currencyId": 8222,
+      "note": "Lunch with a Gotteburg client regarding the new project",
+      "date": "20/06/2025",
+      "type": "EXPENSE",
+      "context": "BUSINESS",
+      "receipt": {
+        "id": "ucSlB22lOP",
+        "name": "invoice_ELSIA-1.pdf",
+        "url": "https://maypact-transactions.b-cdn.net/random2/invoice_ELSIA-1.pdf"
+      }
     }
   ],
   "users": [
@@ -107,6 +123,12 @@
       "username": "random",
       "email": "random@gmail.com",
       "password": "$2b$10$6hniTpQyJvnfumLg3h.VR.UMk3uktLbupk8CTtlC5JiziTSkgOlAa"
+    },
+    {
+      "id": 662,
+      "username": "random2",
+      "email": "random2@gmail.com",
+      "password": "$2b$10$aCSHjj/Oxd9lhCb6024GkOjPv6sRoPR5se3PTcYgjC4Q3PzzaMBoq"
     }
   ],
   "currencies": [

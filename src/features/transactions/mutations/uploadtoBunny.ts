@@ -1,18 +1,17 @@
-// ✅ uploadToBunny.ts
 import { nanoid } from "@reduxjs/toolkit";
 
 export const uploadFileToBunny = async ({
   file,
-  userId,
+  username,
 }: {
   file: File;
-  userId: string;
+  username: string;
 }): Promise<{ id: string; name: string; url: string } | null> => {
-  const id = nanoid(10); // ✅ Generate ID inside the function
+  const id = nanoid(10);
   const formData = new FormData();
   formData.append("file", file);
   formData.append("name", file.name);
-  formData.append("userId", userId);
+  formData.append("username", username);
 
   try {
     const res = await fetch("http://localhost:3000/upload", {

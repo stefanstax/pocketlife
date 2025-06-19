@@ -1,14 +1,17 @@
 import { useQueries, useQuery } from "@tanstack/react-query";
+import { useSelector } from "react-redux";
+import type { RootState } from "./store";
 
-export const useLocalApi = (resource: string, id?: number) =>
-  useQuery({
-    queryKey: id ? [resource, id] : [resource],
+export const useLocalApi = (resource: string, id?: number) => {
+  const { user } = useSelector((state: RootState) => state.auth);
+  return useQuery({
+    queryKey: id ? [resource, id, user?.id] : [resource, user?.id],
     queryFn: async () => {
-      const url = id
-        ? `http://localhost:3000/${resource}/${id}`
-        : `http://localhost:3000/${resource}`;
+      const url = new URL(`http://localhost:3000/${resource}`);
+      if (id) url.pathname += `/${id}`;
+      if (user?.id) url.searchParams.set("userId", user?.id.toString());
 
-      const response = await fetch(url);
+      const response = await fetch(url.toString());
 
       if (!response.ok) {
         throw new Error(`There was a problem loading ${resource}`);
@@ -17,6 +20,7 @@ export const useLocalApi = (resource: string, id?: number) =>
       return response.json();
     },
   });
+};
 
 export const useLocalApis = (firstApi: string, secondApi: string) =>
   useQueries({
