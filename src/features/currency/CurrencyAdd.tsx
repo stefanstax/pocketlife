@@ -7,6 +7,7 @@ import type { CurrencyState } from "./currencyTypes";
 import SubmitButton from "../../components/SubmitButton";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../app/store";
+import { nanoid } from "@reduxjs/toolkit";
 
 const CurrenciesAdd = () => {
   const { user } = useSelector((state: RootState) => state.auth);
@@ -41,7 +42,7 @@ const CurrenciesAdd = () => {
     const formData = new FormData(event.currentTarget);
 
     const verifyData = currenciesSchema.safeParse({
-      id: Math.floor(Math.random() * 10000),
+      id: nanoid(),
       code: formData.get("code"),
       name: formData.get("name"),
       symbol: formData.get("symbol"),

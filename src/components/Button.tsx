@@ -7,6 +7,7 @@ export interface ButtonProps {
   variant: "PRIMARY" | "SECONDARY" | "TERTIARY";
   children: ReactNode;
   onClick?: () => void;
+  type: "button" | "submit" | "reset";
 }
 
 const Button = ({
@@ -14,11 +15,12 @@ const Button = ({
   extraClasses,
   variant,
   children,
+  type,
   onClick,
 }: ButtonProps) => {
   return (
     <button
-      type="button"
+      type={type ?? "button"}
       aria-label={ariaLabel}
       onClick={onClick}
       className={`${

@@ -50,12 +50,12 @@ const CurrencySelection = () => {
   const saveToFavorites = () => {
     mutation.mutate({
       currencies: pickedCurrencies,
-      userId: Number(user?.id),
+      userId: String(user?.id),
     });
   };
 
   return (
-    <section className="bg-[#1b1918] text-white rounded-lg p-4 flex flex-col gap-4">
+    <section className="bg-[#1b1918] text-white  p-4 flex flex-col gap-4">
       <h2>Select currencies you would like to use</h2>
       <div className="flex gap-2">
         {data.map((currency: CurrencyState) => {

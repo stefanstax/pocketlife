@@ -1,4 +1,4 @@
-import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, nanoid, type PayloadAction } from "@reduxjs/toolkit";
 import type { Transaction } from "./transactionTypes";
 
 const initialState: Transaction[] = [];
@@ -9,7 +9,7 @@ const transactionsSlice = createSlice({
   reducers: {
     transactionAdded(state, action: PayloadAction<Omit<Transaction, "id">>) {
       state.push({
-        id: Math.floor(Math.random() * 100),
+        id: nanoid(),
         ...action.payload,
       });
     },

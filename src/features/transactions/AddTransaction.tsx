@@ -2,31 +2,39 @@ import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState, type FormEvent } from "react";
 import { addTransaction } from "./mutations/addTransaction";
 import { transactionSchema } from "./transactionSchemas";
-import { formDiv, input, labelClasses } from "../../app/globalClasses";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../app/store";
 import { useLocalApi } from "../../app/hooks";
 import {
-  transactionContexts,
-  transactionTypes,
   type Receipt,
-  type TransactionContext,
-  type TransactionType,
+  type TransactionContexts,
+  type TransactionTypes,
 } from "./transactionTypes";
 import type { CurrencyState } from "../currency/currencyTypes";
 import SubmitButton from "../../components/SubmitButton";
 import UploadField from "../../components/UploadFile";
+// Form Fields
+import TransactionTitle from "./fields/TransactionTitle";
+import TransactionAmount from "./fields/TransactionAmount";
+import TransactionType from "./fields/TransactionType";
+import TransactionCurrency from "./fields/TransactionCurrency";
+import TransactionContext from "./fields/TransactionContext";
+import TransactionNote from "./fields/TransactionNote";
+import { nanoid } from "@reduxjs/toolkit";
 
 const AddTransaction = () => {
   const { user } = useSelector((state: RootState) => state.auth);
   const [title, setTitle] = useState<string>("");
-  const [amount, setAmount] = useState<string>("");
-  const [context, setContext] = useState<TransactionContext | "">("");
+  const [amount, setAmount] = useState<number | "">("");
+  const [context, setContext] = useState<TransactionContexts | "">("");
   const [currencyId, setCurrencyId] = useState<number | "">("");
   const [note, setNote] = useState<string>("");
-  const [type, setType] = useState<TransactionType | "">("");
+  const [type, setType] = useState<TransactionTypes | "">("");
   const [currencies, setCurrencies] = useState<CurrencyState[]>([]);
   const [receipt, setReceipt] = useState<Receipt | null>(null);
+  const [formErrors, setFormErrors] = useState<Partial<Record<string, string>>>(
+    {}
+  );
 
   const mutation = useMutation({
     mutationFn: addTransaction,
@@ -56,7 +64,7 @@ const AddTransaction = () => {
     const formData = new FormData(event.currentTarget);
 
     const result = transactionSchema.safeParse({
-      id: Math.floor(Math.random() * 100),
+      id: nanoid(),
       title: formData.get("title"),
       amount: formData.get("amount"),
       currencyId: Number(formData.get("currencyId")),
@@ -69,8 +77,15 @@ const AddTransaction = () => {
     });
 
     if (!result.success) {
-      console.log("Validation error:", result.error.flatten());
+      const flattened = result.error.flatten();
+      const fieldErrors = Object.fromEntries(
+        Object.entries(flattened.fieldErrors).map(([key, val]) => [
+          key,
+          val?.[0],
+        ])
+      );
 
+      setFormErrors(fieldErrors);
       return;
     }
 
@@ -78,128 +93,38 @@ const AddTransaction = () => {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="w-full bg-[#1b1918] p-4 rounded-lg flex flex-col gap-4"
-    >
+    <form onSubmit={handleSubmit} className="w-full  flex flex-col gap-4">
       {/* Title */}
-      <div className={formDiv}>
-        <label htmlFor="title" className={labelClasses}>
-          Title
-        </label>
-        <input
-          className={input}
-          type="text"
-          name="title"
-          value={title}
-          placeholder="What was this transaction"
-          onChange={(e) => setTitle(e.target.value)}
-        />
-      </div>
+      <TransactionTitle
+        title={title}
+        setTitle={setTitle}
+        validationError={formErrors?.title}
+      />
       {/* Amount */}
-      <div className={formDiv}>
-        <label htmlFor="amount" className={labelClasses}>
-          Amount
-        </label>
-        <input
-          className={input}
-          type="number"
-          name="amount"
-          step={0.1}
-          placeholder="How much was this transaction"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-        />
-      </div>
+      <TransactionAmount
+        amount={amount}
+        setAmount={setAmount}
+        validationError={formErrors?.amount}
+      />
       {/* Type */}
-      <div className="flex flex-col">
-        <label className={labelClasses} htmlFor="type">
-          Transaction Type
-        </label>
-        <div className="flex-wrap w-full flex gap-2 border-1 px-4 py-2 border-t-0 border-white rounded-b-lg">
-          {transactionTypes.map((option) => {
-            return (
-              <button
-                key={option.name}
-                className={`${
-                  option.name === type ? "bg-[#5152fb]" : ""
-                } w-fit grow-0 text-xs rounded-lg cursor-pointer p-2 border-white flex-1 text-white border-dotted border-2  flex-1`}
-                type="button"
-                onClick={() => setType(option.name as TransactionType)}
-              >
-                {option.name}
-              </button>
-            );
-          })}
-        </div>
-        <input type="hidden" name="type" value={type} />
-      </div>
+      <TransactionType
+        type={type}
+        setType={setType}
+        validationError={formErrors?.type}
+      />
       {/* Currency */}
-      <div className="flex flex-col">
-        <label className={labelClasses} htmlFor="currency">
-          Select Currency
-        </label>
-        <div className="flex-wrap w-full flex gap-2 border-1 px-4 py-2 border-t-0 border-white rounded-b-lg">
-          {currencies.map((curr) => {
-            return (
-              <button
-                key={curr.code}
-                type="button"
-                className={`${
-                  currencyId === curr.id ? "bg-[#5152fb]" : ""
-                } w-fit text-xs grow-0 rounded-lg cursor-pointer p-2 border-white flex-1 text-white border-dotted border-2 flex-1`}
-                onClick={() => setCurrencyId(Number(curr.id))}
-              >
-                {curr.code}
-              </button>
-            );
-          })}
-        </div>
-        <input
-          className={input}
-          type="hidden"
-          name="currencyId"
-          value={currencyId ?? ""}
-        />
-      </div>
+      <TransactionCurrency
+        currencies={currencies}
+        currencyId={currencyId}
+        setCurrencyId={setCurrencyId}
+        validationError={formErrors?.currencyId}
+      />
       {/* Business or Personal Toggle */}
-      <div className={formDiv}>
-        <label className={labelClasses} htmlFor="variant">
-          Transaction Context
-        </label>
-        <div className={`${input} flex gap-2 text-xs`}>
-          {transactionContexts.map((option) => {
-            return (
-              <button
-                key={option.name}
-                type="button"
-                className={`border-2 border-dotted border-white px-4 rounded-lg py-2 ${
-                  option.name === context ? "bg-[#5152fb]" : ""
-                }`}
-                onClick={() => setContext(option.name as TransactionContext)}
-              >
-                {option.name}
-              </button>
-            );
-          })}
-          <input type="hidden" value={context} name="context" />
-        </div>
-      </div>
-      {/* Note */}
-      <div className={formDiv}>
-        <label htmlFor="note" className={labelClasses}>
-          Note
-        </label>
-        <input
-          className={input}
-          type="text"
-          name="note"
-          placeholder="Any note for transaction"
-          value={note}
-          onChange={(event) => setNote(event.target.value)}
-        />
-      </div>
-      <input type="hidden" value={type} name="type" />
+      <TransactionContext
+        context={context}
+        setContext={setContext}
+        validationError={formErrors?.context}
+      />
       {context === "BUSINESS" && (
         <>
           <UploadField
@@ -207,11 +132,10 @@ const AddTransaction = () => {
             setReceipt={setReceipt}
             username={user?.username as string}
           />
-          <a className="text-white" href={receipt?.url}>
-            Open {receipt?.name}
-          </a>
         </>
       )}
+      {/* Note */}
+      <TransactionNote note={note} setNote={setNote} />
 
       <SubmitButton aria="Create transaction" label="Create Transaction" />
     </form>

@@ -13,7 +13,7 @@
 - [] Recognize if note contains a possible words which would make the transaction business context - and notify user to make sure it's not a business transaction
 - [] Open receipts route
 - [] Delete old receipt when new one gets uploaded to the same transaction
-- [] Fully integrate errors in transactions forms
+- [x] Fully integrate errors in transactions forms
 - [] Fully integrate errros into currencies forms
 - [] Add toaster or other type of notifiers to alert user on certain interactions
 - [] Relocate receipt upload errors from the server onto frontend for info

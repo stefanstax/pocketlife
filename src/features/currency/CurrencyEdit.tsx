@@ -58,7 +58,7 @@ const CurrencyEdit = () => {
     const formData = new FormData(event.currentTarget);
 
     const verifyData = currenciesSchema.safeParse({
-      id: Number(id),
+      id,
       code: formData.get("code"),
       name: formData.get("name"),
       symbol: formData.get("symbol"),

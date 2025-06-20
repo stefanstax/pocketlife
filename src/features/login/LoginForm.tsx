@@ -1,6 +1,5 @@
 import { useState, type FormEvent } from "react";
 import { formDiv, input, labelClasses } from "../../app/globalClasses";
-import VariantLink from "../../components/VariantLink";
 import { loginSchemas } from "./loginSchemas";
 import ErrorMessage from "../../components/forms/ErrorMessage";
 import type { LoginState } from "./loginTypes";
@@ -8,6 +7,7 @@ import { useMutation } from "@tanstack/react-query";
 import { login } from "./mutations/login";
 import { useDispatch } from "react-redux";
 import { loginSuccess } from "../auth/authSlice";
+import Button from "../../components/Button";
 
 const LoginForm = () => {
   const [formData, setFormData] = useState<LoginState>({
@@ -65,10 +65,7 @@ const LoginForm = () => {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="w-full flex flex-col gap-6 bg-[#1b1918] rounded-[8px] p-5 text-[#f9f4da]"
-    >
+    <form onSubmit={handleSubmit} className="w-full flex flex-col gap-6  p-5">
       <h1>Login Form</h1>
       {/* Email */}
       <div className={formDiv}>
@@ -101,12 +98,9 @@ const LoginForm = () => {
         />
       </div>
       {/* Submit VariantLink */}
-      <VariantLink
-        variant="PRIMARY"
-        aria="Click to login"
-        type="submit"
-        label="Login"
-      />
+      <Button type="submit" variant="PRIMARY" ariaLabel="Login current user">
+        Login
+      </Button>
       {serverError && (
         <p className="error" style={{ color: "red", marginBottom: "1rem" }}>
           {serverError}

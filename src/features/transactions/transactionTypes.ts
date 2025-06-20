@@ -1,17 +1,17 @@
 export interface Transaction {
-  id: number;
+  id: string;
   date: string;
-  userId: number;
+  userId: string;
   amount: number;
   currencyId: number;
   title: string;
   note: string;
-  type: TransactionType;
-  context: TransactionContext;
+  type: TransactionTypes;
+  context: TransactionContexts;
 }
 
-export type TransactionType = "INCOME" | "EXPENSE" | "SAVINGS";
-export type TransactionContext = "PERSONAL" | "BUSINESS";
+export type TransactionTypes = "INCOME" | "EXPENSE" | "SAVINGS";
+export type TransactionContexts = "PERSONAL" | "BUSINESS";
 
 export const transactionTypes = [
   { name: "EXPENSE" },

@@ -5,7 +5,7 @@ import { Navigate, Outlet } from "react-router";
 const AdminRoute = () => {
   const { user } = useSelector((state: RootState) => state.auth);
 
-  return user?.email === "website@maypact.com" ? (
+  return user?.email === "stefanstax@gmail.com" ? (
     <Outlet />
   ) : (
     <Navigate to="/authentication/login" />

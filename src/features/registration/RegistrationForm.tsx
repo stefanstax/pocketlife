@@ -5,7 +5,8 @@ import { registrationSchema } from "./registrationSchemas";
 import { formDiv, input, labelClasses } from "../../app/globalClasses";
 import { type RegistrationState } from "./registrationTypes";
 import ErrorMessage from "../../components/forms/ErrorMessage";
-import VariantLink from "../../components/VariantLink";
+import Button from "../../components/Button";
+import { nanoid } from "@reduxjs/toolkit";
 
 const RegistrationForm = () => {
   const [formData, setFormData] = useState<RegistrationState>({
@@ -43,7 +44,7 @@ const RegistrationForm = () => {
     const formData = new FormData(event.currentTarget);
 
     const verifyData = registrationSchema.safeParse({
-      id: Math.floor(Math.random() * 1000),
+      id: nanoid(),
       username: formData.get("username"),
       email: formData.get("email"),
       password: formData.get("password"),
@@ -73,7 +74,7 @@ const RegistrationForm = () => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-full flex flex-col gap-6 bg-[#1b1918] rounded-[8px] p-5 text-white"
+      className="w-full flex flex-col gap-6 bg-[#1b1918]  p-5 text-white"
     >
       <h1 className="text-2xl font-black">Registration</h1>
       <p>Your password will be hashed.</p>
@@ -125,12 +126,9 @@ const RegistrationForm = () => {
           placeholder="Password..."
         />
       </div>
-      <VariantLink
-        variant="PRIMARY"
-        aria="Submit user registartion"
-        type="submit"
-        label="Complete registration"
-      />
+      <Button type="submit" variant="PRIMARY" ariaLabel="Login current user">
+        Login
+      </Button>
       {serverError && (
         <p className="error" style={{ color: "red", marginBottom: "1rem" }}>
           {serverError}

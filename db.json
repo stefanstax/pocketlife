@@ -1,110 +1,31 @@
 {
   "transactions": [
     {
-      "id": 24,
-      "title": "HeroesArk savings",
-      "amount": 900,
+      "id": "AnGLNqOd6DO_-ur68yrTL",
+      "title": "Lidl kupovina",
+      "amount": 2700,
       "userId": 977,
-      "currencyId": 3968,
-      "note": "HeroesArk invoice remaining balance",
-      "date": "15/06/2025",
-      "type": "SAVINGS"
-    },
-    {
-      "id": 53,
-      "title": "random",
-      "amount": 100,
-      "userId": 977,
-      "currencyId": 8222,
+      "currencyId": 2471,
       "note": "",
-      "date": "17/06/2025",
+      "date": "21/06/2025",
       "type": "EXPENSE",
-      "context": "PERSONAL"
+      "context": "PERSONAL",
+      "receipt": null
     },
     {
-      "id": 85,
-      "title": "Fuel",
-      "amount": 972.45,
+      "id": "P6ynV-jUE_hDT0qtC26FZ",
+      "title": "Revolut card",
+      "amount": 16.99,
       "userId": 977,
       "currencyId": 8222,
-      "note": "company car fuel",
-      "date": "19/06/2025",
-      "type": "EXPENSE",
-      "context": "PERSONAL"
-    },
-    {
-      "id": 76,
-      "title": "Invoice",
-      "amount": 78,
-      "userId": 977,
-      "currencyId": 8222,
-      "note": "Business - Griffith Accountants #0003",
-      "date": "19/06/2025",
-      "type": "INCOME",
-      "context": "BUSINESS",
-      "receipt": {
-        "id": "QAINug3zPE",
-        "name": "IMG_7363.JPG",
-        "url": "https://maypact-transactions.b-cdn.net/stefanstax/IMG_7363.JPG"
-      }
-    },
-    {
-      "id": 40,
-      "title": "Voda za trening x2",
-      "amount": 200,
-      "userId": 977,
-      "currencyId": 8222,
-      "note": "",
-      "date": "19/06/2025",
+      "note": "Revolut business card order - payment will be refunded",
+      "date": "21/06/2025",
       "type": "EXPENSE",
       "context": "BUSINESS",
       "receipt": {
-        "id": "W0ZZV_6Qt1",
-        "name": "IMG_7363.JPG",
-        "url": "https://maypact-transactions.b-cdn.net/stefanstax/IMG_7363.JPG"
-      }
-    },
-    {
-      "id": 99,
-      "title": "Sladoled + parking",
-      "amount": 263.33,
-      "userId": 977,
-      "currencyId": 8222,
-      "note": "",
-      "date": "19/06/2025",
-      "type": "EXPENSE",
-      "context": "PERSONAL"
-    },
-    {
-      "id": 46,
-      "title": "dawdawdwad",
-      "amount": 23,
-      "userId": 977,
-      "currencyId": 9665,
-      "note": "dawdawdawd",
-      "date": "19/06/2025",
-      "type": "EXPENSE",
-      "context": "BUSINESS",
-      "receipt": {
-        "id": "qT_d19yhLs",
-        "name": "hostinger-elsia-domain.pdf",
-        "url": "https://maypact-transactions.b-cdn.net/stefanstax/hostinger-elsia-domain.pdf"
-      }
-    },
-    {
-      "id": 60,
-      "title": "Lunch with a client",
-      "amount": 172.33,
-      "userId": 662,
-      "currencyId": 8222,
-      "note": "Lunch with a Gotteburg client regarding the new project",
-      "date": "20/06/2025",
-      "type": "EXPENSE",
-      "context": "BUSINESS",
-      "receipt": {
-        "id": "ucSlB22lOP",
-        "name": "invoice_ELSIA-1.pdf",
-        "url": "https://maypact-transactions.b-cdn.net/random2/invoice_ELSIA-1.pdf"
+        "id": "Gqk67bmcao",
+        "name": "Screenshot 2025-06-20 at 23.55.20.png",
+        "url": "https://maypact-transactions.b-cdn.net/stefanstax/Screenshot 2025-06-20 at 23.55.20.png"
       }
     }
   ],
@@ -115,7 +36,8 @@
       "email": "stefanstax@gmail.com",
       "password": "$2b$10$zGzXu37m1VBAc0d5aGOUte0VCB4WT1Ipba60yw0fvDhgB7huie6Ga",
       "currencies": [
-        8222
+        8222,
+        2471
       ]
     },
     {
@@ -128,7 +50,19 @@
       "id": 662,
       "username": "random2",
       "email": "random2@gmail.com",
-      "password": "$2b$10$aCSHjj/Oxd9lhCb6024GkOjPv6sRoPR5se3PTcYgjC4Q3PzzaMBoq"
+      "password": "$2b$10$aCSHjj/Oxd9lhCb6024GkOjPv6sRoPR5se3PTcYgjC4Q3PzzaMBoq",
+      "currencies": [
+        2471
+      ]
+    },
+    {
+      "id": 507,
+      "username": "Saria",
+      "email": "s.s.s.0@live.com",
+      "password": "$2b$10$BGyoUbj2REzC6K6.gSNhT.pyNS8MkeG/z4vl1CzXm.asELN5gJgku",
+      "currencies": [
+        2471
+      ]
     }
   ],
   "currencies": [
@@ -154,7 +88,7 @@
       "id": 2471,
       "code": "RSD",
       "name": "Serbian Dinar",
-      "symbol": "rsd"
+      "symbol": "RSD "
     }
   ]
 }

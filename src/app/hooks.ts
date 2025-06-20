@@ -2,14 +2,14 @@ import { useQueries, useQuery } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 import type { RootState } from "./store";
 
-export const useLocalApi = (resource: string, id?: number) => {
+export const useLocalApi = (resource: string, id?: string) => {
   const { user } = useSelector((state: RootState) => state.auth);
   return useQuery({
     queryKey: id ? [resource, id, user?.id] : [resource, user?.id],
     queryFn: async () => {
       const url = new URL(`http://localhost:3000/${resource}`);
       if (id) url.pathname += `/${id}`;
-      if (user?.id) url.searchParams.set("userId", user?.id.toString());
+      if (user?.id && !id) url.searchParams.set("userId", user?.id.toString());
 
       const response = await fetch(url.toString());
 

@@ -7,5 +7,5 @@ export interface CurrencyState {
 
 export interface FavoriteCurrenciesState {
   currencies: number[];
-  userId: number;
+  userId: string;
 }

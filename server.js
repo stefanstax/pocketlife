@@ -215,7 +215,9 @@ app.get("/transactions", async (req, res) => {
 });
 
 app.get("/transactions/:id", async (req, res) => {
-  const id = Number(req.params.id);
+  const id = req.params.id;
+
+  console.log(id);
 
   try {
     const transactions = readTransactions();
@@ -238,7 +240,7 @@ app.get("/transactions/:id", async (req, res) => {
     let addonCurrencies = [];
 
     currencies.forEach((element) => {
-      if (findTransactionUser.currencies.includes(element.id)) {
+      if (findTransactionUser?.currencies?.includes(element.id)) {
         addonCurrencies.push(element);
       }
     });

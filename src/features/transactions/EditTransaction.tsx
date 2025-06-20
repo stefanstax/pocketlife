@@ -1,16 +1,13 @@
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState, type FormEvent } from "react";
 import { transactionSchema } from "./transactionSchemas";
-import { formDiv, input, labelClasses } from "../../app/globalClasses";
 import { useLocalApi } from "../../app/hooks";
 import { redirect, useParams } from "react-router";
 import { editTransaction } from "./mutations/editTransaction";
 import { type CurrencyState } from "../currency/currencyTypes";
 import {
-  type TransactionContext,
-  transactionTypes,
-  type TransactionType,
-  transactionContexts,
+  type TransactionContexts,
+  type TransactionTypes,
   type Receipt,
 } from "./transactionTypes";
 import SubmitButton from "../../components/SubmitButton";
@@ -18,21 +15,26 @@ import VariantLink from "../../components/VariantLink";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../app/store";
 import UploadField from "../../components/UploadFile";
+import TransactionTitle from "./fields/TransactionTitle";
+import TransactionAmount from "./fields/TransactionAmount";
+import TransactionType from "./fields/TransactionType";
+import TransactionCurrency from "./fields/TransactionCurrency";
+import TransactionContext from "./fields/TransactionContext";
+import TransactionNote from "./fields/TransactionNote";
 
 const EditTransaction = () => {
   const [title, setTitle] = useState<string>("");
-  const [amount, setAmount] = useState<string>("");
+  const [amount, setAmount] = useState<number | "">("");
   const [currencyId, setCurrencyId] = useState<number | "">("");
   const [note, setNote] = useState<string>("");
-  const [type, setType] = useState<TransactionType | "">("");
-  const [context, setContext] = useState<TransactionContext | "">("");
+  const [type, setType] = useState<TransactionTypes | "">("");
+  const [context, setContext] = useState<TransactionContexts | "">("");
   const [receipt, setReceipt] = useState<Receipt | null>(null);
   const [formErrors, setFormErrors] = useState<Partial<Record<string, string>>>(
     {}
   );
   //   Grab ID from url
   const { id } = useParams();
-  const numericId = id ? Number(id) : undefined;
 
   const { user } = useSelector((state: RootState) => state.auth);
 
@@ -40,7 +42,7 @@ const EditTransaction = () => {
     data: transactionData,
     isLoading,
     isPending,
-  } = useLocalApi("transactions", numericId);
+  } = useLocalApi("transactions", id);
 
   const currenciesMatch = transactionData?.availableCurrencies?.some(
     (currency: CurrencyState) =>
@@ -73,9 +75,6 @@ const EditTransaction = () => {
     },
   });
 
-  const typeActiveClass = (value: TransactionType) =>
-    type === value ? "bg-[#5152fb]" : "";
-
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
@@ -97,7 +96,7 @@ const EditTransaction = () => {
       const flattened = result.error.flatten();
 
       const fieldErrors = Object.fromEntries(
-        Object.entries(flattened.fieldErrors).map(([key, val]) => [
+        Object.entries(flattened.fieldErrors)?.map(([key, val]) => [
           key,
           val?.[0],
         ])
@@ -120,10 +119,10 @@ const EditTransaction = () => {
         (currency: CurrencyState) =>
           currency.id === transactionData.transactionCurrency.id
       ) && (
-        <>
+        <div className="flex items-center gap-2 bg-black p-4 ">
           <p className="text-red-400">
             *Your transaction currency (
-            {transactionData.transactionCurrency.code}) is not among your
+            {transactionData?.transactionCurrency?.code}) is not among your
             available currencies
           </p>
           <VariantLink
@@ -132,131 +131,39 @@ const EditTransaction = () => {
             link="/select-currencies/"
             label="Modify available currencies"
           />
-        </>
+        </div>
       )}
-      <div className={formDiv}>
-        <label htmlFor="title" className={labelClasses}>
-          Title
-        </label>
-        <input
-          className={input}
-          type="text"
-          name="title"
-          value={title}
-          placeholder="What was this transaction"
-          onChange={(e) => setTitle(e.target.value)}
-        />
-      </div>
-      <div className={formDiv}>
-        <label htmlFor="amount" className={labelClasses}>
-          Amount
-        </label>
-        <input
-          className={input}
-          type="number"
-          name="amount"
-          step={0.1}
-          placeholder="How much was this transaction"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-        />
-      </div>
-      {/* Type */}
-      <div className="flex flex-col">
-        <label className={labelClasses} htmlFor="type">
-          Transaction Type
-        </label>
-        <div className="flex-wrap w-full flex gap-2 border-1 px-4 py-2 border-t-0 border-white rounded-b-lg">
-          {transactionTypes.map((type) => {
-            return (
-              <button
-                key={type.name}
-                type="button"
-                className={`w-fit text-xs grow-0 rounded-lg cursor-pointer p-2 border-white flex-1 text-white border-dotted border-2  flex-1 ${typeActiveClass(
-                  type.name as TransactionType
-                )}`}
-                onClick={() => setType(type.name as TransactionType)}
-              >
-                {type.name}
-              </button>
-            );
-          })}
-        </div>
-        <input type="hidden" name="type" value={type} />
-      </div>
-      {/* Currency */}
-      <div className="flex flex-col">
-        <label className={labelClasses} htmlFor="currency">
-          Select Currency
-        </label>
-
-        <div className="flex-wrap w-full flex gap-2 border-1 px-4 py-2 border-t-0 border-white rounded-b-lg">
-          {transactionData.availableCurrencies?.map(
-            (currency: CurrencyState) => {
-              const { id, code } = currency;
-
-              return (
-                <button
-                  key={id}
-                  type="button"
-                  className={`${
-                    currencyId === id ? "bg-[#5152fb]" : ""
-                  } w-fit grow-0 text-xs rounded-lg cursor-pointer p-2 border-white flex-1 text-white border-dotted border-2  flex-1`}
-                  onClick={() => setCurrencyId(Number(id))}
-                >
-                  {code}
-                </button>
-              );
-            }
-          )}
-        </div>
-        {formErrors.currencyId && (
-          <p className="my-2 text-red-400">{formErrors.currencyId}</p>
-        )}
-        <input
-          className={input}
-          type="hidden"
-          name="currencyId"
-          value={currencyId}
-        />
-      </div>
-      {/* Business or Personal Toggle */}
-      <div className={formDiv}>
-        <label className={labelClasses} htmlFor="variant">
-          Transaction Context
-        </label>
-        <div className={`${input} flex gap-2 text-xs`}>
-          {transactionContexts.map((option) => {
-            return (
-              <button
-                key={option.name}
-                type="button"
-                className={`border-2 border-dotted border-white px-4 rounded-lg py-2 ${
-                  option.name === context ? "bg-[#5152fb]" : ""
-                }`}
-                onClick={() => setContext(option.name as TransactionContext)}
-              >
-                {option.name}
-              </button>
-            );
-          })}
-          <input type="hidden" value={context} name="context" />
-        </div>
-      </div>
-      <div className={formDiv}>
-        <label htmlFor="note" className={labelClasses}>
-          Note
-        </label>
-        <input
-          className={input}
-          type="text"
-          name="note"
-          placeholder="Any note for transaction"
-          value={note}
-          onChange={(event) => setNote(event.target.value)}
-        />
-      </div>
-      <input type="hidden" value={type} name="type" />
+      <TransactionTitle
+        title={title}
+        setTitle={setTitle}
+        validationError={formErrors?.title}
+      />
+      <TransactionAmount
+        amount={amount}
+        setAmount={setAmount}
+        validationError={formErrors?.amount}
+      />
+      <TransactionType
+        type={type}
+        setType={setType}
+        validationError={formErrors?.type}
+      />
+      <TransactionCurrency
+        currencies={transactionData?.availableCurrencies}
+        currencyId={currencyId}
+        setCurrencyId={setCurrencyId}
+        validationError={formErrors?.currencyId}
+      />
+      <TransactionContext
+        context={context}
+        setContext={setContext}
+        validationError={formErrors?.context}
+      />
+      <TransactionNote
+        note={note}
+        setNote={setNote}
+        validationError={formErrors?.note}
+      />
 
       {context !== null && (
         <>
@@ -267,7 +174,7 @@ const EditTransaction = () => {
             hasFile={
               <a
                 target="_blank"
-                className={`border-2 border-dotted border-white px-4 rounded-lg py-2 text-xs ${
+                className={`border-2 border-dotted border-white px-4  py-2 text-xs ${
                   receipt?.url && "bg-[#5152fb]"
                 }`}
                 href={receipt?.url}
