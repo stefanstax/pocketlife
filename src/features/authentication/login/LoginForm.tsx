@@ -1,13 +1,12 @@
 import { useState, type FormEvent } from "react";
-import { formDiv, input, labelClasses } from "../../app/globalClasses";
-import { loginSchemas } from "./loginSchemas";
-import ErrorMessage from "../../components/forms/ErrorMessage";
-import type { LoginState } from "./loginTypes";
-import { useMutation } from "@tanstack/react-query";
-import { login } from "./mutations/login";
+import { formDiv, input, labelClasses } from "../../../app/globalClasses";
+import ErrorMessage from "../../../components/forms/ErrorMessage";
 import { useDispatch } from "react-redux";
-import { loginSuccess } from "../auth/authSlice";
-import Button from "../../components/Button";
+import { loginSuccess } from "../../../app/authSlice";
+import Button from "../../../components/Button";
+import type { LoginState } from "./loginTypes";
+import { loginSchemas } from "./loginSchemas";
+import { useLoginUserMutation } from "../api/authApi";
 
 const LoginForm = () => {
   const [formData, setFormData] = useState<LoginState>({
@@ -19,23 +18,11 @@ const LoginForm = () => {
     password: "",
   });
   const [serverError, setServerError] = useState("");
+
+  const [loginUser] = useLoginUserMutation();
   const dispatch = useDispatch();
 
-  const mutation = useMutation({
-    mutationFn: login,
-    onSuccess: (user) => {
-      setFormData({
-        email: "",
-        password: "",
-      });
-      dispatch(loginSuccess(user));
-    },
-    onError: (error: any) => {
-      setServerError(error.message);
-    },
-  });
-
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event?.currentTarget);
 
@@ -54,13 +41,17 @@ const LoginForm = () => {
     }
 
     if (verifyData.success) {
-      mutation.mutate({
-        ...verifyData.data,
-      });
-      setFormErrors({
-        email: "",
-        password: "",
-      });
+      try {
+        const user = await loginUser(verifyData.data).unwrap();
+        dispatch(loginSuccess(user));
+        setServerError("");
+        setFormErrors({
+          email: "",
+          password: "",
+        });
+      } catch (error: any) {
+        setServerError(error?.data?.message);
+      }
     }
   };
 

@@ -1,15 +1,17 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { formDiv, input, labelClasses } from "../../app/globalClasses";
 import { currenciesSchema } from "./currenciesSchema";
-import { useMutation } from "@tanstack/react-query";
 import type { CurrencyState } from "./currencyTypes";
-import { useLocalApi } from "../../app/hooks";
 import { useParams } from "react-router";
-import { editCurrency } from "./mutations/editCurrency";
 import SubmitButton from "../../components/SubmitButton";
+import {
+  useEditCurrencyByIdMutation,
+  useGetCurrencyByIdQuery,
+} from "./api/currenciesApi";
 
 const CurrencyEdit = () => {
   const [formData, setFormData] = useState<CurrencyState>({
+    id: "",
     code: "",
     name: "",
     symbol: "",
@@ -17,15 +19,13 @@ const CurrencyEdit = () => {
 
   const { id } = useParams();
 
-  const {
-    data: currencies,
-    isLoading,
-    isPending,
-  } = useLocalApi("currencies", Number(id));
+  const [editCurrencyById] = useEditCurrencyByIdMutation();
+  const { data: currencies } = useGetCurrencyByIdQuery(id ?? "");
 
   useEffect(() => {
     if (currencies) {
       setFormData({
+        id: "",
         code: currencies?.code,
         name: currencies?.name,
         symbol: currencies?.symbol,
@@ -38,21 +38,7 @@ const CurrencyEdit = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const mutation = useMutation({
-    mutationFn: editCurrency,
-    onSuccess: () => {
-      setFormData({
-        code: "",
-        name: "",
-        symbol: "",
-      });
-    },
-    onError: () => {
-      console.error("There was a problem with mutating your data.");
-    },
-  });
-
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const formData = new FormData(event.currentTarget);
@@ -72,11 +58,13 @@ const CurrencyEdit = () => {
     }
 
     if (verifyData.success) {
-      mutation.mutate(verifyData.data);
+      try {
+        await editCurrencyById(verifyData?.data).unwrap();
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
-
-  if (isLoading || isPending) return <h1>Loading Currency...</h1>;
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">

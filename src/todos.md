@@ -10,11 +10,19 @@
 - [] Add ability to delete transaction / for business with each delete also remove images which were previously uploaded to the cloud \*somewhere
 - Add validation errors for each form
 - [x] Add ability to pick favorite currencies as a user / Select DONE - Fetching options thrhgout the app remaining
+- [x] Change all record ids into nanoid
 - [] Recognize if note contains a possible words which would make the transaction business context - and notify user to make sure it's not a business transaction
 - [] Open receipts route
+- [] Transaction categories
+- [] Transaction payment method cash/card
 - [] Delete old receipt when new one gets uploaded to the same transaction
 - [x] Fully integrate errors in transactions forms
 - [] Fully integrate errros into currencies forms
+- [x] Transform TanStack -> RTK in all places where needed
+  - [x] Transactions
+  - [x] Login
+  - [x] Registration
+  - [x] Currencies
 - [] Add toaster or other type of notifiers to alert user on certain interactions
 - [] Relocate receipt upload errors from the server onto frontend for info
 

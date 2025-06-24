@@ -1,31 +1,52 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
-import transactionsReducer from "../features/transactions/transactionsSlice";
-import authReducer from "../features/auth/authSlice";
-import { persistStore, persistReducer } from "redux-persist";
-import storage from "redux-persist/lib/storage"; // defaults to localStorage
+import authReducer from "./authSlice";
+import {
+  persistStore,
+  persistReducer,
+  FLUSH,
+  REHYDRATE,
+  PAUSE,
+  PERSIST,
+  PURGE,
+  REGISTER,
+} from "redux-persist";
+import storage from "redux-persist/lib/storage";
+import { transactionsApi } from "../features/transactions/api/transactionsApi";
+import { authApi } from "../features/authentication/api/authApi";
+import { currenciesApi } from "../features/currency/api/currenciesApi";
 
-const persistConfig = {
-  key: "root",
+// Persist only auth slice
+const authPersistConfig = {
+  key: "auth",
   storage,
-  whiteList: ["auth"],
 };
 
+// Combine reducers
 const rootReducer = combineReducers({
-  transactions: transactionsReducer,
-  auth: authReducer,
+  auth: persistReducer(authPersistConfig, authReducer),
+  [transactionsApi.reducerPath]: transactionsApi.reducer,
+  [authApi.reducerPath]: authApi.reducer,
+  [currenciesApi.reducerPath]: currenciesApi.reducer,
 });
-const persistedReducer = persistReducer(persistConfig, rootReducer);
 
+// Configure store
 export const store = configureStore({
-  reducer: persistedReducer,
+  reducer: rootReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: false,
-    }),
+      serializableCheck: {
+        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+      },
+    })
+      .concat(authApi.middleware)
+      .concat(currenciesApi.middleware)
+      .concat(transactionsApi.middleware),
 });
 
+// Persistor
 export const persistor = persistStore(store);
 
+// Types
 export type AppStore = typeof store;
-export type RootState = ReturnType<AppStore["getState"]>;
-export type AppDispatch = AppStore["dispatch"];
+export type AppDispatch = typeof store.dispatch;
+export type RootState = ReturnType<typeof store.getState>;

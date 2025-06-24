@@ -1,13 +1,21 @@
+import type { CurrencyState } from "../currency/currencyTypes";
+
 export interface Transaction {
   id: string;
   date: string;
   userId: string;
   amount: number;
-  currencyId: number;
+  currencyId: string;
   title: string;
   note: string;
   type: TransactionTypes;
   context: TransactionContexts;
+  receipt?: Receipt;
+}
+
+export interface TransactionExtra extends Transaction {
+  currency: TransactionCurrency;
+  availableCurrencies: CurrencyState[];
 }
 
 export type TransactionTypes = "INCOME" | "EXPENSE" | "SAVINGS";
@@ -18,6 +26,13 @@ export const transactionTypes = [
   { name: "INCOME" },
   { name: "SAVINGS" },
 ];
+
+export interface TransactionCurrency {
+  id: string;
+  code: string;
+  name: string;
+  symbol: string;
+}
 
 export const transactionContexts = [{ name: "BUSINESS" }, { name: "PERSONAL" }];
 

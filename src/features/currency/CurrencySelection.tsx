@@ -9,31 +9,31 @@ import { MdOutlineCheckBoxOutlineBlank } from "react-icons/md";
 import { MdOutlineCheckBox } from "react-icons/md";
 import Button from "../../components/Button";
 import { useMutation } from "@tanstack/react-query";
-import { pickCurrency } from "./mutations/pickCurrency";
 
 const CurrencySelection = () => {
   const { user } = useSelector((state: RootState) => state.auth);
   const { data, isLoading, isPending } = useLocalApi("currencies");
-  const { data: userData } = useLocalApi("users", user?.id);
-  const [pickedCurrencies, setPickedCurrencies] = useState<number[]>([]);
+  const [pickedCurrencies, setPickedCurrencies] = useState<string[]>([]);
+
+  console.log(user);
 
   useEffect(() => {
-    if (userData?.currencies) {
-      setPickedCurrencies(userData?.currencies);
+    if (user?.currencies) {
+      setPickedCurrencies(user?.currencies);
     }
-  }, [userData]);
+  }, [user]);
 
   // Send data to the server
-  const mutation = useMutation({
-    mutationFn: pickCurrency,
-    onSuccess: () => {
-      console.log("Favorite currencies successfully saved!");
-    },
-  });
+  // const mutation = useMutation({
+  //   mutationFn: pickCurrency,
+  //   onSuccess: () => {
+  //     console.log("Favorite currencies successfully saved!");
+  //   },
+  // });
 
   if (isLoading || isPending) return <h1>Currencies are being loaded</h1>;
 
-  const addCurrency = (newCurrency: number) => {
+  const addCurrency = (newCurrency: string) => {
     const alreadyExists = pickedCurrencies.find(
       (existing) => existing === newCurrency
     );
@@ -48,11 +48,13 @@ const CurrencySelection = () => {
   };
 
   const saveToFavorites = () => {
-    mutation.mutate({
-      currencies: pickedCurrencies,
-      userId: String(user?.id),
-    });
+    // mutation.mutate({
+    //   currencies: pickedCurrencies,
+    //   userId: user?.id as string,
+    // });
   };
+
+  console.log(pickedCurrencies);
 
   return (
     <section className="bg-[#1b1918] text-white  p-4 flex flex-col gap-4">
@@ -61,17 +63,18 @@ const CurrencySelection = () => {
         {data.map((currency: CurrencyState) => {
           return (
             <Button
+              type="button"
               key={currency.id}
               ariaLabel="Add currency to favorites"
               variant={
-                pickedCurrencies.includes(currency.id as number)
+                pickedCurrencies.includes(currency.id as string)
                   ? "PRIMARY"
                   : "TERTIARY"
               }
-              onClick={() => addCurrency(currency.id as number)}
+              onClick={() => addCurrency(currency.id as string)}
             >
               {currency.code}{" "}
-              {pickedCurrencies.includes(currency.id as number) ? (
+              {pickedCurrencies.includes(currency.id as string) ? (
                 <MdOutlineCheckBox />
               ) : (
                 <MdOutlineCheckBoxOutlineBlank />
@@ -80,6 +83,7 @@ const CurrencySelection = () => {
           );
         })}
         <Button
+          type="submit"
           variant="PRIMARY"
           ariaLabel="Save currencies to favorites"
           onClick={saveToFavorites}

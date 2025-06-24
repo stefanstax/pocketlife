@@ -1,11 +1,11 @@
 export interface CurrencyState {
-  id?: number;
+  id: string;
   code: string;
   name: string;
   symbol: string;
 }
 
 export interface FavoriteCurrenciesState {
-  currencies: number[];
+  currencies: string[];
   userId: string;
 }

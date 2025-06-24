@@ -19,7 +19,7 @@ const TransactionContext = ({
       <label className={labelClasses} htmlFor="variant">
         Transaction Context
       </label>
-      <div className={`${input} flex gap-2 text-xs`}>
+      <div className={`${input} flex gap-2 `}>
         {transactionContexts.map((option) => {
           return (
             <button

@@ -1,15 +1,15 @@
 import { useState, type FormEvent } from "react";
-import { useMutation } from "@tanstack/react-query";
-import { register } from "./mutations/register";
 import { registrationSchema } from "./registrationSchemas";
-import { formDiv, input, labelClasses } from "../../app/globalClasses";
+import { formDiv, input, labelClasses } from "../../../app/globalClasses";
 import { type RegistrationState } from "./registrationTypes";
-import ErrorMessage from "../../components/forms/ErrorMessage";
-import Button from "../../components/Button";
+import ErrorMessage from "../../../components/forms/ErrorMessage";
+import Button from "../../../components/Button";
 import { nanoid } from "@reduxjs/toolkit";
+import { useAddUserMutation } from "../api/authApi";
 
 const RegistrationForm = () => {
   const [formData, setFormData] = useState<RegistrationState>({
+    id: "",
     username: "",
     email: "",
     password: "",
@@ -21,25 +21,9 @@ const RegistrationForm = () => {
     password: "",
   });
 
-  const mutation = useMutation({
-    mutationFn: register,
-    onSuccess: () => {
-      setFormData({
-        username: "",
-        email: "",
-        password: "",
-      });
-    },
-    onError: (error: any) => {
-      console.error(
-        "At the moment we can't register you. This could be due to server issues or certain keywords in your input.",
-        error
-      );
-      setServerError(error.message);
-    },
-  });
+  const [addUser] = useAddUserMutation();
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
 
@@ -54,20 +38,18 @@ const RegistrationForm = () => {
       const errors = verifyData.error.flatten().fieldErrors;
 
       setFormErrors({
-        username: errors.username?.join(", ") || "",
-        email: errors.email?.join(", ") || "",
-        password: errors.password?.join(", ") || "",
+        username: errors?.username?.join(", ") || "",
+        email: errors?.email?.join(", ") || "",
+        password: errors?.password?.join(", ") || "",
       });
     }
 
-    // Other errors are handled on the backend
-    if (verifyData.success) {
-      mutation.mutate(verifyData.data);
-      setFormErrors({
-        username: "",
-        email: "",
-        password: "",
-      });
+    if (verifyData?.success) {
+      try {
+        await addUser(verifyData?.data).unwrap();
+      } catch (error: any) {
+        setServerError(error?.data?.message);
+      }
     }
   };
 

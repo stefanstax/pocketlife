@@ -1,8 +1,8 @@
 import { useSelector } from "react-redux";
 import type { RootState } from "../app/store";
 import { Link } from "react-router";
-import LoginButton from "../features/auth/LoginButton";
-import LogoutButton from "../features/auth/LogoutButton";
+import LogoutButton from "./LogoutButton";
+import LoginButton from "./LoginButton";
 
 const Navigation = () => {
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);

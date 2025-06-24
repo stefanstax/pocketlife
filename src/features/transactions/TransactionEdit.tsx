@@ -1,31 +1,34 @@
-import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState, type FormEvent } from "react";
 import { transactionSchema } from "./transactionSchemas";
-import { useLocalApi } from "../../app/hooks";
-import { redirect, useParams } from "react-router";
-import { editTransaction } from "./mutations/editTransaction";
-import { type CurrencyState } from "../currency/currencyTypes";
+import { useNavigate, useParams } from "react-router";
 import {
   type TransactionContexts,
   type TransactionTypes,
   type Receipt,
+  type Transaction,
 } from "./transactionTypes";
 import SubmitButton from "../../components/SubmitButton";
 import VariantLink from "../../components/VariantLink";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../app/store";
-import UploadField from "../../components/UploadFile";
 import TransactionTitle from "./fields/TransactionTitle";
 import TransactionAmount from "./fields/TransactionAmount";
 import TransactionType from "./fields/TransactionType";
 import TransactionCurrency from "./fields/TransactionCurrency";
 import TransactionContext from "./fields/TransactionContext";
 import TransactionNote from "./fields/TransactionNote";
+import {
+  useGetTransactionByIdQuery,
+  useUpdateTransactionMutation,
+} from "./api/transactionsApi";
+import type { CurrencyState } from "../currency/currencyTypes";
+import BlurredSpinner from "../../components/BlurredSpinner";
+import UploadField from "../../components/forms/UploadFile";
 
 const EditTransaction = () => {
   const [title, setTitle] = useState<string>("");
   const [amount, setAmount] = useState<number | "">("");
-  const [currencyId, setCurrencyId] = useState<number | "">("");
+  const [currencyId, setCurrencyId] = useState<string | "">("");
   const [note, setNote] = useState<string>("");
   const [type, setType] = useState<TransactionTypes | "">("");
   const [context, setContext] = useState<TransactionContexts | "">("");
@@ -33,20 +36,25 @@ const EditTransaction = () => {
   const [formErrors, setFormErrors] = useState<Partial<Record<string, string>>>(
     {}
   );
-  //   Grab ID from url
+  const navigate = useNavigate();
+
+  // Transaction ID
   const { id } = useParams();
 
+  // User Data
   const { user } = useSelector((state: RootState) => state.auth);
 
-  const {
-    data: transactionData,
-    isLoading,
-    isPending,
-  } = useLocalApi("transactions", id);
+  // Transaction Data
+  const { data: transactionData, isLoading } = useGetTransactionByIdQuery(
+    id || ""
+  );
+
+  // Update transaction mutation
+  const [updateTransaction, { isLoading: updating }] =
+    useUpdateTransactionMutation();
 
   const currenciesMatch = transactionData?.availableCurrencies?.some(
-    (currency: CurrencyState) =>
-      currency.id === transactionData.transactionCurrency.id
+    (currency: CurrencyState) => currency?.id === transactionData?.currency?.id
   );
 
   useEffect(() => {
@@ -54,34 +62,26 @@ const EditTransaction = () => {
       setTitle(transactionData?.title);
       setAmount(transactionData?.amount);
       if (currenciesMatch) {
-        setCurrencyId(transactionData?.transactionCurrency.id);
+        setCurrencyId(transactionData?.currencyId);
       } else {
         setCurrencyId("");
       }
-      setReceipt(transactionData?.receipt);
+      if (transactionData?.receipt) {
+        setReceipt(transactionData?.receipt);
+      }
       setType(transactionData?.type);
       setNote(transactionData?.note);
       setContext(transactionData?.context);
     }
   }, [transactionData]);
 
-  const mutation = useMutation({
-    mutationFn: editTransaction,
-    onSuccess: () => {
-      redirect("/transactions/");
-    },
-    onError: (error) => {
-      console.error("Submission error:", error);
-    },
-  });
-
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
 
     const result = transactionSchema.safeParse({
-      id: transactionData?.id,
-      userId: transactionData.userId,
+      id,
+      userId: transactionData?.userId,
       date: new Date().toLocaleDateString(),
       title: formData.get("title"),
       amount: formData.get("amount"),
@@ -107,23 +107,24 @@ const EditTransaction = () => {
     }
 
     if (result.success) {
-      mutation.mutate(result.data);
+      try {
+        await updateTransaction(result?.data as Transaction).unwrap();
+        navigate("/transactions/");
+      } catch (error) {
+        console.error("Something went bad", error);
+      }
     }
   };
 
-  if (isLoading || isPending) return <h1>We're loading your transaction...</h1>;
+  if (isLoading || updating) return <BlurredSpinner />;
 
   return (
     <form onSubmit={handleSubmit} className="w-full flex flex-col gap-4">
-      {!transactionData?.availableCurrencies?.some(
-        (currency: CurrencyState) =>
-          currency.id === transactionData.transactionCurrency.id
-      ) && (
+      {!currenciesMatch && (
         <div className="flex items-center gap-2 bg-black p-4 ">
           <p className="text-red-400">
-            *Your transaction currency (
-            {transactionData?.transactionCurrency?.code}) is not among your
-            available currencies
+            *Your transaction currency ({transactionData?.currency?.code}) has
+            been disabled. Enable it?
           </p>
           <VariantLink
             aria="Go to Currency modification page"
@@ -149,8 +150,8 @@ const EditTransaction = () => {
         validationError={formErrors?.type}
       />
       <TransactionCurrency
-        currencies={transactionData?.availableCurrencies}
-        currencyId={currencyId}
+        currencies={transactionData?.availableCurrencies ?? []}
+        currencyId={currencyId as string}
         setCurrencyId={setCurrencyId}
         validationError={formErrors?.currencyId}
       />
@@ -174,7 +175,7 @@ const EditTransaction = () => {
             hasFile={
               <a
                 target="_blank"
-                className={`border-2 border-dotted border-white px-4  py-2 text-xs ${
+                className={`border-2 border-dotted border-white px-4  py-2  ${
                   receipt?.url && "bg-[#5152fb]"
                 }`}
                 href={receipt?.url}

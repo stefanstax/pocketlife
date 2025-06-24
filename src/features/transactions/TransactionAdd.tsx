@@ -1,18 +1,14 @@
-import { useMutation } from "@tanstack/react-query";
-import { useEffect, useState, type FormEvent } from "react";
-import { addTransaction } from "./mutations/addTransaction";
+import { useState, type FormEvent } from "react";
 import { transactionSchema } from "./transactionSchemas";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../app/store";
-import { useLocalApi } from "../../app/hooks";
 import {
   type Receipt,
   type TransactionContexts,
+  type TransactionExtra,
   type TransactionTypes,
 } from "./transactionTypes";
-import type { CurrencyState } from "../currency/currencyTypes";
 import SubmitButton from "../../components/SubmitButton";
-import UploadField from "../../components/UploadFile";
 // Form Fields
 import TransactionTitle from "./fields/TransactionTitle";
 import TransactionAmount from "./fields/TransactionAmount";
@@ -21,53 +17,41 @@ import TransactionCurrency from "./fields/TransactionCurrency";
 import TransactionContext from "./fields/TransactionContext";
 import TransactionNote from "./fields/TransactionNote";
 import { nanoid } from "@reduxjs/toolkit";
+import { useLocalApi } from "../../app/hooks";
+import type { CurrencyState } from "../currency/currencyTypes";
+import { useAddTransactionMutation } from "./api/transactionsApi";
+import UploadField from "../../components/forms/UploadFile";
 
-const AddTransaction = () => {
-  const { user } = useSelector((state: RootState) => state.auth);
+const TransactionAdd = () => {
   const [title, setTitle] = useState<string>("");
   const [amount, setAmount] = useState<number | "">("");
   const [context, setContext] = useState<TransactionContexts | "">("");
-  const [currencyId, setCurrencyId] = useState<number | "">("");
+  const [currencyId, setCurrencyId] = useState<string | "">("");
   const [note, setNote] = useState<string>("");
   const [type, setType] = useState<TransactionTypes | "">("");
-  const [currencies, setCurrencies] = useState<CurrencyState[]>([]);
   const [receipt, setReceipt] = useState<Receipt | null>(null);
   const [formErrors, setFormErrors] = useState<Partial<Record<string, string>>>(
     {}
   );
 
-  const mutation = useMutation({
-    mutationFn: addTransaction,
-    onSuccess: () => {
-      setTitle("");
-      setAmount("");
-      setCurrencyId("");
-      setNote("");
-      setType("");
-      setContext("");
-    },
-    onError: (error) => {
-      console.error("Submission error:", error);
-    },
-  });
+  const [addTransaction] = useAddTransactionMutation();
 
-  const { data } = useLocalApi("currencies");
+  const { user } = useSelector((state: RootState) => state.auth);
+  const { data: currencies } = useLocalApi("currencies");
 
-  useEffect(() => {
-    if (data) {
-      setCurrencies(data);
-    }
-  }, [data]);
+  const userCurrencies = currencies?.filter((currency: CurrencyState) =>
+    user?.currencies?.includes(currency?.id ?? "")
+  );
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
 
-    const result = transactionSchema.safeParse({
+    const verifiedData = transactionSchema.safeParse({
       id: nanoid(),
       title: formData.get("title"),
       amount: formData.get("amount"),
-      currencyId: Number(formData.get("currencyId")),
+      currencyId: formData.get("currencyId"),
       note: formData.get("note"),
       date: new Date().toLocaleDateString(),
       type: formData.get("type"),
@@ -76,20 +60,34 @@ const AddTransaction = () => {
       userId: user?.id,
     });
 
-    if (!result.success) {
-      const flattened = result.error.flatten();
+    if (!verifiedData.success) {
+      const flattened = verifiedData.error.flatten();
       const fieldErrors = Object.fromEntries(
         Object.entries(flattened.fieldErrors).map(([key, val]) => [
           key,
           val?.[0],
         ])
       );
-
       setFormErrors(fieldErrors);
       return;
     }
 
-    mutation.mutate(result.data);
+    if (verifiedData.success) {
+      try {
+        await addTransaction(verifiedData?.data as TransactionExtra).unwrap();
+        setTitle("");
+        setAmount("");
+        setCurrencyId("");
+        setNote("");
+        setType("");
+        setContext("");
+        setCurrencyId("");
+        setReceipt(null);
+        console.log("Transaction has been added!");
+      } catch (error) {
+        console.log("There has been a problem", error);
+      }
+    }
   };
 
   return (
@@ -114,7 +112,7 @@ const AddTransaction = () => {
       />
       {/* Currency */}
       <TransactionCurrency
-        currencies={currencies}
+        currencies={userCurrencies}
         currencyId={currencyId}
         setCurrencyId={setCurrencyId}
         validationError={formErrors?.currencyId}
@@ -142,4 +140,4 @@ const AddTransaction = () => {
   );
 };
 
-export default AddTransaction;
+export default TransactionAdd;

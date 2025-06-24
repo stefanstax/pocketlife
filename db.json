@@ -1,94 +1,156 @@
 {
   "transactions": [
     {
-      "id": "AnGLNqOd6DO_-ur68yrTL",
-      "title": "Lidl kupovina",
-      "amount": 2700,
-      "userId": 977,
-      "currencyId": 2471,
-      "note": "",
-      "date": "21/06/2025",
+      "id": "AlSZr5H1T5GzgErPdjpGj",
+      "title": "Test with redux",
+      "amount": 100,
+      "userId": "bS8ddiqYYu1tR-lZ2E4gl",
+      "currencyId": "AnRHl_IYmMDy1QJQoLg8R",
+      "note": "No note.",
+      "date": "22/06/2025",
       "type": "EXPENSE",
       "context": "PERSONAL",
       "receipt": null
     },
     {
-      "id": "P6ynV-jUE_hDT0qtC26FZ",
-      "title": "Revolut card",
-      "amount": 16.99,
-      "userId": 977,
-      "currencyId": 8222,
-      "note": "Revolut business card order - payment will be refunded",
-      "date": "21/06/2025",
+      "id": "cAKkTsCG-YmT1Xon_G7zN",
+      "title": "Elsia domain extension",
+      "amount": 14.8,
+      "userId": "bS8ddiqYYu1tR-lZ2E4gl",
+      "currencyId": "AnRHl_IYmMDy1QJQoLg8R",
+      "note": "",
+      "date": "22/06/2025",
+      "type": "INCOME",
+      "context": "BUSINESS",
+      "receipt": {
+        "id": "YsSU7Lq3zJ",
+        "name": "invoice_ELSIA-1.pdf",
+        "url": "https://maypact-transactions.b-cdn.net/stefanstax/invoice_ELSIA-1.pdf"
+      }
+    },
+    {
+      "id": "HpZ3EB70r6OGUa8ZeF7Fi",
+      "title": "GDrive sub monthly",
+      "amount": 210,
+      "userId": "bS8ddiqYYu1tR-lZ2E4gl",
+      "currencyId": "vOO5AIJGQmrZUh9mCirWC",
+      "note": "",
+      "date": "22/06/2025",
+      "type": "EXPENSE",
+      "context": "PERSONAL",
+      "receipt": null
+    },
+    {
+      "id": "ub98405rogUh11WCGDPxb",
+      "title": "GPLTimes subscription",
+      "amount": 10.73,
+      "userId": "bS8ddiqYYu1tR-lZ2E4gl",
+      "currencyId": "AnRHl_IYmMDy1QJQoLg8R",
+      "note": "WordPress access to tools for both clients and myself.",
+      "date": "22/06/2025",
       "type": "EXPENSE",
       "context": "BUSINESS",
       "receipt": {
-        "id": "Gqk67bmcao",
-        "name": "Screenshot 2025-06-20 at 23.55.20.png",
-        "url": "https://maypact-transactions.b-cdn.net/stefanstax/Screenshot 2025-06-20 at 23.55.20.png"
+        "id": "hVa4ldRLIg",
+        "name": "gpltimes_001.pdf",
+        "url": "https://maypact-transactions.b-cdn.net/stefanstax/gpltimes_001.pdf"
       }
+    },
+    {
+      "id": "hKZ7ep9M12XI5LnBfTo1K",
+      "title": "Aktivnost",
+      "amount": 1200,
+      "userId": "bS8ddiqYYu1tR-lZ2E4gl",
+      "currencyId": "vOO5AIJGQmrZUh9mCirWC",
+      "note": "Luk is trela aktivnost - Kalemegdan",
+      "date": "22/06/2025",
+      "type": "EXPENSE",
+      "context": "PERSONAL",
+      "receipt": null
+    },
+    {
+      "id": "A7WYb0VlxNahfTmSW1mY9",
+      "title": "Maxi racun",
+      "amount": 1350,
+      "userId": "bS8ddiqYYu1tR-lZ2E4gl",
+      "currencyId": "vOO5AIJGQmrZUh9mCirWC",
+      "note": "Misc",
+      "date": "22/06/2025",
+      "type": "EXPENSE",
+      "context": "PERSONAL",
+      "receipt": null
+    },
+    {
+      "id": "g7L8i9_3QLNg6se6QMtU_",
+      "title": "Voda za trening",
+      "amount": 200,
+      "userId": "bS8ddiqYYu1tR-lZ2E4gl",
+      "currencyId": "vOO5AIJGQmrZUh9mCirWC",
+      "note": "25maj trening",
+      "date": "22/06/2025",
+      "type": "EXPENSE",
+      "context": "PERSONAL",
+      "receipt": null
+    },
+    {
+      "id": "VQE-Tdqd2PsGvOU_syvO_",
+      "title": "Piggybank withdrawal",
+      "amount": 100,
+      "userId": "bS8ddiqYYu1tR-lZ2E4gl",
+      "currencyId": "VhcO0fYLoWTROPdmCqa6k",
+      "note": "",
+      "date": "23/06/2025",
+      "type": "INCOME",
+      "context": "PERSONAL",
+      "receipt": null
     }
   ],
   "users": [
     {
-      "id": 977,
+      "id": "bS8ddiqYYu1tR-lZ2E4gl",
       "username": "stefanstax",
       "email": "stefanstax@gmail.com",
-      "password": "$2b$10$zGzXu37m1VBAc0d5aGOUte0VCB4WT1Ipba60yw0fvDhgB7huie6Ga",
+      "password": "$2b$10$TQgWpyrgOoOBUhsHH/Towuy9jInTjSRp7hs3BuvqgjLDfbSWqdD3G",
       "currencies": [
-        8222,
-        2471
+        "VhcO0fYLoWTROPdmCqa6k",
+        "AnRHl_IYmMDy1QJQoLg8R",
+        "vOO5AIJGQmrZUh9mCirWC"
       ]
     },
     {
-      "id": 284,
-      "username": "random",
-      "email": "random@gmail.com",
-      "password": "$2b$10$6hniTpQyJvnfumLg3h.VR.UMk3uktLbupk8CTtlC5JiziTSkgOlAa"
-    },
-    {
-      "id": 662,
-      "username": "random2",
-      "email": "random2@gmail.com",
-      "password": "$2b$10$aCSHjj/Oxd9lhCb6024GkOjPv6sRoPR5se3PTcYgjC4Q3PzzaMBoq",
+      "id": "Er_bdkT64ozfJU3iglE-p",
+      "username": "stefanstax2",
+      "email": "stefanstax2@gmail.com",
+      "password": "$2b$10$OkJoecB6eTlSCWykwVE05eBFqlVPu6X3YAKvrSXpCuNmaC7SpztRa",
       "currencies": [
-        2471
-      ]
-    },
-    {
-      "id": 507,
-      "username": "Saria",
-      "email": "s.s.s.0@live.com",
-      "password": "$2b$10$BGyoUbj2REzC6K6.gSNhT.pyNS8MkeG/z4vl1CzXm.asELN5gJgku",
-      "currencies": [
-        2471
+        "AnRHl_IYmMDy1QJQoLg8R"
       ]
     }
   ],
   "currencies": [
     {
-      "id": 3968,
+      "id": "vOO5AIJGQmrZUh9mCirWC",
+      "code": "RSD",
+      "name": "Serbian Dinar",
+      "symbol": "RSD"
+    },
+    {
+      "id": "VhcO0fYLoWTROPdmCqa6k",
       "code": "EUR",
-      "name": "EURO",
+      "name": "Euro",
       "symbol": "€"
     },
     {
-      "id": 9665,
-      "code": "USD",
-      "name": "US Dollar",
-      "symbol": "$"
-    },
-    {
-      "id": 8222,
+      "id": "AnRHl_IYmMDy1QJQoLg8R",
       "code": "GBP",
-      "name": "UK Pound",
+      "name": "Great British Pound",
       "symbol": "£"
     },
     {
-      "id": 2471,
-      "code": "RSD",
-      "name": "Serbian Dinar",
-      "symbol": "RSD "
+      "id": "66zm38AfyRZkKqDcS7lLz",
+      "code": "USD",
+      "name": "United States Dollar",
+      "symbol": "$"
     }
   ]
 }

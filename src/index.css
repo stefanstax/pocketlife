@@ -13,6 +13,7 @@ h2 {
 a,
 button {
   cursor: pointer;
+  font-size: 16px !important;
 }
 
 .button--submit {

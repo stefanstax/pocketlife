@@ -63,7 +63,7 @@ app.get("/currencies", async (req, res) => {
 });
 
 app.get(`/currencies/:id`, async (req, res) => {
-  const id = Number(req.params.id);
+  const id = req.params.id;
   try {
     const currencies = readCurrencies();
     const currency = currencies.find((currency) => currency.id === id);
@@ -85,7 +85,7 @@ app.put("/currencies/:id", (req, res) => {
   const updatedBody = req.body;
 
   const currencies = readCurrencies();
-  const index = currencies.findIndex((k) => k.id === Number(id));
+  const index = currencies.findIndex((k) => k.id === id);
 
   if (index === -1) {
     return res.status(404).json({ error: "Currency not found" });
@@ -100,6 +100,20 @@ app.put("/currencies/:id", (req, res) => {
   res.json(currencies[index]);
 });
 
+app.delete("/currencies/:id", async (req, res) => {
+  const { id } = req.params;
+  const currencies = readCurrencies();
+
+  const index = currencies.findIndex((find) => find.id === id);
+  if (index === -1) {
+    return res.status(404).json({ message: "Currency was not found." });
+  }
+
+  currencies.splice(index, 1);
+  writeCurrencies(currencies);
+  res.status(200).json({ message: "Currency was deleted." });
+});
+
 // Users
 app.get("/users", async (req, res) => {
   try {
@@ -111,7 +125,7 @@ app.get("/users", async (req, res) => {
 });
 
 app.get("/users/:id", async (req, res) => {
-  const id = Number(req.params.id);
+  const id = req.params.id;
   try {
     const users = readUsers();
     const userFound = users.find((user) => user.id === id);
@@ -123,7 +137,7 @@ app.get("/users/:id", async (req, res) => {
 
 // Example users POST route
 app.post("/users", async (req, res) => {
-  const { username, email, password } = req.body;
+  const { id, username, email, password } = req.body;
 
   const users = readUsers();
   if (users.find((u) => u.email === email)) {
@@ -135,13 +149,18 @@ app.post("/users", async (req, res) => {
   }
 
   const hashed = await bcrypt.hash(password, 10);
-  users.push({
-    ...req.body,
+  const newUserData = {
+    id,
+    username,
+    email,
     password: hashed,
-  });
+  };
 
+  users.push(newUserData);
   writeUsers(users);
-  res.status(201).json({ message: "User created" });
+
+  const { password: _, ...userWithoutPassword } = newUserData;
+  res.status(201).json(userWithoutPassword);
 });
 
 app.put("/users/:id", async (req, res) => {
@@ -156,7 +175,7 @@ app.put("/users/:id", async (req, res) => {
   };
 
   writeUsers(users);
-  res.json(200).json({
+  res.status(200).json({
     message: "You have successfully updated your favorite currencies.",
   });
 });
@@ -168,17 +187,22 @@ app.post("/login", async (req, res) => {
 
   const user = users.find((u) => u.email === email);
   if (!user) {
-    return res.status(401).json({ message: "User was not found." });
+    return res.status(401).json({
+      message: "Check your credentials or create an account instead.",
+    });
   }
 
   const isMatch = await bcrypt.compare(password, user.password);
 
   if (!isMatch) {
-    return res.status(401).json({ message: "Check your credentials again." });
+    return res.status(401).json({
+      message: "Check your credentials or create an account instead.",
+    });
   }
 
   if (user && isMatch) {
-    return res.status(200).json({ message: "Login successfull", user });
+    const { password: _, ...userWithoutPassword } = user;
+    return res.status(200).json(userWithoutPassword);
   }
 });
 
@@ -187,7 +211,7 @@ app.get("/transactions", async (req, res) => {
     const transactions = readTransactions();
     const currencies = readCurrencies();
 
-    const userId = Number(req.query.userId);
+    const userId = req.query.userId;
 
     if (!userId) {
       return res
@@ -217,8 +241,6 @@ app.get("/transactions", async (req, res) => {
 app.get("/transactions/:id", async (req, res) => {
   const id = req.params.id;
 
-  console.log(id);
-
   try {
     const transactions = readTransactions();
     const transaction = transactions.find(
@@ -247,7 +269,7 @@ app.get("/transactions/:id", async (req, res) => {
 
     const transactionWithCurrency = {
       ...transaction,
-      transactionCurrency: currency || null,
+      currency: currency || null,
       availableCurrencies: addonCurrencies,
     };
 
@@ -274,7 +296,7 @@ app.put("/transactions/:id", (req, res) => {
   const updatedBody = req.body;
 
   const transactions = readTransactions();
-  const index = transactions.findIndex((k) => k.id === Number(id));
+  const index = transactions.findIndex((k) => k.id === id);
 
   if (index === -1) {
     return res.status(404).json({ error: "Transaction not found" });

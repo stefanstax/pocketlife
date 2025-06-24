@@ -1,8 +1,8 @@
 // ✅ UploadField.tsx
 import { useRef } from "react";
-import { formDiv, input, labelClasses } from "../app/globalClasses";
-import { uploadFileToBunny } from "../features/transactions/mutations/uploadtoBunny";
-import type { Receipt } from "../features/transactions/transactionTypes";
+import type { Receipt } from "../../features/transactions/transactionTypes";
+import { uploadFileToBunny } from "../../features/transactions/api/uploadtoBunny";
+import { formDiv, input, labelClasses } from "../../app/globalClasses";
 
 const UploadField = ({
   receipt,
@@ -48,7 +48,7 @@ const UploadField = ({
       <label className={labelClasses}>Upload Receipt</label>
 
       <div className={input}>
-        <div className="flex gap-2 items-center text-xs flex-wrap">
+        <div className="flex gap-2 items-center  flex-wrap">
           <button
             type="button"
             className="border-2 border-dotted px-4  py-2"

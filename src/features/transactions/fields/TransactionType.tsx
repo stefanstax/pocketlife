@@ -25,7 +25,7 @@ const TransactionType = ({
                 option.name === type
                   ? "bg-[#5152fb] text-white border-white"
                   : ""
-              } w-fit grow-0 text-xs  cursor-pointer p-2 border-black flex-1 border-dotted border-2  flex-1`}
+              } w-fit grow-0   cursor-pointer p-2 border-black flex-1 border-dotted border-2  flex-1`}
               type="button"
               onClick={() => setType(option.name as TransactionTypes)}
             >

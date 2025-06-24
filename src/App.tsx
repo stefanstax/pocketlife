@@ -5,16 +5,16 @@ import Login from "./pages/Login";
 import Registration from "./pages/Registration";
 import Home from "./pages/Home";
 import Layout from "./components/Layout";
-import ProtectedRoute from "./features/auth/ProtectedRoute";
-import GuestRoute from "./features/auth/GuestRoute";
 import TransactionList from "./features/transactions/TransactionList";
-import AddTransaction from "./features/transactions/AddTransaction";
-import EditTransaction from "./features/transactions/EditTransaction";
+import AddTransaction from "./features/transactions/TransactionAdd";
+import EditTransaction from "./features/transactions/TransactionEdit";
 import CurrenciesAdd from "./features/currency/CurrencyAdd";
 import CurrencyList from "./features/currency/CurrencyList";
 import CurrencyEdit from "./features/currency/CurrencyEdit";
-import AdminRoute from "./features/auth/AdminRoute";
 import CurrencySelection from "./features/currency/CurrencySelection";
+import ProtectedRoute from "./components/ProtectedRoute";
+import AdminRoute from "./components/AdminRoute";
+import GuestRoute from "./components/GuestRoute";
 
 const queryClient = new QueryClient();
 

@@ -9,11 +9,10 @@ export const transactionSchema = z.object({
       .number({ message: "Please enter transaction amount" })
       .positive("Transaction amount must be higher than 0")
   ),
-  userId: z.number(),
-  currencyId: z.preprocess(
-    (val) => Number(val),
-    z.number().min(1, "Please select transaction currency")
-  ),
+  userId: z.string(),
+  currencyId: z
+    .string()
+    .nonempty({ message: "Transaction currency must be selected" }),
   note: z.string(),
   date: z.string(),
   type: z.enum(["INCOME", "EXPENSE", "SAVINGS"], {

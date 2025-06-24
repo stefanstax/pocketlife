@@ -1,42 +1,30 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { formDiv, input, labelClasses } from "../../app/globalClasses";
 import { currenciesSchema } from "./currenciesSchema";
-import { useMutation } from "@tanstack/react-query";
-import { addCurrency } from "./mutations/addCurrency";
 import type { CurrencyState } from "./currencyTypes";
 import SubmitButton from "../../components/SubmitButton";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../app/store";
 import { nanoid } from "@reduxjs/toolkit";
+import { useAddCurrencyMutation } from "./api/currenciesApi";
 
 const CurrenciesAdd = () => {
   const { user } = useSelector((state: RootState) => state.auth);
   const [formData, setFormData] = useState<CurrencyState>({
+    id: "",
     code: "",
     name: "",
     symbol: "",
   });
+
+  const [addCurrency] = useAddCurrencyMutation();
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const mutation = useMutation({
-    mutationFn: addCurrency,
-    onSuccess: () => {
-      setFormData({
-        code: "",
-        name: "",
-        symbol: "",
-      });
-    },
-    onError: () => {
-      console.error("There was a problem with mutating your data.");
-    },
-  });
-
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const formData = new FormData(event.currentTarget);
@@ -57,7 +45,11 @@ const CurrenciesAdd = () => {
     }
 
     if (verifyData.success) {
-      mutation.mutate(verifyData.data);
+      try {
+        await addCurrency(verifyData?.data).unwrap();
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 

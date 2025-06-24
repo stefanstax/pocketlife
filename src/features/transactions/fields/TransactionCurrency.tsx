@@ -9,8 +9,8 @@ const TransactionCurrency = ({
   validationError,
 }: {
   currencies: CurrencyState[];
-  currencyId: number | "";
-  setCurrencyId: (value: number) => void;
+  currencyId: string | "";
+  setCurrencyId: (value: string) => void;
   validationError?: string;
 }) => {
   return (
@@ -28,8 +28,8 @@ const TransactionCurrency = ({
                 currencyId === curr.id
                   ? "bg-[#5152fb] text-white border-white"
                   : ""
-              } w-fit text-xs grow-0  cursor-pointer p-2 border-black flex-1 border-dotted border-2 flex-1`}
-              onClick={() => setCurrencyId(Number(curr?.id))}
+              } w-fit  grow-0  cursor-pointer p-2 border-black flex-1 border-dotted border-2 flex-1`}
+              onClick={() => setCurrencyId(curr?.id)}
             >
               {curr?.code}
             </button>
