@@ -21,7 +21,7 @@ import {
   useGetTransactionByIdQuery,
   useUpdateTransactionMutation,
 } from "./api/transactionsApi";
-import type { CurrencyState } from "../currency/currencyTypes";
+import type { CurrencyState } from "./currency/currencyTypes";
 import BlurredSpinner from "../../components/BlurredSpinner";
 import UploadField from "../../components/forms/UploadFile";
 
@@ -82,9 +82,10 @@ const EditTransaction = () => {
     const result = transactionSchema.safeParse({
       id,
       userId: transactionData?.userId,
-      date: new Date().toLocaleDateString(),
       title: formData.get("title"),
       amount: formData.get("amount"),
+      date: transactionData?.date,
+      time: transactionData?.time ?? new Date().toLocaleTimeString(),
       currencyId: formData.get("currencyId"),
       note: formData.get("note"),
       type: formData.get("type"),

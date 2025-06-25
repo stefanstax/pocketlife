@@ -1,4 +1,10 @@
 {
+  
+  "compilerOptions": {
+    "jsx": "react-jsx",             
+    "lib": ["DOM", "ESNext"],        
+    "types": ["vite/client", "react"] 
+  },
   "files": [],
   "references": [
     { "path": "./tsconfig.app.json" },

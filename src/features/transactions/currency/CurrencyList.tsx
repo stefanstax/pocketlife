@@ -1,9 +1,9 @@
 import { Link } from "react-router";
-import { useLocalApi } from "../../app/hooks";
+import { useLocalApi } from "../../../app/hooks";
 import { useRemoveCurrencyByIdMutation } from "./api/currenciesApi";
 import type { CurrencyState } from "./currencyTypes";
 import { RiDeleteBin6Line } from "react-icons/ri";
-import { PRIMARY, SHARED } from "../../app/globalClasses";
+import { PRIMARY, SHARED } from "../../../app/globalClasses";
 
 const CurrencyList = () => {
   const { data, isLoading, isPending } = useLocalApi("currencies");

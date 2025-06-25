@@ -18,7 +18,7 @@ import TransactionContext from "./fields/TransactionContext";
 import TransactionNote from "./fields/TransactionNote";
 import { nanoid } from "@reduxjs/toolkit";
 import { useLocalApi } from "../../app/hooks";
-import type { CurrencyState } from "../currency/currencyTypes";
+import type { CurrencyState } from "./currency/currencyTypes";
 import { useAddTransactionMutation } from "./api/transactionsApi";
 import UploadField from "../../components/forms/UploadFile";
 
@@ -54,6 +54,7 @@ const TransactionAdd = () => {
       currencyId: formData.get("currencyId"),
       note: formData.get("note"),
       date: new Date().toLocaleDateString(),
+      time: new Date().toLocaleTimeString(),
       type: formData.get("type"),
       context: formData.get("context"),
       receipt: receipt,

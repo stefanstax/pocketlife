@@ -3,34 +3,38 @@ import BlurredSpinner from "../../components/BlurredSpinner";
 import { useGetTransactionsQuery } from "./api/transactionsApi";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../app/store";
-import type { Transaction, TransactionExtra } from "./transactionTypes";
-import PersonalTransactions from "./PersonalTransactions";
-import BusinessTransactions from "./BusinessTransactions";
+import type { TransactionExtra } from "./transactionTypes";
+import Pagination from "../../components/Pagination";
+import { useState } from "react";
+import TransactionsTable from "./TransactionsTable";
 
 const TransactionList = () => {
   const { user } = useSelector((state: RootState) => state.auth);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(5);
 
-  const { data, isLoading } = useGetTransactionsQuery(user?.id ?? "");
+  const { data, isLoading } = useGetTransactionsQuery({
+    userId: user?.id ?? "",
+    page,
+    limit,
+    sortBy: "date",
+    order: "desc",
+  });
 
   if (isLoading) {
     return <BlurredSpinner />;
   }
 
-  const filterByPersonal = data?.filter(
-    (transaction: Transaction) => transaction.context === "PERSONAL"
-  );
-
-  const filterByBusiness = data?.filter(
-    (transaction: Transaction) => transaction.context === "BUSINESS"
-  );
-
   return (
     <section>
       <div className="flex gap-4 mb-10 flex-wrap items-stretch justify-between">
-        <h3 className="text-2xl font-[700]">Personal Transactions</h3>
-        <PersonalTransactions data={filterByPersonal as TransactionExtra[]} />
-        <h3 className="text-2xl font-[700]">Business Transactions</h3>
-        <BusinessTransactions data={filterByBusiness as TransactionExtra[]} />
+        <TransactionsTable data={data?.data as TransactionExtra[]} />
+        <Pagination
+          page={page}
+          total={data?.total as number}
+          perPage={limit}
+          onPageChange={setPage}
+        />
       </div>
       <VariantLink
         variant="PRIMARY"

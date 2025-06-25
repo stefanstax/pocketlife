@@ -164,20 +164,19 @@ app.post("/users", async (req, res) => {
 });
 
 app.put("/users/:id", async (req, res) => {
-  const { currencies, userId } = req.body;
-
+  const currencies = req.body;
+  const userId = req.params.id;
   const users = readUsers();
-  const userPosition = users.findIndex((u) => u.id === userId);
+  const index = users.findIndex((u) => u.id === userId);
 
-  users[userPosition] = {
-    ...users[userPosition],
+  users[index] = {
+    ...users[index],
     currencies,
   };
 
   writeUsers(users);
-  res.status(200).json({
-    message: "You have successfully updated your favorite currencies.",
-  });
+  const { password, ...userWithoutPassword } = users[index];
+  res.status(200).json(userWithoutPassword);
 });
 
 app.post("/login", async (req, res) => {
@@ -207,32 +206,56 @@ app.post("/login", async (req, res) => {
 });
 
 app.get("/transactions", async (req, res) => {
+  const { userId, page, limit, sortBy = "date", order = "desc" } = req.query;
+
   try {
     const transactions = readTransactions();
     const currencies = readCurrencies();
 
-    const userId = req.query.userId;
-
     if (!userId) {
-      return res
-        .status(200)
-        .json({ message: "Please login first to see your transactions." });
+      return res.status(200).json({
+        message: "Please login first to see your transactions.",
+      });
     }
 
-    const transactionsWithCurrency = transactions.map((transaction) => {
-      const currency = currencies.find((c) => c.id === transaction.currencyId);
+    const filtered = transactions.filter(
+      (transaction) => transaction.userId === userId
+    );
 
+    const transactionsWithCurrency = filtered.map((transaction) => {
+      const currency = currencies.find((c) => c.id === transaction.currencyId);
       return {
         ...transaction,
         currency: currency || null,
       };
     });
 
-    const userSpecificTransactions = transactionsWithCurrency.filter(
-      (transaction) => transaction.userId === userId
-    );
+    const startIndex = (parseInt(page) - 1) * parseInt(limit);
+    const endIndex = startIndex + parseInt(limit);
 
-    res.json(userSpecificTransactions);
+    const sortTransactions = transactionsWithCurrency.sort((a, b) => {
+      const valA = a[sortBy];
+      const valB = b[sortBy];
+
+      if (!valA || !valB) return 0;
+
+      if (typeof valA === "string") {
+        return order === "asc"
+          ? valA.localeCompare(valB)
+          : valB.localeCompare(valA);
+      }
+
+      return order === "asc" ? valA - valB : valB - valA;
+    });
+
+    const paginatedTransactions = sortTransactions.slice(startIndex, endIndex);
+
+    res.json({
+      data: paginatedTransactions,
+      total: transactionsWithCurrency.length,
+      page,
+      limit,
+    });
   } catch {
     res.status(500).json({ error: "Failed to read database" });
   }

@@ -1,12 +1,12 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
-import { formDiv, input, labelClasses } from "../../app/globalClasses";
+import { formDiv, input, labelClasses } from "../../../app/globalClasses";
 import { currenciesSchema } from "./currenciesSchema";
 import type { CurrencyState } from "./currencyTypes";
-import SubmitButton from "../../components/SubmitButton";
 import { useSelector } from "react-redux";
-import type { RootState } from "../../app/store";
+import type { RootState } from "../../../app/store";
 import { nanoid } from "@reduxjs/toolkit";
 import { useAddCurrencyMutation } from "./api/currenciesApi";
+import SubmitButton from "../../../components/SubmitButton";
 
 const CurrenciesAdd = () => {
   const { user } = useSelector((state: RootState) => state.auth);

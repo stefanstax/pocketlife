@@ -1,8 +1,11 @@
-import type { CurrencyState } from "../currency/currencyTypes";
+import type { CurrencyState } from "./currency/currencyTypes";
 
 export interface Transaction {
   id: string;
   date: string;
+  updatedDate?: string;
+  time: string;
+  updatedTime?: string;
   userId: string;
   amount: number;
   currencyId: string;
@@ -11,6 +14,13 @@ export interface Transaction {
   type: TransactionTypes;
   context: TransactionContexts;
   receipt?: Receipt;
+}
+
+export interface PaginatatedTransactions {
+  data: Transaction[];
+  total: number;
+  page: number;
+  limit: number;
 }
 
 export interface TransactionExtra extends Transaction {

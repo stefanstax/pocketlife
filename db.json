@@ -103,6 +103,95 @@
       "type": "INCOME",
       "context": "PERSONAL",
       "receipt": null
+    },
+    {
+      "id": "u3hD78jJvKZJGHQTuZbR3",
+      "title": "Piggybank withdrawal",
+      "amount": 5000,
+      "userId": "bS8ddiqYYu1tR-lZ2E4gl",
+      "currencyId": "vOO5AIJGQmrZUh9mCirWC",
+      "note": "",
+      "date": "24/06/2025",
+      "type": "INCOME",
+      "context": "PERSONAL",
+      "receipt": null,
+      "time": "18:16:56"
+    },
+    {
+      "id": "n_LsTk53dq78Vtq-YGCdU",
+      "title": "Trening",
+      "amount": 440,
+      "userId": "bS8ddiqYYu1tR-lZ2E4gl",
+      "currencyId": "vOO5AIJGQmrZUh9mCirWC",
+      "note": "",
+      "date": "24/06/2025",
+      "type": "EXPENSE",
+      "context": "PERSONAL",
+      "receipt": null,
+      "time": "18:17:03"
+    },
+    {
+      "id": "ugTZG5Ll_DaM9WnthTVVX",
+      "title": "Himalayas app",
+      "amount": 9,
+      "userId": "bS8ddiqYYu1tR-lZ2E4gl",
+      "currencyId": "66zm38AfyRZkKqDcS7lLz",
+      "note": "Job application platform",
+      "date": "24/06/2025",
+      "type": "EXPENSE",
+      "context": "PERSONAL",
+      "receipt": null
+    },
+    {
+      "id": "kcOfco3qMEvT75IwKOFtl",
+      "title": "GA-001",
+      "amount": 76,
+      "userId": "bS8ddiqYYu1tR-lZ2E4gl",
+      "currencyId": "AnRHl_IYmMDy1QJQoLg8R",
+      "note": "Griffith accountants maintenance invoice",
+      "date": "24/06/2025",
+      "type": "INCOME",
+      "context": "BUSINESS",
+      "receipt": null
+    },
+    {
+      "id": "c1g9omM_gBakcibodi8Rh",
+      "title": "Jerry kafica + kolac",
+      "amount": 340,
+      "userId": "bS8ddiqYYu1tR-lZ2E4gl",
+      "currencyId": "vOO5AIJGQmrZUh9mCirWC",
+      "note": "",
+      "date": "25/06/2025",
+      "type": "EXPENSE",
+      "context": "PERSONAL",
+      "receipt": null,
+      "time": "16:41:41"
+    },
+    {
+      "id": "B5CWh9um93zsDwVvZeE31",
+      "title": "Jerry kafice",
+      "amount": 340,
+      "userId": "bS8ddiqYYu1tR-lZ2E4gl",
+      "currencyId": "vOO5AIJGQmrZUh9mCirWC",
+      "note": "",
+      "date": "25/06/2025",
+      "type": "EXPENSE",
+      "context": "PERSONAL",
+      "receipt": null,
+      "time": "18:17:47"
+    },
+    {
+      "id": "S5Goho3sUMQsp41JiPEac",
+      "title": "Maxi",
+      "amount": 1200,
+      "userId": "bS8ddiqYYu1tR-lZ2E4gl",
+      "currencyId": "vOO5AIJGQmrZUh9mCirWC",
+      "note": "",
+      "date": "25/06/2025",
+      "time": "17:47:18",
+      "type": "EXPENSE",
+      "context": "PERSONAL",
+      "receipt": null
     }
   ],
   "users": [
@@ -113,8 +202,9 @@
       "password": "$2b$10$TQgWpyrgOoOBUhsHH/Towuy9jInTjSRp7hs3BuvqgjLDfbSWqdD3G",
       "currencies": [
         "VhcO0fYLoWTROPdmCqa6k",
+        "vOO5AIJGQmrZUh9mCirWC",
         "AnRHl_IYmMDy1QJQoLg8R",
-        "vOO5AIJGQmrZUh9mCirWC"
+        "66zm38AfyRZkKqDcS7lLz"
       ]
     },
     {

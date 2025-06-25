@@ -7,7 +7,7 @@ export interface ButtonProps {
   variant: "PRIMARY" | "SECONDARY" | "TERTIARY";
   children: ReactNode;
   onClick?: () => void;
-  type: "button" | "submit" | "reset";
+  type?: "button" | "submit" | "reset";
 }
 
 const Button = ({

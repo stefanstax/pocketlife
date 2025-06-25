@@ -1,9 +1,9 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { formDiv, input, labelClasses } from "../../app/globalClasses";
+import { formDiv, input, labelClasses } from "../../../app/globalClasses";
 import { currenciesSchema } from "./currenciesSchema";
 import type { CurrencyState } from "./currencyTypes";
 import { useParams } from "react-router";
-import SubmitButton from "../../components/SubmitButton";
+import SubmitButton from "../../../components/SubmitButton";
 import {
   useEditCurrencyByIdMutation,
   useGetCurrencyByIdQuery,

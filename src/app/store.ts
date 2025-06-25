@@ -13,7 +13,8 @@ import {
 import storage from "redux-persist/lib/storage";
 import { transactionsApi } from "../features/transactions/api/transactionsApi";
 import { authApi } from "../features/authentication/api/authApi";
-import { currenciesApi } from "../features/currency/api/currenciesApi";
+import { categoriesApi } from "../features/transactions/category/api/categoriesApi";
+import { currenciesApi } from "../features/transactions/currency/api/currenciesApi";
 
 // Persist only auth slice
 const authPersistConfig = {
@@ -26,6 +27,7 @@ const rootReducer = combineReducers({
   auth: persistReducer(authPersistConfig, authReducer),
   [transactionsApi.reducerPath]: transactionsApi.reducer,
   [authApi.reducerPath]: authApi.reducer,
+  [categoriesApi.reducerPath]: categoriesApi.reducer,
   [currenciesApi.reducerPath]: currenciesApi.reducer,
 });
 

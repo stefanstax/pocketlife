@@ -1,17 +1,18 @@
 import type { Receipt, Transaction } from "./transactionTypes";
-import type { CurrencyState } from "../currency/currencyTypes";
-import { Link } from "react-router";
+import type { CurrencyState } from "./currency/currencyTypes";
+import { Link } from "react-router-dom";
 import { PRIMARY, SHARED } from "../../app/globalClasses";
 import NoDataFallback from "../../components/forms/NoDataFallback";
+import { TbReceiptOff, TbReceiptPound } from "react-icons/tb";
 
 type Props = {
   data: (Transaction & { currency: CurrencyState; receipt?: Receipt })[];
 };
 
-const BusinessTransactions = ({ data }: Props) => {
+const TransactionsTable = ({ data }: Props) => {
   return (
     <>
-      <table className="w-full text-left text-sm border-collapse">
+      <table className="w-full text-left border-collapse">
         <thead>
           <tr className="bg-black text-white">
             <th className="p-2 w-[100px]">Date</th>
@@ -34,6 +35,7 @@ const BusinessTransactions = ({ data }: Props) => {
               currency,
               note,
               date,
+              time,
               context,
               receipt,
             } = transaction;
@@ -43,19 +45,36 @@ const BusinessTransactions = ({ data }: Props) => {
                 key={id}
                 className="border-b border-[#5152fb] hover:bg-[#f4f4ff] transition"
               >
-                <td className="p-2">{date}</td>
+                <td className="p-2">
+                  <p className="flex flex-col">
+                    <span>{date}</span>
+                    <span className="text-xs">{time}</span>
+                  </p>
+                </td>
                 <td className="p-2">{type}</td>
                 <td className="p-2">{title}</td>
                 <td className="p-2">
                   {currency?.symbol}
-                  {amount}
+                  {amount.toFixed(2)}
                 </td>
-                <td className="p-2">{note?.trim() ? note : "No note"}</td>
+                <td className="p-2">{note?.trim() ? note : "-"}</td>
                 <td className="p-2">
-                  {context === "BUSINESS" && !receipt ? (
-                    <span className="text-red-500">*Receipt missing</span>
+                  {!receipt ? (
+                    <span
+                      className={`flex gap-2 items-center ${
+                        context === "BUSINESS"
+                          ? "text-red-500"
+                          : "text-blue-500"
+                      }`}
+                    >
+                      <TbReceiptOff fontSize={20} /> Receipt missing
+                    </span>
                   ) : receipt ? (
-                    "Attached"
+                    <Link to={receipt?.url} target="_blank">
+                      <span className="flex gap-2 items-center text-black hover:text-[#5152fb]">
+                        <TbReceiptPound fontSize={20} /> View Receipt
+                      </span>
+                    </Link>
                   ) : (
                     "-"
                   )}
@@ -78,4 +97,4 @@ const BusinessTransactions = ({ data }: Props) => {
   );
 };
 
-export default BusinessTransactions;
+export default TransactionsTable;

@@ -3,18 +3,41 @@ import type { RootState } from "../app/store";
 import { Link } from "react-router";
 import LogoutButton from "./LogoutButton";
 import LoginButton from "./LoginButton";
+import { FaMoneyBillTransfer } from "react-icons/fa6";
+import { FaCircleDollarToSlot } from "react-icons/fa6";
+import { FaFileInvoiceDollar } from "react-icons/fa";
 
 const Navigation = () => {
-  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const { user, isAuthenticated } = useSelector(
+    (state: RootState) => state.auth
+  );
+
   return (
-    <nav className="w-full flex-wrap mt-4 px-4 py-2 min-h-[60px] bg-[#1b1918]  flex justify-between items-center mx-auto">
-      <p className="text-2xl text-[#f9f4da] font-black">Transactions App</p>
-      <div className="flex gap-5 text-[#5152fb]">
-        <Link to="/transactions/">Transactions</Link>
-        <Link to="/select-currencies/">Toggle Currencies</Link>
-        <Link to="/links/">Links</Link>
+    <nav className="w-full flex-wrap mt-4 p-4 min-h-[60px] bg-[#1b1918] gap-4 flex justify-start items-center mx-auto">
+      <h1 className="text-xl text-white font-black">Transactions App</h1>
+      <div className="flex gap-5 font-[500] text-white">
+        <Link
+          to="/transactions/"
+          className="flex gap-2 items-center hover:text-blue-200"
+        >
+          <FaMoneyBillTransfer /> Transactions
+        </Link>
+        {user?.username === "stefanstax" && (
+          <Link
+            to="/currencies/"
+            className="flex gap-2 items-center hover:text-blue-200"
+          >
+            <FaFileInvoiceDollar /> Manage Currencies
+          </Link>
+        )}
+        <Link
+          to="/select-currencies/"
+          className="flex gap-2 items-center hover:text-blue-200"
+        >
+          <FaCircleDollarToSlot /> Toggle Currencies
+        </Link>
       </div>
-      <div className="flex gap-5 items-center justify between">
+      <div className="flex gap-5 ml-auto items-center justify between">
         {isAuthenticated ? <LogoutButton /> : <LoginButton />}
       </div>
     </nav>

@@ -4,7 +4,7 @@ interface ErrorMessageProps {
 const ErrorMessage = ({ field }: ErrorMessageProps) => {
   if (!field?.length) return null;
 
-  return <p className="text-red-500 text-sm">{field}</p>;
+  return <p className="text-red-500">{field}</p>;
 };
 
 export default ErrorMessage;
