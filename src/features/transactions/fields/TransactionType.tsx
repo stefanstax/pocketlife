@@ -16,16 +16,16 @@ const TransactionType = ({
       <label className={labelClasses} htmlFor="type">
         Transaction Type
       </label>
-      <div className={`${input} flex gap-2`}>
+      <div className={`${input} grid grid-cols-4 gap-2`}>
         {transactionTypes.map((option) => {
           return (
             <button
               key={option.name}
               className={`${
                 option.name === type
-                  ? "bg-[#5152fb] text-white border-white"
+                  ? "bg-[#5152fb] text-white border-black"
                   : ""
-              } w-fit grow-0   cursor-pointer p-2 border-black flex-1 border-dotted border-2  flex-1`}
+              } w-full rounded-sm cursor-pointer p-2 border-black flex-1 border-solid border-2  flex-1`}
               type="button"
               onClick={() => setType(option.name as TransactionTypes)}
             >

@@ -1,207 +1,219 @@
 import express from "express";
 import bcrypt from "bcryptjs";
-import fs, { write } from "fs";
 import cors from "cors";
 import multer from "multer";
+import { supabase } from "./supabaseClient.js";
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 
-const DB_PATH = "./db.json";
 import dotenv from "dotenv";
 import axios from "axios";
 dotenv.config();
 
-const readUsers = () => {
-  const data = fs.readFileSync(DB_PATH);
-  return JSON.parse(data).users || [];
-};
-
-const readCurrencies = () => {
-  const data = fs.readFileSync(DB_PATH);
-  return JSON.parse(data).currencies || [];
-};
-
-const writeCurrencies = (newCurrency) => {
-  const db = JSON.parse(fs.readFileSync(DB_PATH));
-  db.currencies = newCurrency;
-  fs.writeFileSync(DB_PATH, JSON.stringify(db, null, 2));
-};
-
-const writeUsers = (updatedUsers) => {
-  const db = JSON.parse(fs.readFileSync(DB_PATH));
-  db.users = updatedUsers;
-  fs.writeFileSync(DB_PATH, JSON.stringify(db, null, 2));
-};
-
-// Transactions
-const readTransactions = () => {
-  const data = fs.readFileSync(DB_PATH);
-  return JSON.parse(data).transactions || [];
-};
-
-const writeTransactions = (newTransactions) => {
-  const db = JSON.parse(fs.readFileSync(DB_PATH));
-  db.transactions = newTransactions;
-  fs.writeFileSync(DB_PATH, JSON.stringify(db, null, 2));
-};
-
-// Root route
-app.get("/", (req, res) => {
-  res.send("API is running 🎉");
-});
-
 // Currencies
 app.get("/currencies", async (req, res) => {
   try {
-    const currencies = readCurrencies();
-    res.json(currencies); // assuming your JSON has a "users" array
-  } catch (err) {
-    res.status(500).json({ error: "Failed to read database" });
+    const { data, error } = await supabase.from("currencies").select("*");
+
+    if (error) return res.status(400).json({ message: error.message });
+    res.status(200).json(data);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
   }
 });
 
 app.get(`/currencies/:id`, async (req, res) => {
   const id = req.params.id;
+
   try {
-    const currencies = readCurrencies();
-    const currency = currencies.find((currency) => currency.id === id);
-    res.json(currency);
-  } catch {
-    res.status(500).json({ error: "Failed to read database" });
+    const { data, error } = await supabase
+      .from("currencies")
+      .select("*")
+      .eq("code", id)
+      .single();
+
+    if (error) return res.status(400).json({ message: error.message });
+
+    return res.status(200).json(data);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
   }
 });
 
 app.post("/currencies", async (req, res) => {
-  const currencies = readCurrencies();
-  currencies.push(req.body);
-  writeCurrencies(currencies);
-  res.status(201).json({ message: "Currency successfully created!" });
+  const newCurrency = req.body;
+
+  try {
+    const { data: existing } = await supabase
+      .from("currencies")
+      .select("*")
+      .eq("code", newCurrency.code);
+
+    if (existing.length > 0)
+      return res
+        .status(400)
+        .json({ message: "You've already created this currency." });
+
+    const { data, error } = await supabase
+      .from("currencies")
+      .insert([newCurrency]);
+
+    if (error) return res.status(400).json({ message: error.message });
+    res.status(201).json({
+      data,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "There was an issue inserting a new currency." });
+  }
 });
 
-app.put("/currencies/:id", (req, res) => {
-  const { id } = req.params;
+app.put("/currencies/:code", async (req, res) => {
+  const { code } = req.params;
   const updatedBody = req.body;
 
-  const currencies = readCurrencies();
-  const index = currencies.findIndex((k) => k.id === id);
+  try {
+    const { error } = await supabase
+      .from("currencies")
+      .update(updatedBody)
+      .eq("code", code);
 
-  if (index === -1) {
-    return res.status(404).json({ error: "Currency not found" });
+    if (error) {
+      return res.status(400).json({ message: error.message });
+    }
+
+    return res.status(200).json({ message: "Currency has been updated." });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message || "Unexpected server error.",
+    });
   }
-
-  currencies[index] = {
-    ...currencies[index],
-    ...updatedBody,
-  };
-
-  writeCurrencies(currencies);
-  res.json(currencies[index]);
 });
 
-app.delete("/currencies/:id", async (req, res) => {
-  const { id } = req.params;
-  const currencies = readCurrencies();
+app.delete("/currencies/:code", async (req, res) => {
+  const { code } = req.params;
+  try {
+    const { error } = await supabase
+      .from("currencies")
+      .delete()
+      .eq("code", code);
 
-  const index = currencies.findIndex((find) => find.id === id);
-  if (index === -1) {
-    return res.status(404).json({ message: "Currency was not found." });
+    if (error) return res.status(400).json({ message: error.message });
+    res.status(200).json({ message: "Currency has been deleted." });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
-
-  currencies.splice(index, 1);
-  writeCurrencies(currencies);
-  res.status(200).json({ message: "Currency was deleted." });
 });
 
 // Users
 app.get("/users", async (req, res) => {
   try {
-    const users = readUsers();
-    res.json(users); // assuming your JSON has a "users" array
-  } catch (err) {
-    res.status(500).json({ error: "Failed to acquire users" });
+    const { data, error } = await supabase.from("users").select("*");
+
+    if (error) return res.status(400).json({ message: error.message });
+    res.status(200).json(data);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 });
 
 app.get("/users/:id", async (req, res) => {
   const id = req.params.id;
   try {
-    const users = readUsers();
-    const userFound = users.find((user) => user.id === id);
-    res.json(userFound);
-  } catch (err) {
-    res.status(500).json({ error: "Failed to acquire user" });
+    const { data, error } = await supabase
+      .from("users")
+      .select("*")
+      .eq("id", id)
+      .single();
+    if (error) return res.status(400).json({ message: error.message });
+    res.status(200).json(data);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 });
 
-// Example users POST route
 app.post("/users", async (req, res) => {
-  const { id, username, email, password } = req.body;
-
-  const users = readUsers();
-  if (users.find((u) => u.email === email)) {
-    return res.status(409).json({ message: "Email already exists." });
-  }
-
-  if (users.find((u) => u.username === username)) {
-    return res.status(409).json({ message: "Username is already occupied." });
-  }
+  const { username, email, password } = req.body;
 
   const hashed = await bcrypt.hash(password, 10);
   const newUserData = {
-    id,
     username,
     email,
     password: hashed,
   };
 
-  users.push(newUserData);
-  writeUsers(users);
+  try {
+    const { data: existing } = await supabase
+      .from("users")
+      .select("email")
+      .eq("email", email)
+      .maybeSingle();
 
-  const { password: _, ...userWithoutPassword } = newUserData;
-  res.status(201).json(userWithoutPassword);
+    if (existing)
+      return res.status(409).json({ message: "Maybe try some other email." });
+
+    const { data, error } = await supabase.from("users").insert([newUserData]);
+
+    if (error) return res.status(400).json({ message: error.message });
+
+    const insertedUser = data[0];
+    const { password: _, ...user } = insertedUser;
+
+    res.status(201).json(user);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
 });
 
 app.put("/users/:id", async (req, res) => {
-  const currencies = req.body;
-  const userId = req.params.id;
-  const users = readUsers();
-  const index = users.findIndex((u) => u.id === userId);
+  const { id } = req.params;
+  const updatedBody = req.body;
 
-  users[index] = {
-    ...users[index],
-    currencies,
-  };
-
-  writeUsers(users);
-  const { password, ...userWithoutPassword } = users[index];
-  res.status(200).json(userWithoutPassword);
+  try {
+    const { data, error } = await supabase
+      .from("users")
+      .update(updatedBody)
+      .eq("id", id)
+      .select()
+      .single();
+    if (error) return res.status(400).json({ message: error.message });
+    res
+      .status(200)
+      .json({ message: "User has been successfully updated.", ...data });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
 });
 
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
-  const users = readUsers();
+  try {
+    const { data, error } = await supabase
+      .from("users")
+      .select("*")
+      .eq("email", email)
+      .single();
 
-  const user = users.find((u) => u.email === email);
-  if (!user) {
-    return res.status(401).json({
-      message: "Check your credentials or create an account instead.",
-    });
-  }
+    if (error || !data) {
+      return res.status(401).json({ message: "User was not found." });
+    }
 
-  const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(password, data.password);
 
-  if (!isMatch) {
-    return res.status(401).json({
-      message: "Check your credentials or create an account instead.",
-    });
-  }
+    if (!isMatch) {
+      return res
+        .status(401)
+        .json({ message: "Double check your credentials." });
+    }
 
-  if (user && isMatch) {
-    const { password: _, ...userWithoutPassword } = user;
-    return res.status(200).json(userWithoutPassword);
+    const { password: _, ...user } = data;
+    return res.status(201).json(user);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
   }
 });
 
@@ -209,8 +221,19 @@ app.get("/transactions", async (req, res) => {
   const { userId, page, limit, sortBy = "date", order = "desc" } = req.query;
 
   try {
-    const transactions = readTransactions();
-    const currencies = readCurrencies();
+    const { data: currencies, error: currencyError } = await supabase
+      .from("currencies")
+      .select("*");
+
+    if (currencyError) return res.status(400).json({ message: error.message });
+
+    const { data: transactions, error: transactionError } = await supabase
+      .from("transactions")
+      .select("*")
+      .eq("userId", userId);
+
+    if (transactionError)
+      return res.status(400).json({ message: error.message });
 
     if (!userId) {
       return res.status(200).json({
@@ -223,7 +246,9 @@ app.get("/transactions", async (req, res) => {
     );
 
     const transactionsWithCurrency = filtered.map((transaction) => {
-      const currency = currencies.find((c) => c.id === transaction.currencyId);
+      const currency = currencies.find(
+        (c) => c.code === transaction.currencyId
+      );
       return {
         ...transaction,
         currency: currency || null,
@@ -265,73 +290,74 @@ app.get("/transactions/:id", async (req, res) => {
   const id = req.params.id;
 
   try {
-    const transactions = readTransactions();
-    const transaction = transactions.find(
-      (transaction) => transaction.id === id
-    );
+    const { data, error } = await supabase
+      .from("transactions")
+      .select("*")
+      .eq("id", id)
+      .select()
+      .single();
 
-    if (!transaction) {
+    if (!data) {
       return res.status(404).json({ error: "Transaction not found" });
     }
 
-    const currencies = readCurrencies();
-    const currency = currencies.find((c) => c.id === transaction.currencyId);
-
-    const users = readUsers();
-    const findTransactionUser = users.find(
-      (user) => user.id === transaction.userId
-    );
-
-    let addonCurrencies = [];
-
-    currencies.forEach((element) => {
-      if (findTransactionUser?.currencies?.includes(element.id)) {
-        addonCurrencies.push(element);
-      }
-    });
-
-    const transactionWithCurrency = {
-      ...transaction,
-      currency: currency || null,
-      availableCurrencies: addonCurrencies,
-    };
-
-    res.json(transactionWithCurrency);
+    res.status(200).json(data);
   } catch (error) {
-    console.error("Error fetching transaction:", error);
     res.status(500).json({ error: "Failed to read database" });
   }
 });
 
 // Transactions
 app.post("/transactions", async (req, res) => {
-  const transactions = readTransactions();
-  transactions.push({
-    ...req.body,
-  });
+  try {
+    const { data, error } = await supabase
+      .from("transactions")
+      .insert(req.body);
 
-  writeTransactions(transactions);
-  res.status(201).json({ message: "Transaction Added!" });
+    if (error) return res.status(400).json({ message: error.message });
+    return res.status(201).json(data);
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+    });
+  }
 });
 
-app.put("/transactions/:id", (req, res) => {
+app.put("/transactions/:id", async (req, res) => {
   const { id } = req.params;
   const updatedBody = req.body;
 
-  const transactions = readTransactions();
-  const index = transactions.findIndex((k) => k.id === id);
+  try {
+    const { data, error } = await supabase
+      .from("transactions")
+      .update(updatedBody)
+      .eq("id", id)
+      .select()
+      .single();
 
-  if (index === -1) {
-    return res.status(404).json({ error: "Transaction not found" });
+    if (error) return res.status(400).json({ message: error.message });
+    return res.status(200).json(data);
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+    });
   }
+});
 
-  transactions[index] = {
-    ...transactions[index],
-    ...updatedBody,
-  };
+app.delete("/transactions/:id", async (req, res) => {
+  const { id } = req.params;
 
-  writeTransactions(transactions);
-  res.json(transactions[index]);
+  try {
+    const { error } = await supabase.from("transactions").delete().eq("id", id);
+    if (id)
+      return res
+        .status(400)
+        .json({ message: "Please double check delete parameters." });
+
+    return res.status(200).json({ message: "Transaction has been deleted." });
+  } catch (error) {
+    return res.status(500).json({ message: error?.message });
+  }
 });
 
 // Upload files to Bunny

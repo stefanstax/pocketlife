@@ -4,8 +4,8 @@ import { useSelector } from "react-redux";
 import type { RootState } from "../../app/store";
 import {
   type Receipt,
+  type Transaction,
   type TransactionContexts,
-  type TransactionExtra,
   type TransactionTypes,
 } from "./transactionTypes";
 import SubmitButton from "../../components/SubmitButton";
@@ -16,11 +16,9 @@ import TransactionType from "./fields/TransactionType";
 import TransactionCurrency from "./fields/TransactionCurrency";
 import TransactionContext from "./fields/TransactionContext";
 import TransactionNote from "./fields/TransactionNote";
-import { nanoid } from "@reduxjs/toolkit";
-import { useLocalApi } from "../../app/hooks";
-import type { CurrencyState } from "./currency/currencyTypes";
 import { useAddTransactionMutation } from "./api/transactionsApi";
 import UploadField from "../../components/forms/UploadFile";
+import ServerMessage from "../../components/ServerMessage";
 
 const TransactionAdd = () => {
   const [title, setTitle] = useState<string>("");
@@ -33,22 +31,20 @@ const TransactionAdd = () => {
   const [formErrors, setFormErrors] = useState<Partial<Record<string, string>>>(
     {}
   );
+  const [serverMessage, setServerMessage] = useState<any>();
 
-  const [addTransaction] = useAddTransactionMutation();
+  const [
+    addTransaction,
+    { isLoading: creatingTransaction, isError: errorCreatingTransaction },
+  ] = useAddTransactionMutation();
 
   const { user } = useSelector((state: RootState) => state.auth);
-  const { data: currencies } = useLocalApi("currencies");
-
-  const userCurrencies = currencies?.filter((currency: CurrencyState) =>
-    user?.currencies?.includes(currency?.id ?? "")
-  );
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
 
     const verifiedData = transactionSchema.safeParse({
-      id: nanoid(),
       title: formData.get("title"),
       amount: formData.get("amount"),
       currencyId: formData.get("currencyId"),
@@ -75,7 +71,9 @@ const TransactionAdd = () => {
 
     if (verifiedData.success) {
       try {
-        await addTransaction(verifiedData?.data as TransactionExtra).unwrap();
+        console.log(verifiedData?.data);
+
+        await addTransaction(verifiedData?.data as Transaction).unwrap();
         setTitle("");
         setAmount("");
         setCurrencyId("");
@@ -84,15 +82,15 @@ const TransactionAdd = () => {
         setContext("");
         setCurrencyId("");
         setReceipt(null);
-        console.log("Transaction has been added!");
+        setServerMessage("Transaction successfully created.");
       } catch (error) {
-        console.log("There has been a problem", error);
+        setServerMessage(error?.data?.message ?? "Uncaught error.");
       }
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full  flex flex-col gap-4">
+    <form onSubmit={handleSubmit} className="w-full grid grid-cols-1 gap-4">
       {/* Title */}
       <TransactionTitle
         title={title}
@@ -113,7 +111,7 @@ const TransactionAdd = () => {
       />
       {/* Currency */}
       <TransactionCurrency
-        currencies={userCurrencies}
+        currencies={user?.currencies ?? []}
         currencyId={currencyId}
         setCurrencyId={setCurrencyId}
         validationError={formErrors?.currencyId}
@@ -124,19 +122,26 @@ const TransactionAdd = () => {
         setContext={setContext}
         validationError={formErrors?.context}
       />
-      {context === "BUSINESS" && (
-        <>
-          <UploadField
-            receipt={receipt}
-            setReceipt={setReceipt}
-            username={user?.username as string}
-          />
-        </>
-      )}
+      <>
+        <UploadField
+          receipt={receipt}
+          setReceipt={setReceipt}
+          username={user?.username as string}
+        />
+      </>
       {/* Note */}
       <TransactionNote note={note} setNote={setNote} />
 
-      <SubmitButton aria="Create transaction" label="Create Transaction" />
+      <SubmitButton
+        aria="Create transaction"
+        label={creatingTransaction ? "Creating..." : "Create"}
+      />
+      {serverMessage && (
+        <ServerMessage
+          serverMessage={serverMessage}
+          isError={errorCreatingTransaction}
+        />
+      )}
     </form>
   );
 };

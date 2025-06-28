@@ -1,47 +1,68 @@
 import { Link } from "react-router";
-import { useLocalApi } from "../../../app/hooks";
-import { useRemoveCurrencyByIdMutation } from "./api/currenciesApi";
+import {
+  useGetCurrenciesQuery,
+  useRemoveCurrencyByIdMutation,
+} from "./api/currenciesApi";
 import type { CurrencyState } from "./currencyTypes";
-import { RiDeleteBin6Line } from "react-icons/ri";
 import { PRIMARY, SHARED } from "../../../app/globalClasses";
+import BlurredSpinner from "../../../components/BlurredSpinner";
+import { useState } from "react";
 
 const CurrencyList = () => {
-  const { data, isLoading, isPending } = useLocalApi("currencies");
-  const [removeCurrencyById] = useRemoveCurrencyByIdMutation();
+  const { data } = useGetCurrenciesQuery();
+  const [removeCurrencyById, { isLoading: loadingCurrencies, isSuccess }] =
+    useRemoveCurrencyByIdMutation();
+  const [serverMessage, setServerMessage] = useState<any>();
+  const [currencyRemoval, setCurrencyRemoval] = useState<string | null>(null);
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (code: string) => {
     try {
-      await removeCurrencyById(id).unwrap();
+      await removeCurrencyById(code).unwrap();
+      setCurrencyRemoval(code);
+      setServerMessage(`Currency ${code} has been removed.`);
     } catch (error) {
-      console.log(error);
+      setServerMessage(error?.data?.message ?? "Uncaught error.");
     }
   };
-  if (isLoading || isPending) return <h1>Loading...</h1>;
+
+  if (loadingCurrencies) return <BlurredSpinner />;
+
   return (
-    <div className="flex gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 flex-wrap gap-4">
       {data?.map((currency: CurrencyState) => {
         return (
-          <div className="flex flex-col border border-solid p-4 gap-4">
+          <div
+            key={currency?.code}
+            className="flex rounded-sm shadow-2xl flex-col border border-solid p-4 gap-4"
+          >
             <p className="font-bold min-w-[200px]">
               ({currency?.symbol}) {currency?.name}
             </p>
             <p>Number of transactions with this currency: </p>
-            <Link
-              className={`${PRIMARY} ${SHARED}`}
-              to={`/currencies/${currency?.id}`}
-            >
-              Edit currency
-            </Link>
-            <button
-              onClick={() => handleDelete(currency?.id)}
-              className="flex gap-2 items-center justify-center border border-red-400 bg-red-400 p-2 text-white hover:text-red-400 hover:bg-transparent"
-            >
-              Delete
-              <RiDeleteBin6Line />
-            </button>
+            <div className="flex gap-2">
+              <Link
+                className={`${PRIMARY} ${SHARED} flex-1`}
+                to={`/currencies/${currency?.code}`}
+              >
+                Edit currency
+              </Link>
+              <button
+                onClick={() => handleDelete(currency?.code)}
+                className="flex flex-1 rounded-sm gap-2 items-center justify-center border border-black-400 bg-black p-2 text-white hover:text-neutral-700 hover:bg-transparent"
+              >
+                {currencyRemoval === currency?.code && CurrencyRemoveLoading
+                  ? "Deleting..."
+                  : "Delete"}
+              </button>
+            </div>
           </div>
         );
       })}
+      {serverMessage || isSuccess ? (
+        <div className="rounded-sm shadow-xl bg-black w-fit text-white p-2">
+          <p>{serverMessage}</p>
+        </div>
+      ) : null}
     </div>
   );
 };

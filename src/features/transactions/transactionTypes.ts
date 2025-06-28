@@ -16,16 +16,15 @@ export interface Transaction {
   receipt?: Receipt;
 }
 
+export interface TransactionList extends Transaction {
+  currency: CurrencyState;
+}
+
 export interface PaginatatedTransactions {
   data: Transaction[];
   total: number;
   page: number;
   limit: number;
-}
-
-export interface TransactionExtra extends Transaction {
-  currency: TransactionCurrency;
-  availableCurrencies: CurrencyState[];
 }
 
 export type TransactionTypes = "INCOME" | "EXPENSE" | "SAVINGS";
@@ -37,7 +36,7 @@ export const transactionTypes = [
   { name: "SAVINGS" },
 ];
 
-export interface TransactionCurrency {
+export interface TransactionCurrency extends Transaction {
   id: string;
   code: string;
   name: string;

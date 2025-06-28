@@ -3,10 +3,10 @@ import BlurredSpinner from "../../components/BlurredSpinner";
 import { useGetTransactionsQuery } from "./api/transactionsApi";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../app/store";
-import type { TransactionExtra } from "./transactionTypes";
 import Pagination from "../../components/Pagination";
 import { useState } from "react";
 import TransactionsTable from "./TransactionsTable";
+import type { TransactionList } from "./transactionTypes";
 
 const TransactionList = () => {
   const { user } = useSelector((state: RootState) => state.auth);
@@ -28,7 +28,7 @@ const TransactionList = () => {
   return (
     <section>
       <div className="flex gap-4 mb-10 flex-wrap items-stretch justify-between">
-        <TransactionsTable data={data?.data as TransactionExtra[]} />
+        <TransactionsTable data={data?.data as TransactionList[]} />
         <Pagination
           page={page}
           total={data?.total as number}

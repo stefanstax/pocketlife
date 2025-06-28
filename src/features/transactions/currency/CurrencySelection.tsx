@@ -13,13 +13,17 @@ import {
 } from "./api/currenciesApi";
 import { updateUser } from "../../../app/authSlice";
 import { useDispatch } from "react-redux";
+import ServerMessage from "../../../components/ServerMessage";
+import BlurredSpinner from "../../../components/BlurredSpinner";
 
 const CurrencySelection = () => {
   const { user } = useSelector((state: RootState) => state.auth);
-  const { data } = useGetCurrenciesQuery();
+  const { data, isLoading: loadingCurrencies } = useGetCurrenciesQuery();
   const [pickedCurrencies, setPickedCurrencies] = useState<string[]>([]);
+  const [serverMessage, setServerMessage] = useState<any>();
 
-  const [saveFavoriteCurrencies] = useSaveFavoriteCurrenciesMutation();
+  const [saveFavoriteCurrencies, { isError }] =
+    useSaveFavoriteCurrenciesMutation();
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -49,30 +53,33 @@ const CurrencySelection = () => {
         currencies: pickedCurrencies,
       }).unwrap();
       dispatch(updateUser(updatedUser));
+      setServerMessage("Favorite currencies succefully saved.");
     } catch (error) {
-      console.log(error);
+      setServerMessage(error?.data?.message ?? "Uncaught error.");
     }
   };
 
+  if (loadingCurrencies) return <BlurredSpinner />;
+
   return (
-    <section className="bg-[#1b1918] text-white  p-4 flex flex-col gap-4">
+    <section className="bg-black text-white  p-4 grid grid-cols-1 gap-4 rounded-sm">
       <h2>Select currencies you would like to use</h2>
-      <div className="flex gap-2">
+      <div className="grid grid-cols-5 gap-2">
         {data?.map((currency: CurrencyState) => {
           return (
             <Button
               type="button"
-              key={currency.id}
+              key={currency.code}
               ariaLabel="Add currency to favorites"
               variant={
-                pickedCurrencies.includes(currency.id as string)
+                pickedCurrencies.includes(currency.code as string)
                   ? "PRIMARY"
                   : "TERTIARY"
               }
-              onClick={() => addCurrency(currency.id as string)}
+              onClick={() => addCurrency(currency.code as string)}
             >
               {currency.code}{" "}
-              {pickedCurrencies.includes(currency.id as string) ? (
+              {pickedCurrencies.includes(currency.code as string) ? (
                 <MdOutlineCheckBox />
               ) : (
                 <MdOutlineCheckBoxOutlineBlank />
@@ -89,6 +96,9 @@ const CurrencySelection = () => {
           Save to Favorites
         </Button>
       </div>
+      {serverMessage && (
+        <ServerMessage serverMessage={serverMessage} isError={isError} />
+      )}
     </section>
   );
 };

@@ -25,7 +25,7 @@ const Pagination = ({
     if (page < totalPages) onPageChange(page + 1);
   };
   return (
-    <div className="flex gap-2 items-center">
+    <div className="grid grid-cols-3 gap-2 items-center">
       <button
         className={`${PRIMARY} ${SHARED}`}
         onClick={handlePrev}

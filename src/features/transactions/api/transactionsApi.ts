@@ -1,13 +1,10 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import type {
-  PaginatatedTransactions,
-  Transaction,
-  TransactionExtra,
-} from "../transactionTypes";
+import type { PaginatatedTransactions, Transaction } from "../transactionTypes";
 
 export const transactionsApi = createApi({
   reducerPath: "transactionsApi",
   baseQuery: fetchBaseQuery({ baseUrl: "http://localhost:3000/" }),
+  tagTypes: ["Transactions"],
   endpoints: (builder) => ({
     getTransactions: builder.query<
       PaginatatedTransactions,
@@ -23,16 +20,18 @@ export const transactionsApi = createApi({
         url: "transactions",
         params: { userId, page, limit, sortBy, order },
       }),
+      providesTags: ["Transactions"],
     }),
-    getTransactionById: builder.query<TransactionExtra, string>({
+    getTransactionById: builder.query<Transaction, string>({
       query: (id) => `transactions/${id}`,
     }),
-    addTransaction: builder.mutation<Transaction, TransactionExtra>({
+    addTransaction: builder.mutation<Transaction, Transaction>({
       query: (transaction) => ({
         url: "transactions",
         method: "POST",
         body: transaction,
       }),
+      invalidatesTags: ["Transactions"],
     }),
     updateTransaction: builder.mutation<Transaction, Transaction>({
       query: (transaction) => ({
@@ -40,6 +39,14 @@ export const transactionsApi = createApi({
         method: "PUT",
         body: transaction,
       }),
+      invalidatesTags: ["Transactions"],
+    }),
+    deleteTransaction: builder.mutation<void, string>({
+      query: (id) => ({
+        url: `transactions/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Transactions"],
     }),
   }),
 });
@@ -49,4 +56,5 @@ export const {
   useGetTransactionByIdQuery,
   useAddTransactionMutation,
   useUpdateTransactionMutation,
+  useDeleteTransactionMutation,
 } = transactionsApi;

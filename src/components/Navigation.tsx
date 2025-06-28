@@ -13,7 +13,7 @@ const Navigation = () => {
   );
 
   return (
-    <nav className="w-full flex-wrap mt-4 p-4 min-h-[60px] bg-[#1b1918] gap-4 flex justify-start items-center mx-auto">
+    <nav className="w-full flex-wrap mt-4 p-4 min-h-[60px] bg-black rounded-sm shadow-xl gap-4 flex justify-start items-center mx-auto">
       <h1 className="text-xl text-white font-black">Transactions App</h1>
       <div className="flex gap-5 font-[500] text-white">
         <Link

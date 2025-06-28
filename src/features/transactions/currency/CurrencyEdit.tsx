@@ -8,30 +8,34 @@ import {
   useEditCurrencyByIdMutation,
   useGetCurrencyByIdQuery,
 } from "./api/currenciesApi";
+import BlurredSpinner from "../../../components/BlurredSpinner";
 
 const CurrencyEdit = () => {
   const [formData, setFormData] = useState<CurrencyState>({
-    id: "",
     code: "",
     name: "",
     symbol: "",
   });
+  const [serverError, setServerError] = useState<any>();
 
   const { id } = useParams();
 
-  const [editCurrencyById] = useEditCurrencyByIdMutation();
-  const { data: currencies } = useGetCurrencyByIdQuery(id ?? "");
+  const [editCurrencyById, { isLoading, isSuccess }] =
+    useEditCurrencyByIdMutation();
+  const { data: currencies, isLoading: loadingCurrencies } =
+    useGetCurrencyByIdQuery(id ?? "");
 
   useEffect(() => {
     if (currencies) {
       setFormData({
-        id: "",
         code: currencies?.code,
         name: currencies?.name,
         symbol: currencies?.symbol,
       });
     }
   }, [currencies]);
+
+  if (loadingCurrencies) return <BlurredSpinner />;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -44,7 +48,6 @@ const CurrencyEdit = () => {
     const formData = new FormData(event.currentTarget);
 
     const verifyData = currenciesSchema.safeParse({
-      id,
       code: formData.get("code"),
       name: formData.get("name"),
       symbol: formData.get("symbol"),
@@ -62,6 +65,7 @@ const CurrencyEdit = () => {
         await editCurrencyById(verifyData?.data).unwrap();
       } catch (error) {
         console.log(error);
+        setServerError(error?.data?.message ?? "Unrecognized error caught.");
       }
     }
   };
@@ -107,7 +111,18 @@ const CurrencyEdit = () => {
           onChange={handleChange}
         />
       </div>
-      <SubmitButton aria="Update Currency" label="Update Currency" />
+      <SubmitButton
+        aria="Save Currency"
+        label={isLoading ? "Saving..." : "Save currency"}
+      />
+      {serverError && (
+        <p className="bg-black text-red-400 p-2 w-fit">{serverError}</p>
+      )}
+      {isSuccess && (
+        <p className="bg-black rounded-sm text-white p-2 w-fit">
+          Currency successfully saved.
+        </p>
+      )}
     </form>
   );
 };

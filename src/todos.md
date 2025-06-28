@@ -25,7 +25,9 @@
   - [x] Currencies
 - [] Add toaster or other type of notifiers to alert user on certain interactions
 - [] Relocate receipt upload errors from the server onto frontend for info
-
-  / Maybe(s)
-
-- [] Relocate custom forms to be React Hook forms instead
+- [] Swap local db to Supabase
+  - [x] Swap backend to align with Supabase
+  - [] Swap currencies api and frontend
+  - [] Swap transactions api and frontend
+  - [] Swap users api and frontend
+  - [] Swap users api and frontend

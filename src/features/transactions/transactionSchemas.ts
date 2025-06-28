@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const transactionSchema = z.object({
-  id: z.string(),
+  id: z.string().optional(),
   title: z.string().nonempty({ message: "Please enter transaction title" }),
   amount: z.preprocess(
     (val) => parseFloat(String(val)),

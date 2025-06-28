@@ -21,7 +21,6 @@ import {
   useGetTransactionByIdQuery,
   useUpdateTransactionMutation,
 } from "./api/transactionsApi";
-import type { CurrencyState } from "./currency/currencyTypes";
 import BlurredSpinner from "../../components/BlurredSpinner";
 import UploadField from "../../components/forms/UploadFile";
 
@@ -36,10 +35,11 @@ const EditTransaction = () => {
   const [formErrors, setFormErrors] = useState<Partial<Record<string, string>>>(
     {}
   );
-  const navigate = useNavigate();
 
   // Transaction ID
   const { id } = useParams();
+
+  const navigate = useNavigate();
 
   // User Data
   const { user } = useSelector((state: RootState) => state.auth);
@@ -53,8 +53,8 @@ const EditTransaction = () => {
   const [updateTransaction, { isLoading: updating }] =
     useUpdateTransactionMutation();
 
-  const currenciesMatch = transactionData?.availableCurrencies?.some(
-    (currency: CurrencyState) => currency?.id === transactionData?.currency?.id
+  const currenciesMatch = user?.currencies?.includes(
+    transactionData?.currencyId ?? ""
   );
 
   useEffect(() => {
@@ -80,7 +80,7 @@ const EditTransaction = () => {
     const formData = new FormData(event.currentTarget);
 
     const result = transactionSchema.safeParse({
-      id,
+      id: id,
       userId: transactionData?.userId,
       title: formData.get("title"),
       amount: formData.get("amount"),
@@ -124,8 +124,8 @@ const EditTransaction = () => {
       {!currenciesMatch && (
         <div className="flex items-center gap-2 bg-black p-4 ">
           <p className="text-red-400">
-            *Your transaction currency ({transactionData?.currency?.code}) has
-            been disabled. Enable it?
+            *Your transaction currency ({transactionData?.currencyId}) has been
+            disabled. Enable it?
           </p>
           <VariantLink
             aria="Go to Currency modification page"
@@ -151,7 +151,7 @@ const EditTransaction = () => {
         validationError={formErrors?.type}
       />
       <TransactionCurrency
-        currencies={transactionData?.availableCurrencies ?? []}
+        currencies={user?.currencies ?? []}
         currencyId={currencyId as string}
         setCurrencyId={setCurrencyId}
         validationError={formErrors?.currencyId}
@@ -176,7 +176,7 @@ const EditTransaction = () => {
             hasFile={
               <a
                 target="_blank"
-                className={`border-2 border-dotted border-white px-4  py-2  ${
+                className={`border-2 border-solid border-black px-4  py-2  ${
                   receipt?.url && "bg-[#5152fb]"
                 }`}
                 href={receipt?.url}

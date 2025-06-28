@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 import RegistrationForm from "../features/authentication/registration/RegistrationForm";
-import { buttonSecondary } from "../app/globalClasses";
+import { SECONDARY } from "../app/globalClasses";
 
 const Registration = () => {
   return (
@@ -8,7 +8,7 @@ const Registration = () => {
       <div className="min-w-[600px] flex flex-col items-center justify-center gap-4">
         <RegistrationForm />
         <Link
-          className={`min-w-[200px] ${buttonSecondary}`}
+          className={`min-w-[200px] ${SECONDARY}`}
           to="/authentication/login"
         >
           Login

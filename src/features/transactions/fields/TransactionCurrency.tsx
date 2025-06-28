@@ -1,6 +1,5 @@
-import { input, labelClasses } from "../../../app/globalClasses";
+import { formDiv, input, labelClasses } from "../../../app/globalClasses";
 import FormError from "../../../components/FormError";
-import type { CurrencyState } from "../../currency/currencyTypes";
 
 const TransactionCurrency = ({
   currencies,
@@ -8,30 +7,30 @@ const TransactionCurrency = ({
   setCurrencyId,
   validationError,
 }: {
-  currencies: CurrencyState[];
+  currencies: string[];
   currencyId: string | "";
   setCurrencyId: (value: string) => void;
   validationError?: string;
 }) => {
   return (
-    <div className="flex flex-col">
+    <div className={formDiv}>
       <label className={labelClasses} htmlFor="currency">
         Select Currency
       </label>
-      <div className={`${input} flex gap-2`}>
+      <div className={`${input} grid grid-cols-4 gap-2`}>
         {currencies?.map((curr) => {
           return (
             <button
-              key={curr?.code}
+              key={curr}
               type="button"
               className={`${
-                currencyId === curr.id
-                  ? "bg-[#5152fb] text-white border-white"
+                currencyId === curr
+                  ? "bg-[#5152fb] text-white border-black"
                   : ""
-              } w-fit  grow-0  cursor-pointer p-2 border-black flex-1 border-dotted border-2 flex-1`}
-              onClick={() => setCurrencyId(curr?.id)}
+              } w-full rounded-sm cursor-pointer p-2 border-black flex-1 border-solid border-2 flex-1`}
+              onClick={() => setCurrencyId(curr)}
             >
-              {curr?.code}
+              {curr}
             </button>
           );
         })}

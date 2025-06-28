@@ -1,11 +1,11 @@
 import { useSelector } from "react-redux";
-import type { RootState } from "../../app/store";
 import { Navigate, Outlet } from "react-router";
+import type { RootState } from "../app/store";
 
 const AdminRoute = () => {
   const { user } = useSelector((state: RootState) => state.auth);
 
-  return user?.email === "stefanstax@gmail.com" ? (
+  return user?.email === import.meta.env.VITE_ADMIN_EMAIL ? (
     <Outlet />
   ) : (
     <Navigate to="/authentication/login" />

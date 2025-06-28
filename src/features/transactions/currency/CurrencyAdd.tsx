@@ -4,20 +4,20 @@ import { currenciesSchema } from "./currenciesSchema";
 import type { CurrencyState } from "./currencyTypes";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../../app/store";
-import { nanoid } from "@reduxjs/toolkit";
 import { useAddCurrencyMutation } from "./api/currenciesApi";
 import SubmitButton from "../../../components/SubmitButton";
+import ServerError from "../../../components/ServerMessage";
 
 const CurrenciesAdd = () => {
   const { user } = useSelector((state: RootState) => state.auth);
   const [formData, setFormData] = useState<CurrencyState>({
-    id: "",
     code: "",
     name: "",
     symbol: "",
   });
+  const [serverMessage, setServerMessage] = useState<any>();
 
-  const [addCurrency] = useAddCurrencyMutation();
+  const [addCurrency, { isLoading, isError }] = useAddCurrencyMutation();
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -30,7 +30,6 @@ const CurrenciesAdd = () => {
     const formData = new FormData(event.currentTarget);
 
     const verifyData = currenciesSchema.safeParse({
-      id: nanoid(),
       code: formData.get("code"),
       name: formData.get("name"),
       symbol: formData.get("symbol"),
@@ -47,8 +46,10 @@ const CurrenciesAdd = () => {
     if (verifyData.success) {
       try {
         await addCurrency(verifyData?.data).unwrap();
+        setServerMessage("Currency has been created successfully.");
       } catch (error) {
         console.log(error);
+        setServerMessage(error?.data?.message ?? "Error was not caught.");
       }
     }
   };
@@ -94,7 +95,14 @@ const CurrenciesAdd = () => {
           onChange={handleChange}
         />
       </div>
-      <SubmitButton aria="Create currency" label="Create currency" />
+      <SubmitButton
+        aria="Create currency"
+        label={isLoading ? "Creating..." : "Create currency"}
+      />
+
+      {serverMessage && (
+        <ServerError serverMessage={serverMessage} isError={isError} />
+      )}
     </form>
   );
 };

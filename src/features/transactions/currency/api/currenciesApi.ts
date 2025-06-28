@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type { CurrencyState } from "../currencyTypes";
-import type { User } from "../../../app/authSlice";
+import type { User } from "../../../../app/authSlice";
 
 export const currenciesApi = createApi({
   reducerPath: "currenciesApi",
@@ -21,14 +21,14 @@ export const currenciesApi = createApi({
     }),
     editCurrencyById: builder.mutation<CurrencyState, CurrencyState>({
       query: (data) => ({
-        url: `currencies/${data?.id}`,
+        url: `currencies/${data?.code}`,
         method: "PUT",
         body: data,
       }),
     }),
     removeCurrencyById: builder.mutation<void, string>({
-      query: (id) => ({
-        url: `currencies/${id}`,
+      query: (code) => ({
+        url: `currencies/${code}`,
         method: "DELETE",
       }),
     }),
@@ -39,7 +39,7 @@ export const currenciesApi = createApi({
       query: ({ userId, currencies }) => ({
         url: `users/${userId}`,
         method: "PUT",
-        body: currencies,
+        body: { currencies },
       }),
     }),
   }),
