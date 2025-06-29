@@ -4,7 +4,7 @@ import type { User } from "../../../../app/authSlice";
 
 export const currenciesApi = createApi({
   reducerPath: "currenciesApi",
-  baseQuery: fetchBaseQuery({ baseUrl: "http://localhost:3000/" }),
+  baseQuery: fetchBaseQuery({ baseUrl: import.meta.env.VITE_API_URL }),
   endpoints: (builder) => ({
     getCurrencies: builder.query<CurrencyState[], void>({
       query: () => "currencies",

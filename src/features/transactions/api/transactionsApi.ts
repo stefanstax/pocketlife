@@ -7,7 +7,7 @@ import type {
 
 export const transactionsApi = createApi({
   reducerPath: "transactionsApi",
-  baseQuery: fetchBaseQuery({ baseUrl: "http://localhost:3000/" }),
+  baseQuery: fetchBaseQuery({ baseUrl: import.meta.env.VITE_API_URL }),
   tagTypes: ["Transactions"],
   endpoints: (builder) => ({
     getTransactions: builder.query<
