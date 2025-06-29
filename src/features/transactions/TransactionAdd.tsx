@@ -83,7 +83,7 @@ const TransactionAdd = () => {
         setCurrencyId("");
         setReceipt(null);
         setServerMessage("Transaction successfully created.");
-      } catch (error) {
+      } catch (error: any) {
         setServerMessage(error?.data?.message ?? "Uncaught error.");
       }
     }

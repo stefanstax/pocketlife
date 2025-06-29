@@ -63,9 +63,8 @@ const CurrencyEdit = () => {
     if (verifyData.success) {
       try {
         await editCurrencyById(verifyData?.data).unwrap();
-      } catch (error) {
-        console.log(error);
-        setServerError(error?.data?.message ?? "Unrecognized error caught.");
+      } catch (error: any) {
+        setServerError(error?.data?.message ?? "Uncaught error.");
       }
     }
   };
