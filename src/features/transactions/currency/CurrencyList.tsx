@@ -13,12 +13,10 @@ const CurrencyList = () => {
   const [removeCurrencyById, { isLoading: loadingCurrencies, isSuccess }] =
     useRemoveCurrencyByIdMutation();
   const [serverMessage, setServerMessage] = useState<any>();
-  const [currencyRemoval, setCurrencyRemoval] = useState<string | null>(null);
 
   const handleDelete = async (code: string) => {
     try {
       await removeCurrencyById(code).unwrap();
-      setCurrencyRemoval(code);
       setServerMessage(`Currency ${code} has been removed.`);
     } catch (error) {
       setServerMessage(error?.data?.message ?? "Uncaught error.");
@@ -50,9 +48,7 @@ const CurrencyList = () => {
                 onClick={() => handleDelete(currency?.code)}
                 className="flex flex-1 rounded-sm gap-2 items-center justify-center border border-black-400 bg-black p-2 text-white hover:text-neutral-700 hover:bg-transparent"
               >
-                {currencyRemoval === currency?.code && CurrencyRemoveLoading
-                  ? "Deleting..."
-                  : "Delete"}
+                Delete
               </button>
             </div>
           </div>
