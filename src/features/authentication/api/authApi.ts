@@ -5,7 +5,7 @@ import type { RegistrationState } from "../registration/registrationTypes";
 export const authApi = createApi({
   reducerPath: "authApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: import.meta.env.VITE_SUPABASE_URL,
+    baseUrl: import.meta.env.VITE_API_URL,
   }),
   endpoints: (builder) => ({
     addUser: builder.mutation<RegistrationState, RegistrationState>({
