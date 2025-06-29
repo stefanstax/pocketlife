@@ -16,7 +16,9 @@ export interface Transaction {
   receipt?: Receipt;
 }
 
-export interface TransactionList extends Transaction {
+export type TransactionClone = Omit<Transaction, "id" | "currency">;
+
+export interface TransactionWithCurrency extends Transaction {
   currency: CurrencyState;
 }
 
