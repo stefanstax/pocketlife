@@ -10,7 +10,6 @@ lerna-debug.log*
 db.json
 
 node_modules
-dist
 dist-ssr
 *.local
 
