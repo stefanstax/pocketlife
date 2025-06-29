@@ -6,12 +6,12 @@ import type { RootState } from "../../app/store";
 import Pagination from "../../components/Pagination";
 import { useState } from "react";
 import TransactionsTable from "./TransactionsTable";
-import type { TransactionList } from "./transactionTypes";
+import type { TransactionWithCurrency } from "./transactionTypes";
 
 const TransactionList = () => {
   const { user } = useSelector((state: RootState) => state.auth);
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(5);
+  const limit = 5;
 
   const { data, isLoading } = useGetTransactionsQuery({
     userId: user?.id ?? "",
@@ -28,7 +28,7 @@ const TransactionList = () => {
   return (
     <section>
       <div className="flex gap-4 mb-10 flex-wrap items-stretch justify-between">
-        <TransactionsTable data={data?.data as TransactionList[]} />
+        <TransactionsTable data={data?.data as TransactionWithCurrency[]} />
         <Pagination
           page={page}
           total={data?.total as number}

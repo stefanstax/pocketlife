@@ -1,5 +1,9 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import type { PaginatatedTransactions, Transaction } from "../transactionTypes";
+import type {
+  PaginatatedTransactions,
+  Transaction,
+  TransactionClone,
+} from "../transactionTypes";
 
 export const transactionsApi = createApi({
   reducerPath: "transactionsApi",
@@ -25,7 +29,7 @@ export const transactionsApi = createApi({
     getTransactionById: builder.query<Transaction, string>({
       query: (id) => `transactions/${id}`,
     }),
-    addTransaction: builder.mutation<Transaction, Transaction>({
+    addTransaction: builder.mutation<Transaction, TransactionClone>({
       query: (transaction) => ({
         url: "transactions",
         method: "POST",

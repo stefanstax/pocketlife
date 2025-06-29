@@ -1,27 +1,41 @@
-import type { TransactionList } from "./transactionTypes";
+import type { TransactionWithCurrency } from "./transactionTypes";
 import { Link } from "react-router-dom";
 import { PRIMARY, SHARED } from "../../app/globalClasses";
 import NoDataFallback from "../../components/forms/NoDataFallback";
 import { TbReceiptOff, TbReceiptPound } from "react-icons/tb";
 import Button from "../../components/Button";
-import { useDeleteTransactionMutation } from "./api/transactionsApi";
-import { useState } from "react";
+import {
+  useAddTransactionMutation,
+  useDeleteTransactionMutation,
+} from "./api/transactionsApi";
 
 type Props = {
-  data: TransactionList[];
+  data: TransactionWithCurrency[];
 };
 
 const TransactionsTable = ({ data }: Props) => {
-  const [deleteTransaction, { isLoading: transactionRemoving }] =
-    useDeleteTransactionMutation();
+  const [deleteTransaction] = useDeleteTransactionMutation();
 
-  const [whoseBeingRemoved, setWhoseBeingRemoved] = useState<string | null>(
-    null
-  );
+  const [addTransaction] = useAddTransactionMutation();
 
   const handleDelete = async (id: string) => {
     await deleteTransaction(id);
-    setWhoseBeingRemoved(id);
+  };
+
+  const handleClone = async (transaction: TransactionWithCurrency) => {
+    const { currency, id, ...rest } = transaction;
+    const clonedTransaction = {
+      ...rest,
+      date: new Date().toLocaleDateString(),
+      time: new Date().toLocaleTimeString(),
+      receipt: undefined,
+    };
+
+    try {
+      await addTransaction(clonedTransaction);
+    } catch (error) {
+      console.log(error?.data?.message);
+    }
   };
 
   return (
@@ -105,9 +119,15 @@ const TransactionsTable = ({ data }: Props) => {
                         ariaLabel="Delete transaction"
                         onClick={() => handleDelete(id)}
                       >
-                        {transactionRemoving && whoseBeingRemoved === id
-                          ? "Deleting..."
-                          : "Delete"}
+                        Delete
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="PRIMARY"
+                        ariaLabel="Clone transaction"
+                        onClick={() => handleClone(transaction)}
+                      >
+                        Clone
                       </Button>
                     </td>
                   </tr>
