@@ -18,7 +18,7 @@ const CurrencyList = () => {
     try {
       await removeCurrencyById(code).unwrap();
       setServerMessage(`Currency ${code} has been removed.`);
-    } catch (error) {
+    } catch (error: any) {
       setServerMessage(error?.data?.message ?? "Uncaught error.");
     }
   };

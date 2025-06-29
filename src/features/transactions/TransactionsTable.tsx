@@ -33,8 +33,8 @@ const TransactionsTable = ({ data }: Props) => {
 
     try {
       await addTransaction(clonedTransaction);
-    } catch (error) {
-      console.log(error?.data?.message);
+    } catch (error: any) {
+      console.log(error?.data?.message ?? "Uncaught error.");
     }
   };
 

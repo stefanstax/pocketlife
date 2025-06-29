@@ -50,7 +50,7 @@ const LoginForm = () => {
           password: "",
         });
       } catch (error: any) {
-        setServerError(error?.data?.message);
+        setServerError(error?.data?.message ?? "Uncaught error");
       }
     }
   };

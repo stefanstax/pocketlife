@@ -48,7 +48,7 @@ const RegistrationForm = () => {
       try {
         await addUser(verifyData?.data).unwrap();
       } catch (error: any) {
-        setServerError(error?.data?.message);
+        setServerError(error?.data?.message ?? "Uncaught error.");
       }
     }
   };

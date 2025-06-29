@@ -47,8 +47,7 @@ const CurrenciesAdd = () => {
       try {
         await addCurrency(verifyData?.data).unwrap();
         setServerMessage("Currency has been created successfully.");
-      } catch (error) {
-        console.log(error);
+      } catch (error: any) {
         setServerMessage(error?.data?.message ?? "Error was not caught.");
       }
     }

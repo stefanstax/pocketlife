@@ -54,7 +54,7 @@ const CurrencySelection = () => {
       }).unwrap();
       dispatch(updateUser(updatedUser));
       setServerMessage("Favorite currencies succefully saved.");
-    } catch (error) {
+    } catch (error: any) {
       setServerMessage(error?.data?.message ?? "Uncaught error.");
     }
   };
