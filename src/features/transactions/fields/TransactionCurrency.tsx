@@ -17,7 +17,7 @@ const TransactionCurrency = ({
       <label className={labelClasses} htmlFor="currency">
         Select Currency
       </label>
-      <div className={`${input} grid grid-cols-4 gap-2`}>
+      <div className={`${input} flex flex-wrap gap-2`}>
         {currencies?.map((curr) => {
           return (
             <button
@@ -27,7 +27,7 @@ const TransactionCurrency = ({
                 currencyId === curr
                   ? "bg-[#5152fb] text-white border-black"
                   : ""
-              } w-full rounded-sm cursor-pointer p-2 border-black flex-1 border-solid border-2 flex-1`}
+              } min-w-[100px] rounded-sm cursor-pointer p-2 border-black border-solid border-1`}
               onClick={() => setCurrencyId(curr)}
             >
               {curr}

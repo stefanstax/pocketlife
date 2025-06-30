@@ -38,106 +38,108 @@ const TransactionsTable = ({ data }: Props) => {
     }
   };
 
+  const tableColumnPadding = "py-2";
+
   return (
     <>
-      <section className="w-full overflow-x-auto">
-        <div className="overflow-y-auto rounded-sm">
-          <table className="w-full table-auto text-left">
-            <thead className="bg-black text-white sticky top-0 z-10">
-              <tr>
-                <th className="p-2 w-[100px]">Date</th>
-                <th className="p-2 w-[100px]">Type</th>
-                <th className="p-2 w-[100px]">Title</th>
-                <th className="p-2 w-[100px]">Amount</th>
-                <th className="p-2 w-[100px]">Note</th>
-                <th className="p-2 w-[100px]">Receipt</th>
-                <th className="p-2 w-[100px]">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data?.map((transaction) => {
-                const {
-                  id,
-                  title,
-                  type,
-                  amount,
-                  currency,
-                  note,
-                  date,
-                  time,
-                  context,
-                  receipt,
-                } = transaction;
+      <div className="w-full overflow-x-auto rounded-sm">
+        <table className="w-full table-auto">
+          <thead className="bg-blue-200 text-black sticky top-0 z-10">
+            <tr>
+              <th className={`${tableColumnPadding} min-w-[200px]`}>Actions</th>
+              <th className={`${tableColumnPadding} min-w-[200px]`}>Date</th>
+              <th className={`${tableColumnPadding} min-w-[200px]`}>Type</th>
+              <th className={`${tableColumnPadding} min-w-[200px]`}>Title</th>
+              <th className={`${tableColumnPadding} min-w-[200px]`}>Amount</th>
+              <th className={`${tableColumnPadding} min-w-[200px]`}>Note</th>
+              <th className={`${tableColumnPadding} min-w-[200px]`}>Receipt</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data?.map((transaction) => {
+              const {
+                id,
+                title,
+                type,
+                amount,
+                currency,
+                note,
+                date,
+                time,
+                context,
+                receipt,
+              } = transaction;
 
-                return (
-                  <tr
-                    key={id}
-                    className="border-b border-[#5152fb] hover:bg-[#f4f4ff] transition"
-                  >
-                    <td className="p-2">
-                      <div className="flex flex-col">
-                        <span>{date}</span>
-                        <span className="text-xs">{time}</span>
-                      </div>
-                    </td>
-                    <td className="p-2">{type}</td>
-                    <td className="p-2">{title}</td>
-                    <td className="p-2">
-                      {currency?.symbol}
-                      {amount.toFixed(2)}
-                    </td>
-                    <td className="p-2">{note?.trim() ? note : "-"}</td>
-                    <td className="p-2">
-                      {!receipt ? (
-                        <span
-                          className={`flex gap-2 items-center ${
-                            context === "BUSINESS"
-                              ? "text-red-500"
-                              : "text-blue-500"
-                          }`}
-                        >
-                          <TbReceiptOff fontSize={20} /> Receipt missing
+              return (
+                <tr
+                  key={id}
+                  className="border-b border-[#5152fb] hover:bg-[#f4f4ff] transition"
+                >
+                  <td className={`${tableColumnPadding} flex flex-wrap gap-2`}>
+                    <Link
+                      className={`${PRIMARY} ${SHARED}`}
+                      to={`${import.meta.env.VITE_WEB_URL}transactions/${id}`}
+                    >
+                      Edit
+                    </Link>
+                    <Button
+                      type="button"
+                      variant="PRIMARY"
+                      ariaLabel="Delete transaction"
+                      onClick={() => handleDelete(id)}
+                    >
+                      Delete
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="PRIMARY"
+                      ariaLabel="Clone transaction"
+                      onClick={() => handleClone(transaction)}
+                    >
+                      Clone
+                    </Button>
+                  </td>
+                  <td className={`${tableColumnPadding}`}>
+                    <div className="flex flex-col">
+                      <span>{date}</span>
+                      <span className="text-xs">{time}</span>
+                    </div>
+                  </td>
+                  <td className={`${tableColumnPadding}`}>{type}</td>
+                  <td className={`${tableColumnPadding}`}>{title}</td>
+                  <td className={`${tableColumnPadding}`}>
+                    {currency?.symbol}
+                    {amount.toFixed(2)}
+                  </td>
+                  <td className={`${tableColumnPadding}`}>
+                    {note?.trim() ? note : "-"}
+                  </td>
+                  <td className={`${tableColumnPadding}`}>
+                    {!receipt ? (
+                      <span
+                        className={`flex gap-2 items-center ${
+                          context === "BUSINESS"
+                            ? "text-red-500"
+                            : "text-blue-500"
+                        }`}
+                      >
+                        <TbReceiptOff fontSize={20} /> Receipt missing
+                      </span>
+                    ) : (
+                      <Link to={receipt?.url} target="_blank">
+                        <span className="flex gap-2 items-center text-black hover:text-[#5152fb]">
+                          <TbReceiptPound fontSize={20} /> View Receipt
                         </span>
-                      ) : (
-                        <Link to={receipt?.url} target="_blank">
-                          <span className="flex gap-2 items-center text-black hover:text-[#5152fb]">
-                            <TbReceiptPound fontSize={20} /> View Receipt
-                          </span>
-                        </Link>
-                      )}
-                    </td>
-                    <td className="p-2 grid grid-cols-2 gap-2">
-                      <Link
-                        className={`${PRIMARY} ${SHARED}`}
-                        to={`http://localhost:5173/transactions/${id}`}
-                      >
-                        Edit
                       </Link>
-                      <Button
-                        type="button"
-                        variant="PRIMARY"
-                        ariaLabel="Delete transaction"
-                        onClick={() => handleDelete(id)}
-                      >
-                        Delete
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="PRIMARY"
-                        ariaLabel="Clone transaction"
-                        onClick={() => handleClone(transaction)}
-                      >
-                        Clone
-                      </Button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </section>
-      {!data?.length && <NoDataFallback dataType="business transactions" />}
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+      {!data?.length && <NoDataFallback dataType="Transactions" />}
     </>
   );
 };

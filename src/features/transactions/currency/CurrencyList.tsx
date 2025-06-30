@@ -26,12 +26,12 @@ const CurrencyList = () => {
   if (loadingCurrencies) return <BlurredSpinner />;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 flex-wrap gap-4">
+    <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
       {data?.map((currency: CurrencyState) => {
         return (
           <div
             key={currency?.code}
-            className="flex rounded-sm shadow-2xl flex-col border border-solid p-4 gap-4"
+            className="flex rounded-sm flex-col border border-solid p-4 gap-4"
           >
             <p className="font-bold min-w-[200px]">
               ({currency?.symbol}) {currency?.name}
@@ -55,7 +55,7 @@ const CurrencyList = () => {
         );
       })}
       {serverMessage || isSuccess ? (
-        <div className="rounded-sm shadow-xl bg-black w-fit text-white p-2">
+        <div className="rounded-sm bg-black w-fit text-white p-2">
           <p>{serverMessage}</p>
         </div>
       ) : null}
