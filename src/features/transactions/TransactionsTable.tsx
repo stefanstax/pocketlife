@@ -78,7 +78,7 @@ const TransactionsTable = ({ data }: Props) => {
                   <td className={`${tableColumnPadding} flex flex-wrap gap-2`}>
                     <Link
                       className={`${PRIMARY} ${SHARED}`}
-                      to={`${import.meta.env.VITE_WEB_URL}transactions/${id}`}
+                      to={`${import.meta.env.VITE_WEB_URL}/transactions/${id}`}
                     >
                       Edit
                     </Link>
