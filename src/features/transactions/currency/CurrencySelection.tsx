@@ -62,9 +62,11 @@ const CurrencySelection = () => {
   if (loadingCurrencies) return <BlurredSpinner />;
 
   return (
-    <section className="bg-black text-white  p-4 grid grid-cols-1 gap-4 rounded-sm">
-      <h2>Select currencies you would like to use</h2>
-      <div className="grid grid-cols-5 gap-2">
+    <section className="w-full p-4 grid grid-cols-1 gap-4 rounded-sm">
+      <h2 className="text-2xl font-bold text-center">
+        Select currencies you would like to use
+      </h2>
+      <div className="flex flex-wrap justify-center gap-2">
         {data?.map((currency: CurrencyState) => {
           return (
             <Button

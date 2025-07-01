@@ -14,7 +14,7 @@ export const uploadFileToBunny = async ({
   formData.append("username", username);
 
   try {
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/upload`, {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}upload`, {
       method: "POST",
       body: formData,
     });

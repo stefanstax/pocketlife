@@ -56,8 +56,8 @@ const LoginForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full flex flex-col gap-6  p-5">
-      <h1>Login Form</h1>
+    <form onSubmit={handleSubmit} className="w-full flex flex-col gap-6">
+      <h1 className="text-2xl font-black">Login Form</h1>
       {/* Email */}
       <div className={formDiv}>
         <label className={labelClasses}>

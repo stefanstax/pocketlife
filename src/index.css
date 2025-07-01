@@ -1,10 +1,23 @@
 @import "tailwindcss";
 
-a,
+
+body {
+  /* background-color: oklch(88.2% .059 254.128); */
+  background: linear-gradient(135deg, #232946 0%, #3e497a 55%, #7c81ad 100%);
+
+  font-family: "Inter";
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+}
+
+/* a,
 button {
   cursor: pointer;
   font-size: 16px !important;
-}
+} */
 
 .button--submit {
   background-color: var(--color-yellow-400);

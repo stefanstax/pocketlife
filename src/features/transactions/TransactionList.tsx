@@ -26,8 +26,8 @@ const TransactionList = () => {
   }
 
   return (
-    <section>
-      <div className="flex gap-4 mb-10 flex-wrap items-stretch justify-between">
+    <div className="w-full flex flex-col gap-10">
+      <div className="flex flex-col justify-start items-start gap-2">
         <TransactionsTable data={data?.data as TransactionWithCurrency[]} />
         <Pagination
           page={page}
@@ -40,9 +40,9 @@ const TransactionList = () => {
         variant="PRIMARY"
         aria="Go to transaction addition page"
         label="Add new transaction"
-        link="http://localhost:5173/transactions/add"
+        link={`${import.meta.env.VITE_WEB_URL}transactions/add`}
       />
-    </section>
+    </div>
   );
 };
 

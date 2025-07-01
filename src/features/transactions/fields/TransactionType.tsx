@@ -16,7 +16,7 @@ const TransactionType = ({
       <label className={labelClasses} htmlFor="type">
         Transaction Type
       </label>
-      <div className={`${input} grid grid-cols-4 gap-2`}>
+      <div className={`${input} flex flex-wrap gap-2`}>
         {transactionTypes.map((option) => {
           return (
             <button
@@ -25,7 +25,7 @@ const TransactionType = ({
                 option.name === type
                   ? "bg-[#5152fb] text-white border-black"
                   : ""
-              } w-full rounded-sm cursor-pointer p-2 border-black flex-1 border-solid border-2  flex-1`}
+              } min-w-[100px] rounded-sm cursor-pointer p-2 border-black border-solid border-1`}
               type="button"
               onClick={() => setType(option.name as TransactionTypes)}
             >

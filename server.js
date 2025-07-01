@@ -353,6 +353,7 @@ app.delete("/transactions/:id", async (req, res) => {
       return res
         .status(400)
         .json({ message: "Please double check delete parameters." });
+    if (error) return res.status(400).json({ message: error?.message });
 
     return res.status(200).json({ message: "Transaction has been deleted." });
   } catch (error) {
@@ -402,3 +403,5 @@ app.post("/upload", upload.single("file"), async (req, res) => {
     });
   }
 });
+
+app.listen(3000, () => console.log("Server running!"));

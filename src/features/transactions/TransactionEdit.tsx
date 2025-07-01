@@ -161,11 +161,6 @@ const EditTransaction = () => {
         setContext={setContext}
         validationError={formErrors?.context}
       />
-      <TransactionNote
-        note={note}
-        setNote={setNote}
-        validationError={formErrors?.note}
-      />
 
       {context !== null && (
         <>
@@ -176,7 +171,7 @@ const EditTransaction = () => {
             hasFile={
               <a
                 target="_blank"
-                className={`border-2 border-solid border-black px-4  py-2  ${
+                className={`border-1 border-solid border-black px-4 text-white rounded-sm py-2 ${
                   receipt?.url && "bg-[#5152fb]"
                 }`}
                 href={receipt?.url}
@@ -191,6 +186,12 @@ const EditTransaction = () => {
           )}
         </>
       )}
+
+      <TransactionNote
+        note={note}
+        setNote={setNote}
+        validationError={formErrors?.note}
+      />
 
       <SubmitButton aria="Update transaction" label="Update Transaction" />
     </form>
