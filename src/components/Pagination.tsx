@@ -19,8 +19,6 @@ const Pagination = ({
 
   const totalPages = Math.ceil(total / perPage);
 
-  console.log(page, total, perPage, totalPages);
-
   const handleNext = () => {
     if (page < totalPages) onPageChange(page + 1);
   };

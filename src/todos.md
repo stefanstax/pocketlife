@@ -6,6 +6,7 @@
 
 - [] Fix date entries to be unanymous
 - [] URL currently are missing / which breaks the API
+- [] Currencies added, after removal stay inside of user's data - On currency removal without previously setting it to non-favorite also remove from the user's currencies db column
 
 / New Features
 

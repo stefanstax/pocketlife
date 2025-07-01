@@ -2,10 +2,8 @@ import type { CurrencyState } from "./currency/currencyTypes";
 
 export interface Transaction {
   id: string;
-  date: string;
-  updatedDate?: string;
-  time: string;
-  updatedTime?: string;
+  created_at: string;
+  updated_at: string;
   userId: string;
   amount: number;
   currencyId: string;
