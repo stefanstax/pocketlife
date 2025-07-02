@@ -17,7 +17,7 @@ const TransactionList = () => {
     userId: user?.id ?? "",
     page,
     limit,
-    sortBy: "date",
+    sortBy: "created_at",
     order: "desc",
   });
 
@@ -40,7 +40,7 @@ const TransactionList = () => {
         variant="PRIMARY"
         aria="Go to transaction addition page"
         label="Add new transaction"
-        link={`${import.meta.env.VITE_WEB_URL}transactions/add`}
+        link={`${import.meta.env.VITE_WEB_URL}/transactions/add`}
       />
     </div>
   );

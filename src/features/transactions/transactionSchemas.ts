@@ -2,6 +2,8 @@ import { z } from "zod";
 
 export const transactionSchema = z.object({
   id: z.string().optional(),
+  created_at: z.string(),
+  updated_at: z.string().nullable(),
   title: z.string().nonempty({ message: "Please enter transaction title" }),
   amount: z.preprocess(
     (val) => parseFloat(String(val)),
@@ -14,8 +16,6 @@ export const transactionSchema = z.object({
     .string()
     .nonempty({ message: "Transaction currency must be selected" }),
   note: z.string(),
-  date: z.string(),
-  time: z.string(),
   type: z.enum(["INCOME", "EXPENSE", "SAVINGS"], {
     message: "Please select transaction type",
   }),
