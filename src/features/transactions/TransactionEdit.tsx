@@ -84,7 +84,7 @@ const EditTransaction = () => {
       userId: transactionData?.userId,
       title: formData.get("title"),
       amount: formData.get("amount"),
-      date: transactionData?.date,
+      date: transactionData?.date ?? new Date().toLocaleTimeString(),
       time: transactionData?.time ?? new Date().toLocaleTimeString(),
       currencyId: formData.get("currencyId"),
       note: formData.get("note"),

@@ -259,17 +259,26 @@ app.get("/transactions", async (req, res) => {
     const endIndex = startIndex + parseInt(limit);
 
     const sortTransactions = transactionsWithCurrency.sort((a, b) => {
-      const valA = a[sortBy];
-      const valB = b[sortBy];
+      let valA, valB;
+
+      if (sortBy === "datetime") {
+        valA = new Date(`${a.date}T${a.time || "00:00:00"}`);
+        valB = new Date(`${b.date}T${b.time || "00:00:00"}`);
+      } else {
+        valA = a[sortBy];
+        valB = b[sortBy];
+      }
+
+      if (sortBy === "datetime") {
+        return order === "asc" ? valA - valB : valB - valA;
+      }
 
       if (!valA || !valB) return 0;
-
       if (typeof valA === "string") {
         return order === "asc"
           ? valA.localeCompare(valB)
           : valB.localeCompare(valA);
       }
-
       return order === "asc" ? valA - valB : valB - valA;
     });
 
