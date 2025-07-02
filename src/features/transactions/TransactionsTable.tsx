@@ -26,8 +26,6 @@ const TransactionsTable = ({ data }: Props) => {
     const { currency, id, ...rest } = transaction;
     const clonedTransaction = {
       ...rest,
-      date: new Date().toLocaleDateString(),
-      time: new Date().toLocaleTimeString(),
       receipt: undefined,
     };
 
@@ -47,7 +45,8 @@ const TransactionsTable = ({ data }: Props) => {
           <thead className="bg-blue-200 text-black sticky top-0 z-10">
             <tr>
               <th className={`${tableColumnPadding} min-w-[200px]`}>Actions</th>
-              <th className={`${tableColumnPadding} min-w-[200px]`}>Date</th>
+              <th className={`${tableColumnPadding} min-w-[200px]`}>Created</th>
+              <th className={`${tableColumnPadding} min-w-[200px]`}>Updated</th>
               <th className={`${tableColumnPadding} min-w-[200px]`}>Type</th>
               <th className={`${tableColumnPadding} min-w-[200px]`}>Title</th>
               <th className={`${tableColumnPadding} min-w-[200px]`}>Amount</th>
@@ -64,11 +63,16 @@ const TransactionsTable = ({ data }: Props) => {
                 amount,
                 currency,
                 note,
-                date,
-                time,
+                created_at,
+                updated_at,
                 context,
                 receipt,
               } = transaction;
+
+              const createdDate = new Date(created_at).toLocaleDateString();
+              const createdTime = new Date(created_at).toLocaleTimeString();
+              const updatedDate = new Date(updated_at).toLocaleDateString();
+              const updatedTime = new Date(updated_at).toLocaleTimeString();
 
               return (
                 <tr
@@ -101,8 +105,22 @@ const TransactionsTable = ({ data }: Props) => {
                   </td>
                   <td className={`${tableColumnPadding}`}>
                     <div className="flex flex-col">
-                      <span>{date}</span>
-                      <span className="text-xs">{time}</span>
+                      <span>{createdDate}</span>
+                      <span className="text-xs">{createdTime}</span>
+                    </div>
+                  </td>
+                  <td className={`${tableColumnPadding}`}>
+                    <div className="flex flex-col">
+                      <span>
+                        {updatedDate === "01/01/1970"
+                          ? "No update yet."
+                          : updatedDate}
+                      </span>
+                      <span className="text-xs">
+                        {updatedTime === "01:00:00"
+                          ? "No update yet."
+                          : updatedTime}
+                      </span>
                     </div>
                   </td>
                   <td className={`${tableColumnPadding}`}>{type}</td>

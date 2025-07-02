@@ -218,7 +218,7 @@ app.post("/login", async (req, res) => {
 });
 
 app.get("/transactions", async (req, res) => {
-  const { userId, page, limit, sortBy = "date", order = "desc" } = req.query;
+  const { userId, page, limit } = req.query;
 
   try {
     const { data: currencies, error: currencyError } = await supabase
@@ -227,10 +227,15 @@ app.get("/transactions", async (req, res) => {
 
     if (currencyError) return res.status(400).json({ message: error.message });
 
+    const startIndex = (parseInt(page) - 1) * parseInt(limit);
+    const endIndex = startIndex + parseInt(limit);
+
     const { data: transactions, error: transactionError } = await supabase
       .from("transactions")
       .select("*")
-      .eq("userId", userId);
+      .eq("userId", userId)
+      .order("created_at", { ascending: false })
+      .range(startIndex, endIndex);
 
     if (transactionError)
       return res.status(400).json({ message: error.message });
@@ -241,11 +246,7 @@ app.get("/transactions", async (req, res) => {
       });
     }
 
-    const filtered = transactions.filter(
-      (transaction) => transaction.userId === userId
-    );
-
-    const transactionsWithCurrency = filtered.map((transaction) => {
+    const transactionsWithCurrency = transactions.map((transaction) => {
       const currency = currencies.find(
         (c) => c.code === transaction.currencyId
       );
@@ -255,38 +256,9 @@ app.get("/transactions", async (req, res) => {
       };
     });
 
-    const startIndex = (parseInt(page) - 1) * parseInt(limit);
-    const endIndex = startIndex + parseInt(limit);
-
-    const sortTransactions = transactionsWithCurrency.sort((a, b) => {
-      let valA, valB;
-
-      if (sortBy === "datetime") {
-        valA = new Date(`${a.date}T${a.time || "00:00:00"}`);
-        valB = new Date(`${b.date}T${b.time || "00:00:00"}`);
-      } else {
-        valA = a[sortBy];
-        valB = b[sortBy];
-      }
-
-      if (sortBy === "datetime") {
-        return order === "asc" ? valA - valB : valB - valA;
-      }
-
-      if (!valA || !valB) return 0;
-      if (typeof valA === "string") {
-        return order === "asc"
-          ? valA.localeCompare(valB)
-          : valB.localeCompare(valA);
-      }
-      return order === "asc" ? valA - valB : valB - valA;
-    });
-
-    const paginatedTransactions = sortTransactions.slice(startIndex, endIndex);
-
     res.json({
-      data: paginatedTransactions,
-      total: transactionsWithCurrency.length,
+      data: transactionsWithCurrency,
+      total: transactions.length,
       page,
       limit,
     });

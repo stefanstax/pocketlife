@@ -17,7 +17,7 @@ const TransactionList = () => {
     userId: user?.id ?? "",
     page,
     limit,
-    sortBy: "date",
+    sortBy: "created_at",
     order: "desc",
   });
 
