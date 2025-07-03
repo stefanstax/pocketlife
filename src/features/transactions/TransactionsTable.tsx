@@ -46,7 +46,7 @@ const TransactionsTable = ({ data }: Props) => {
     });
   };
 
-  const tableColumnPadding = "py-2";
+  const tableColumnPadding = "p-4";
 
   return (
     <>
@@ -55,13 +55,19 @@ const TransactionsTable = ({ data }: Props) => {
           <thead className="bg-blue-50 text-[#5152fb] sticky top-0 z-10">
             <tr>
               <th className={`${tableColumnPadding} min-w-[200px]`}>Actions</th>
-              <th className={`${tableColumnPadding} min-w-[200px]`}>Created</th>
-              <th className={`${tableColumnPadding} min-w-[200px]`}>Updated</th>
-              <th className={`${tableColumnPadding} min-w-[200px]`}>Type</th>
-              <th className={`${tableColumnPadding} min-w-[200px]`}>Title</th>
-              <th className={`${tableColumnPadding} min-w-[200px]`}>Amount</th>
+              <th className={`${tableColumnPadding} min-w-[200px]`}>
+                What was charged
+              </th>
+              <th className={`${tableColumnPadding} min-w-[200px]`}>
+                How much
+              </th>
               <th className={`${tableColumnPadding} min-w-[200px]`}>Note</th>
-              <th className={`${tableColumnPadding} min-w-[200px]`}>Receipt</th>
+              <th className={`${tableColumnPadding} min-w-[200px]`}>
+                Receipt/Invoice
+              </th>
+              <th className={`${tableColumnPadding} min-w-[200px]`}>
+                Created/Updated
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -115,29 +121,13 @@ const TransactionsTable = ({ data }: Props) => {
                       <FaRegClone />
                     </Button>
                   </td>
-                  <td className={`${tableColumnPadding}`}>
-                    <div className="flex flex-col">
-                      <span>{createdDate}</span>
-                      <span className="text-xs">{createdTime}</span>
-                    </div>
-                  </td>
-                  <td className={`${tableColumnPadding}`}>
-                    <div className="flex flex-col">
-                      <span>
-                        {updatedDate === "01/01/1970"
-                          ? "No update yet."
-                          : updatedDate}
-                      </span>
-                      <span className="text-xs">
-                        {updatedTime === "01:00:00"
-                          ? "No update yet."
-                          : updatedTime}
-                      </span>
-                    </div>
-                  </td>
-                  <td className={`${tableColumnPadding}`}>{type}</td>
+
                   <td className={`${tableColumnPadding}`}>{title}</td>
-                  <td className={`${tableColumnPadding}`}>
+                  <td
+                    className={`${tableColumnPadding} ${
+                      type === "EXPENSE" ? "text-red-400" : "text-green-400"
+                    }`}
+                  >
                     {currency?.symbol}
                     {amount.toFixed(2)}
                   </td>
@@ -162,6 +152,18 @@ const TransactionsTable = ({ data }: Props) => {
                         </span>
                       </Link>
                     )}
+                  </td>
+                  <td className={`${tableColumnPadding}`}>
+                    <span className="flex items-center gap-1">
+                      {createdDate} - {createdTime}
+                    </span>
+                    <span
+                      className={`${
+                        updatedDate === "01/01/1970" ? "hidden" : "flex"
+                      } items-center gap-1`}
+                    >
+                      {updatedDate} -{updatedTime}
+                    </span>
                   </td>
                 </tr>
               );
