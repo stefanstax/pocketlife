@@ -42,13 +42,13 @@ const LoginForm = () => {
 
     if (verifyData.success) {
       try {
-        const user = loginUser(verifyData.data).unwrap();
-        await toast.promise(user, {
+        const loginPromise = loginUser(verifyData.data).unwrap();
+        const { token, user } = await toast.promise(loginPromise, {
           pending: "Checking your credentials.",
           success: "You have been logged in.",
           error: "Please check your credentials.",
         });
-        dispatch(loginSuccess(await user));
+        dispatch(loginSuccess({ token, user }));
         setFormErrors({
           email: "",
           password: "",

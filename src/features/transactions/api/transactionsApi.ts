@@ -4,10 +4,21 @@ import type {
   Transaction,
   TransactionClone,
 } from "../transactionTypes";
+import type { RootState } from "../../../app/store";
 
 export const transactionsApi = createApi({
   reducerPath: "transactionsApi",
-  baseQuery: fetchBaseQuery({ baseUrl: import.meta.env.VITE_API_URL }),
+  baseQuery: fetchBaseQuery({
+    baseUrl: import.meta.env.VITE_API_URL,
+    prepareHeaders: (headers, api) => {
+      const state = api.getState() as RootState;
+      const token = state.auth.token;
+      if (token) {
+        headers.set("authorization", `Bearer ${token}`);
+      }
+      return headers;
+    },
+  }),
   tagTypes: ["Transactions"],
   endpoints: (builder) => ({
     getTransactions: builder.query<

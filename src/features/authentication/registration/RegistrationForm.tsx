@@ -4,16 +4,15 @@ import { formDiv, input, labelClasses } from "../../../app/globalClasses";
 import { type RegistrationState } from "./registrationTypes";
 import ErrorMessage from "../../../components/forms/ErrorMessage";
 import Button from "../../../components/Button";
-import { nanoid } from "@reduxjs/toolkit";
 import { useAddUserMutation } from "../api/authApi";
 import { toast } from "react-toastify";
 
 const RegistrationForm = () => {
   const [formData, setFormData] = useState<RegistrationState>({
-    id: "",
     username: "",
     email: "",
     password: "",
+    currencies: [],
   });
   const [formErrors, setFormErrors] = useState({
     username: "",
@@ -28,11 +27,10 @@ const RegistrationForm = () => {
     const formData = new FormData(event.currentTarget);
 
     const verifyData = registrationSchema.safeParse({
-      id: nanoid(),
       username: formData.get("username"),
       email: formData.get("email"),
       password: formData.get("password"),
-      currencies: null,
+      currencies: [],
     });
 
     if (!verifyData.success) {
@@ -47,10 +45,13 @@ const RegistrationForm = () => {
 
     if (verifyData?.success) {
       try {
-        await toast.promise(addUser(verifyData?.data).unwrap(), {
-          pending: "We are verifying your credentials.",
-          success: "You have been registered.",
-        });
+        await toast.promise(
+          addUser(verifyData?.data as RegistrationState).unwrap(),
+          {
+            pending: "We are verifying your credentials.",
+            success: "You have been registered.",
+          }
+        );
       } catch (error: any) {
         toast.error(error?.data?.message ?? "Uncaught error. Check console.");
       }

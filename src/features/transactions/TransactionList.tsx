@@ -9,7 +9,7 @@ import TransactionsTable from "./TransactionsTable";
 import type { TransactionWithCurrency } from "./transactionTypes";
 
 const TransactionList = () => {
-  const { user } = useSelector((state: RootState) => state.auth);
+  const { user, token } = useSelector((state: RootState) => state.auth);
   const [page, setPage] = useState(1);
   const limit = 5;
 
@@ -24,6 +24,8 @@ const TransactionList = () => {
   if (isLoading) {
     return <BlurredSpinner />;
   }
+
+  console.log(user, token);
 
   return (
     <div className="w-full flex flex-col gap-10">
