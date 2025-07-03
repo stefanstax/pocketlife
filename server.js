@@ -148,21 +148,20 @@ app.post("/users", async (req, res) => {
   try {
     const { data: existing } = await supabase
       .from("users")
-      .select("email")
-      .eq("email", email)
+      .select("*")
+      .or(`email.eq.${email},username.eq.${username}`)
       .maybeSingle();
 
     if (existing)
-      return res.status(409).json({ message: "Maybe try some other email." });
+      return res
+        .status(409)
+        .json({ message: "Either email or username already exist." });
 
     const { data, error } = await supabase.from("users").insert([newUserData]);
 
     if (error) return res.status(400).json({ message: error.message });
 
-    const insertedUser = data[0];
-    const { password: _, ...user } = insertedUser;
-
-    res.status(201).json(user);
+    return res.status(201).json({ message: "User has been created." });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }

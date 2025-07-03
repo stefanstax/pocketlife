@@ -4,10 +4,15 @@ import { PRIMARY, SHARED } from "../../app/globalClasses";
 import NoDataFallback from "../../components/forms/NoDataFallback";
 import { TbReceiptOff, TbReceiptPound } from "react-icons/tb";
 import Button from "../../components/Button";
+import { FiEdit2 } from "react-icons/fi";
+import { AiOutlineDelete } from "react-icons/ai";
+import { FaRegClone } from "react-icons/fa6";
+
 import {
   useAddTransactionMutation,
   useDeleteTransactionMutation,
 } from "./api/transactionsApi";
+import { toast } from "react-toastify";
 
 type Props = {
   data: TransactionWithCurrency[];
@@ -19,7 +24,12 @@ const TransactionsTable = ({ data }: Props) => {
   const [addTransaction] = useAddTransactionMutation();
 
   const handleDelete = async (id: string) => {
-    await deleteTransaction(id);
+    try {
+      await deleteTransaction(id);
+      toast.success("Transaction was deleted.");
+    } catch (error: any) {
+      toast.error(error?.data?.message ?? "Uncaught error. Check console.");
+    }
   };
 
   const handleClone = async (transaction: TransactionWithCurrency) => {
@@ -29,11 +39,11 @@ const TransactionsTable = ({ data }: Props) => {
       receipt: undefined,
     };
 
-    try {
-      await addTransaction(clonedTransaction);
-    } catch (error: any) {
-      console.log(error?.data?.message ?? "Uncaught error.");
-    }
+    await toast.promise(addTransaction(clonedTransaction), {
+      pending: "Transaction is being cloned.",
+      success: "Transaction has been cloned.",
+      error: "Transaction could not be cloned.",
+    });
   };
 
   const tableColumnPadding = "py-2";
@@ -42,7 +52,7 @@ const TransactionsTable = ({ data }: Props) => {
     <>
       <div className="w-full overflow-x-auto rounded-sm">
         <table className="w-full table-auto">
-          <thead className="bg-blue-200 text-black sticky top-0 z-10">
+          <thead className="bg-blue-50 text-[#5152fb] sticky top-0 z-10">
             <tr>
               <th className={`${tableColumnPadding} min-w-[200px]`}>Actions</th>
               <th className={`${tableColumnPadding} min-w-[200px]`}>Created</th>
@@ -77,14 +87,16 @@ const TransactionsTable = ({ data }: Props) => {
               return (
                 <tr
                   key={id}
-                  className="border-b border-[#5152fb] hover:bg-[#f4f4ff] transition"
+                  className="border-b text-center border-[#5152fb] hover:bg-[#f4f4ff] transition"
                 >
-                  <td className={`${tableColumnPadding} flex flex-wrap gap-2`}>
+                  <td
+                    className={`${tableColumnPadding} grid grid-cols-3 gap-2`}
+                  >
                     <Link
-                      className={`${PRIMARY} ${SHARED}`}
+                      className={`${PRIMARY} ${SHARED} `}
                       to={`${import.meta.env.VITE_WEB_URL}/transactions/${id}`}
                     >
-                      Edit
+                      <FiEdit2 />
                     </Link>
                     <Button
                       type="button"
@@ -92,7 +104,7 @@ const TransactionsTable = ({ data }: Props) => {
                       ariaLabel="Delete transaction"
                       onClick={() => handleDelete(id)}
                     >
-                      Delete
+                      <AiOutlineDelete />
                     </Button>
                     <Button
                       type="button"
@@ -100,7 +112,7 @@ const TransactionsTable = ({ data }: Props) => {
                       ariaLabel="Clone transaction"
                       onClick={() => handleClone(transaction)}
                     >
-                      Clone
+                      <FaRegClone />
                     </Button>
                   </td>
                   <td className={`${tableColumnPadding}`}>

@@ -15,6 +15,7 @@ import CurrencySelection from "./features/transactions/currency/CurrencySelectio
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
 import GuestRoute from "./components/GuestRoute";
+import { ToastContainer } from "react-toastify";
 
 const queryClient = new QueryClient();
 
@@ -51,6 +52,15 @@ const App = () => {
             </Route>
           </Route>
         </Routes>
+        <ToastContainer
+          position="bottom-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={true}
+          closeOnClick
+          pauseOnHover
+          draggable
+        />
       </BrowserRouter>
     </QueryClientProvider>
   );

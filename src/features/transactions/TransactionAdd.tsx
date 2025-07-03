@@ -18,7 +18,7 @@ import TransactionContext from "./fields/TransactionContext";
 import TransactionNote from "./fields/TransactionNote";
 import { useAddTransactionMutation } from "./api/transactionsApi";
 import UploadField from "../../components/forms/UploadFile";
-import ServerMessage from "../../components/ServerMessage";
+import { toast } from "react-toastify";
 
 const TransactionAdd = () => {
   const [title, setTitle] = useState<string>("");
@@ -31,7 +31,6 @@ const TransactionAdd = () => {
   const [formErrors, setFormErrors] = useState<Partial<Record<string, string>>>(
     {}
   );
-  const [serverMessage, setServerMessage] = useState<any>();
 
   const [
     addTransaction,
@@ -70,22 +69,22 @@ const TransactionAdd = () => {
     }
 
     if (verifiedData.success) {
-      try {
-        console.log(verifiedData?.data);
-
-        await addTransaction(verifiedData?.data as Transaction).unwrap();
-        setTitle("");
-        setAmount("");
-        setCurrencyId("");
-        setNote("");
-        setType("");
-        setContext("");
-        setCurrencyId("");
-        setReceipt(null);
-        setServerMessage("Transaction successfully created.");
-      } catch (error: any) {
-        setServerMessage(error?.data?.message ?? "Uncaught error.");
-      }
+      await toast.promise(
+        addTransaction(verifiedData?.data as Transaction).unwrap(),
+        {
+          pending: "Transaction is being created.",
+          success: "Transaction has been created.",
+          error: "Transaction couldn't be created.",
+        }
+      );
+      setTitle("");
+      setAmount("");
+      setCurrencyId("");
+      setNote("");
+      setType("");
+      setContext("");
+      setCurrencyId("");
+      setReceipt(null);
     }
   };
 
@@ -136,12 +135,6 @@ const TransactionAdd = () => {
         aria="Create transaction"
         label={creatingTransaction ? "Creating..." : "Create"}
       />
-      {serverMessage && (
-        <ServerMessage
-          serverMessage={serverMessage}
-          isError={errorCreatingTransaction}
-        />
-      )}
     </form>
   );
 };

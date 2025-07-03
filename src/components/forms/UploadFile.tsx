@@ -1,8 +1,8 @@
-// ✅ UploadField.tsx
 import { useRef } from "react";
 import type { Receipt } from "../../features/transactions/transactionTypes";
 import { uploadFileToBunny } from "../../features/transactions/api/uploadtoBunny";
 import { formDiv, input, labelClasses } from "../../app/globalClasses";
+import { toast } from "react-toastify";
 
 const UploadField = ({
   receipt,
@@ -27,10 +27,23 @@ const UploadField = ({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const result = await uploadFileToBunny({
-      file,
-      username,
-    });
+    // * If file is above 20MB alert and block upload
+    if (file?.size > 20971520) {
+      toast.warning("Please upload a file smaller than 20MB.");
+      return;
+    }
+
+    const result = await toast.promise(
+      uploadFileToBunny({
+        file,
+        username,
+      }),
+      {
+        pending: "File is being uploaded",
+        success: "File has been uploaded",
+        error: "There was an issue uploading this file.",
+      }
+    );
 
     if (result?.url) {
       setReceipt({
@@ -71,6 +84,7 @@ const UploadField = ({
           ref={fileInputRef}
           onChange={handleUpload}
           className="hidden"
+          accept="image/*, application/pdf"
         />
       </div>
     </div>
