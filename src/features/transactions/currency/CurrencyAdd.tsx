@@ -16,7 +16,7 @@ const CurrenciesAdd = () => {
     symbol: "",
   });
 
-  const [addCurrency, { isLoading, isError }] = useAddCurrencyMutation();
+  const [addCurrency, { isLoading }] = useAddCurrencyMutation();
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;

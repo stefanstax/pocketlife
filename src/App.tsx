@@ -1,4 +1,3 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router";
 import Authentication from "./pages/Authentication";
 import Login from "./pages/Login";
@@ -17,52 +16,48 @@ import AdminRoute from "./components/AdminRoute";
 import GuestRoute from "./components/GuestRoute";
 import { ToastContainer } from "react-toastify";
 
-const queryClient = new QueryClient();
-
 const App = () => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Home />} />
-            <Route element={<AdminRoute />}>
-              <Route path="currencies">
-                <Route index element={<CurrencyList />} />
-                <Route path="add" element={<CurrenciesAdd />} />
-                <Route path=":id" element={<CurrencyEdit />} />
-              </Route>{" "}
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Home />} />
+          <Route element={<AdminRoute />}>
+            <Route path="currencies">
+              <Route index element={<CurrencyList />} />
+              <Route path="add" element={<CurrenciesAdd />} />
+              <Route path=":id" element={<CurrencyEdit />} />
+            </Route>{" "}
+          </Route>
+          <Route element={<ProtectedRoute />}>
+            {/* Protected Routes */}
+            <Route path="transactions">
+              <Route index element={<TransactionList />} />
+              <Route path="add" element={<AddTransaction />} />
+              <Route path=":id" element={<EditTransaction />} />
             </Route>
-            <Route element={<ProtectedRoute />}>
-              {/* Protected Routes */}
-              <Route path="transactions">
-                <Route index element={<TransactionList />} />
-                <Route path="add" element={<AddTransaction />} />
-                <Route path=":id" element={<EditTransaction />} />
-              </Route>
-              <Route path="select-currencies" element={<CurrencySelection />} />
-            </Route>
-            {/* Guest Routes */}
-            <Route element={<GuestRoute />}>
-              <Route path="authentication">
-                <Route index element={<Authentication />} />
-                <Route path="login" element={<Login />} />
-                <Route path="registration" element={<Registration />} />
-              </Route>
+            <Route path="select-currencies" element={<CurrencySelection />} />
+          </Route>
+          {/* Guest Routes */}
+          <Route element={<GuestRoute />}>
+            <Route path="authentication">
+              <Route index element={<Authentication />} />
+              <Route path="login" element={<Login />} />
+              <Route path="registration" element={<Registration />} />
             </Route>
           </Route>
-        </Routes>
-        <ToastContainer
-          position="bottom-right"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop={true}
-          closeOnClick
-          pauseOnHover
-          draggable
-        />
-      </BrowserRouter>
-    </QueryClientProvider>
+        </Route>
+      </Routes>
+      <ToastContainer
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick={false}
+        pauseOnHover
+        draggable
+      />
+    </BrowserRouter>
   );
 };
 

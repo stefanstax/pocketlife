@@ -32,10 +32,8 @@ const TransactionAdd = () => {
     {}
   );
 
-  const [
-    addTransaction,
-    { isLoading: creatingTransaction, isError: errorCreatingTransaction },
-  ] = useAddTransactionMutation();
+  const [addTransaction, { isLoading: creatingTransaction }] =
+    useAddTransactionMutation();
 
   const { user } = useSelector((state: RootState) => state.auth);
 
