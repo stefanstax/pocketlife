@@ -7,6 +7,7 @@ import Button from "../../../components/Button";
 import type { LoginState } from "./loginTypes";
 import { loginSchemas } from "./loginSchemas";
 import { useLoginUserMutation } from "../api/authApi";
+import { toast } from "react-toastify";
 
 const LoginForm = () => {
   const [formData, setFormData] = useState<LoginState>({
@@ -17,7 +18,6 @@ const LoginForm = () => {
     email: "",
     password: "",
   });
-  const [serverError, setServerError] = useState("");
 
   const [loginUser] = useLoginUserMutation();
   const dispatch = useDispatch();
@@ -42,15 +42,19 @@ const LoginForm = () => {
 
     if (verifyData.success) {
       try {
-        const user = await loginUser(verifyData.data).unwrap();
-        dispatch(loginSuccess(user));
-        setServerError("");
+        const loginPromise = loginUser(verifyData.data).unwrap();
+        const { token, user } = await toast.promise(loginPromise, {
+          pending: "Checking your credentials.",
+          success: "You have been logged in.",
+          error: "Please check your credentials.",
+        });
+        dispatch(loginSuccess({ token, user }));
         setFormErrors({
           email: "",
           password: "",
         });
       } catch (error: any) {
-        setServerError(error?.data?.message ?? "Uncaught error");
+        toast.error(error?.data?.message ?? "Uncaught error. Check console.");
       }
     }
   };
@@ -88,15 +92,9 @@ const LoginForm = () => {
           placeholder="Your password"
         />
       </div>
-      {/* Submit VariantLink */}
       <Button type="submit" variant="PRIMARY" ariaLabel="Login current user">
         Login
       </Button>
-      {serverError && (
-        <p className="error" style={{ color: "red", marginBottom: "1rem" }}>
-          {serverError}
-        </p>
-      )}{" "}
     </form>
   );
 };

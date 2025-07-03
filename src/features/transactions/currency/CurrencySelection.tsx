@@ -13,17 +13,15 @@ import {
 } from "./api/currenciesApi";
 import { updateUser } from "../../../app/authSlice";
 import { useDispatch } from "react-redux";
-import ServerMessage from "../../../components/ServerMessage";
 import BlurredSpinner from "../../../components/BlurredSpinner";
+import { toast } from "react-toastify";
 
 const CurrencySelection = () => {
   const { user } = useSelector((state: RootState) => state.auth);
   const { data, isLoading: loadingCurrencies } = useGetCurrenciesQuery();
   const [pickedCurrencies, setPickedCurrencies] = useState<string[]>([]);
-  const [serverMessage, setServerMessage] = useState<any>();
 
-  const [saveFavoriteCurrencies, { isError }] =
-    useSaveFavoriteCurrenciesMutation();
+  const [saveFavoriteCurrencies] = useSaveFavoriteCurrenciesMutation();
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -47,16 +45,18 @@ const CurrencySelection = () => {
   };
 
   const saveToFavorites = async () => {
-    try {
-      const updatedUser = await saveFavoriteCurrencies({
-        userId: user?.id ?? "",
-        currencies: pickedCurrencies,
-      }).unwrap();
-      dispatch(updateUser(updatedUser));
-      setServerMessage("Favorite currencies succefully saved.");
-    } catch (error: any) {
-      setServerMessage(error?.data?.message ?? "Uncaught error.");
-    }
+    const updatedUser = saveFavoriteCurrencies({
+      userId: user?.id ?? "",
+      currencies: pickedCurrencies,
+    }).unwrap();
+
+    await toast.promise(updatedUser, {
+      pending: "Favorite currencies are being added.",
+      success: "Favorite currencies have been saved.",
+      error: "Favorite currencies could not be saved.",
+    });
+
+    dispatch(updateUser(await updatedUser));
   };
 
   if (loadingCurrencies) return <BlurredSpinner />;
@@ -66,7 +66,7 @@ const CurrencySelection = () => {
       <h2 className="text-2xl font-bold text-center">
         Select currencies you would like to use
       </h2>
-      <div className="flex flex-wrap justify-center gap-2">
+      <div className="grid grid-cols-4 justify-center gap-2">
         {data?.map((currency: CurrencyState) => {
           return (
             <Button
@@ -89,18 +89,15 @@ const CurrencySelection = () => {
             </Button>
           );
         })}
-        <Button
-          type="button"
-          variant="PRIMARY"
-          ariaLabel="Save currencies to favorites"
-          onClick={saveToFavorites}
-        >
-          Save to Favorites
-        </Button>
       </div>
-      {serverMessage && (
-        <ServerMessage serverMessage={serverMessage} isError={isError} />
-      )}
+      <Button
+        type="button"
+        variant="PRIMARY"
+        ariaLabel="Save currencies to favorites"
+        onClick={saveToFavorites}
+      >
+        Save to Favorites
+      </Button>
     </section>
   );
 };

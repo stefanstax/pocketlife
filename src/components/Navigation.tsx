@@ -5,14 +5,10 @@ import LoginButton from "./LoginButton";
 import { PRIMARY, SHARED } from "../app/globalClasses";
 
 const Navigation = () => {
-  const { user, isAuthenticated } = useSelector(
-    (state: RootState) => state.auth
-  );
-
-  console.log(user?.email);
+  const { user, token } = useSelector((state: RootState) => state.auth);
 
   return (
-    <nav className="w-full gap-4 min-h-[80px] flex items-center justify-center p-4">
+    <nav className="w-11/12 lg:w-10/12 mx-auto gap-4 grid grid-cols-2 lg:grid-cols-4 items-center justify-center">
       <Link to="/transactions/" className={`${PRIMARY} ${SHARED}`}>
         Transactions
       </Link>
@@ -24,7 +20,7 @@ const Navigation = () => {
       <Link to="/select-currencies/" className={`${PRIMARY} ${SHARED}`}>
         Toggle Currencies
       </Link>
-      {!isAuthenticated && <LoginButton />}
+      {!token && <LoginButton />}
     </nav>
   );
 };

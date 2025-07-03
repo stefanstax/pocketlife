@@ -1,10 +1,21 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type { CurrencyState } from "../currencyTypes";
 import type { User } from "../../../../app/authSlice";
+import type { RootState } from "../../../../app/store";
 
 export const currenciesApi = createApi({
   reducerPath: "currenciesApi",
-  baseQuery: fetchBaseQuery({ baseUrl: import.meta.env.VITE_API_URL }),
+  baseQuery: fetchBaseQuery({
+    baseUrl: import.meta.env.VITE_API_URL,
+    prepareHeaders: (headers, api) => {
+      const state = api.getState() as RootState;
+      const token = state.auth.token;
+      if (token) {
+        headers.set("authorization", `Bearer ${token}`);
+      }
+      return headers;
+    },
+  }),
   endpoints: (builder) => ({
     getCurrencies: builder.query<CurrencyState[], void>({
       query: () => "currencies",

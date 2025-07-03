@@ -3,9 +3,9 @@ import { Navigate, Outlet } from "react-router";
 import type { RootState } from "../app/store";
 
 const GuestRoute = () => {
-  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const { token } = useSelector((state: RootState) => state.auth);
 
-  if (isAuthenticated) {
+  if (token) {
     return <Navigate to="/" />;
   } else {
     return <Outlet />;

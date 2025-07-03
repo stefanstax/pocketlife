@@ -4,31 +4,36 @@ export interface User {
   id: string;
   username: string;
   email: string;
-  password: string;
   currencies: string[];
+}
+
+export interface UserWithToken {
+  token: string | null;
+  user: User;
 }
 
 interface AuthState {
   user: User | null;
-  isAuthenticated: boolean;
+  token: string | null;
 }
 
 const initialState: AuthState = {
   user: null,
-  isAuthenticated: false,
+  token: null,
 };
 
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    loginSuccess: (state, action: PayloadAction<User>) => {
-      state.user = action.payload;
-      state.isAuthenticated = true;
+    loginSuccess: (state, action: PayloadAction<UserWithToken>) => {
+      const { user, token } = action.payload;
+      state.user = user;
+      state.token = token;
     },
     logout: (state) => {
       state.user = null;
-      state.isAuthenticated = false;
+      state.token = null;
     },
     updateUser: (state, action: PayloadAction<Partial<User>>) => {
       if (state.user) {

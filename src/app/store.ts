@@ -16,10 +16,10 @@ import { authApi } from "../features/authentication/api/authApi";
 import { categoriesApi } from "../features/transactions/category/api/categoriesApi";
 import { currenciesApi } from "../features/transactions/currency/api/currenciesApi";
 
-// Persist only auth slice
 const authPersistConfig = {
   key: "auth",
   storage,
+  whitelist: ["user", "token"],
 };
 
 // Combine reducers

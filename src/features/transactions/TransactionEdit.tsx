@@ -23,6 +23,7 @@ import {
 } from "./api/transactionsApi";
 import BlurredSpinner from "../../components/BlurredSpinner";
 import UploadField from "../../components/forms/UploadFile";
+import { toast } from "react-toastify";
 
 const EditTransaction = () => {
   const [title, setTitle] = useState<string>("");
@@ -108,12 +109,15 @@ const EditTransaction = () => {
     }
 
     if (result.success) {
-      try {
-        await updateTransaction(result?.data as Transaction).unwrap();
-        navigate("/transactions/");
-      } catch (error) {
-        console.error("Something went bad", error);
-      }
+      await toast.promise(
+        updateTransaction(result?.data as Transaction).unwrap(),
+        {
+          pending: "Transaction is being updated.",
+          success: "Transaction has been updated.",
+          error: "Transaction couldn't be updated.",
+        }
+      );
+      navigate("/transactions/");
     }
   };
 

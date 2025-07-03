@@ -2,13 +2,14 @@ import { useEffect, useState, type FormEvent } from "react";
 import { formDiv, input, labelClasses } from "../../../app/globalClasses";
 import { currenciesSchema } from "./currenciesSchema";
 import type { CurrencyState } from "./currencyTypes";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import SubmitButton from "../../../components/SubmitButton";
 import {
   useEditCurrencyByIdMutation,
   useGetCurrencyByIdQuery,
 } from "./api/currenciesApi";
 import BlurredSpinner from "../../../components/BlurredSpinner";
+import { toast } from "react-toastify";
 
 const CurrencyEdit = () => {
   const [formData, setFormData] = useState<CurrencyState>({
@@ -16,14 +17,14 @@ const CurrencyEdit = () => {
     name: "",
     symbol: "",
   });
-  const [serverError, setServerError] = useState<any>();
 
   const { id } = useParams();
 
-  const [editCurrencyById, { isLoading, isSuccess }] =
-    useEditCurrencyByIdMutation();
+  const [editCurrencyById] = useEditCurrencyByIdMutation();
   const { data: currencies, isLoading: loadingCurrencies } =
     useGetCurrencyByIdQuery(id ?? "");
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (currencies) {
@@ -61,11 +62,12 @@ const CurrencyEdit = () => {
     }
 
     if (verifyData.success) {
-      try {
-        await editCurrencyById(verifyData?.data).unwrap();
-      } catch (error: any) {
-        setServerError(error?.data?.message ?? "Uncaught error.");
-      }
+      await toast.promise(editCurrencyById(verifyData?.data).unwrap(), {
+        pending: "Currency is being updated.",
+        success: "Currency has been updated.",
+        error: "Currency could not be updated.",
+      });
+      navigate("/currencies");
     }
   };
 
@@ -110,18 +112,7 @@ const CurrencyEdit = () => {
           onChange={handleChange}
         />
       </div>
-      <SubmitButton
-        aria="Save Currency"
-        label={isLoading ? "Saving..." : "Save currency"}
-      />
-      {serverError && (
-        <p className="bg-black text-red-400 p-2 w-fit">{serverError}</p>
-      )}
-      {isSuccess && (
-        <p className="bg-black rounded-sm text-white p-2 w-fit">
-          Currency successfully saved.
-        </p>
-      )}
+      <SubmitButton aria="Update Currency" label="Update Currency" />
     </form>
   );
 };

@@ -3,17 +3,21 @@ import bcrypt from "bcryptjs";
 import cors from "cors";
 import multer from "multer";
 import { supabase } from "./supabaseClient.js";
+import helmet from "helmet";
 
 const app = express();
 app.use(express.json());
+app.use(helmet());
 app.use(cors());
 
 import dotenv from "dotenv";
 import axios from "axios";
+import jwt from "jsonwebtoken";
+import { authenticateToken } from "./src/app/middleware/authenticateToken.js";
 dotenv.config();
 
 // Currencies
-app.get("/currencies", async (req, res) => {
+app.get("/currencies", authenticateToken, async (req, res) => {
   try {
     const { data, error } = await supabase.from("currencies").select("*");
 
@@ -24,7 +28,7 @@ app.get("/currencies", async (req, res) => {
   }
 });
 
-app.get(`/currencies/:id`, async (req, res) => {
+app.get(`/currencies/:id`, authenticateToken, async (req, res) => {
   const id = req.params.id;
 
   try {
@@ -42,7 +46,7 @@ app.get(`/currencies/:id`, async (req, res) => {
   }
 });
 
-app.post("/currencies", async (req, res) => {
+app.post("/currencies", authenticateToken, async (req, res) => {
   const newCurrency = req.body;
 
   try {
@@ -71,7 +75,7 @@ app.post("/currencies", async (req, res) => {
   }
 });
 
-app.put("/currencies/:code", async (req, res) => {
+app.put("/currencies/:code", authenticateToken, async (req, res) => {
   const { code } = req.params;
   const updatedBody = req.body;
 
@@ -93,7 +97,7 @@ app.put("/currencies/:code", async (req, res) => {
   }
 });
 
-app.delete("/currencies/:code", async (req, res) => {
+app.delete("/currencies/:code", authenticateToken, async (req, res) => {
   const { code } = req.params;
   try {
     const { error } = await supabase
@@ -109,7 +113,7 @@ app.delete("/currencies/:code", async (req, res) => {
 });
 
 // Users
-app.get("/users", async (req, res) => {
+app.get("/users", authenticateToken, async (req, res) => {
   try {
     const { data, error } = await supabase.from("users").select("*");
 
@@ -120,7 +124,7 @@ app.get("/users", async (req, res) => {
   }
 });
 
-app.get("/users/:id", async (req, res) => {
+app.get("/users/:id", authenticateToken, async (req, res) => {
   const id = req.params.id;
   try {
     const { data, error } = await supabase
@@ -148,27 +152,25 @@ app.post("/users", async (req, res) => {
   try {
     const { data: existing } = await supabase
       .from("users")
-      .select("email")
-      .eq("email", email)
+      .select("*")
+      .or(`email.eq.${email},username.eq.${username}`)
       .maybeSingle();
 
     if (existing)
-      return res.status(409).json({ message: "Maybe try some other email." });
+      return res
+        .status(409)
+        .json({ message: "Either email or username already exist." });
 
     const { data, error } = await supabase.from("users").insert([newUserData]);
-
     if (error) return res.status(400).json({ message: error.message });
 
-    const insertedUser = data[0];
-    const { password: _, ...user } = insertedUser;
-
-    res.status(201).json(user);
+    return res.status(201).json({ message: "User has been created." });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
 });
 
-app.put("/users/:id", async (req, res) => {
+app.put("/users/:id", authenticateToken, async (req, res) => {
   const { id } = req.params;
   const updatedBody = req.body;
 
@@ -211,70 +213,75 @@ app.post("/login", async (req, res) => {
     }
 
     const { password: _, ...user } = data;
-    return res.status(201).json(user);
+    const token = jwt.sign(
+      {
+        userId: user?.id,
+        email: user?.email,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    return res.status(201).json({ token, user });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
 });
 
-app.get("/transactions", async (req, res) => {
-  const { userId, page, limit } = req.query;
+app.get("/transactions", authenticateToken, async (req, res) => {
+  const pageNum = parseInt(req.query.page || "1", 10);
+  const limitNum = parseInt(req.query.limit || "10", 10);
+  const startIndex = (pageNum - 1) * limitNum;
+  const endIndex = startIndex + limitNum - 1;
+
+  const userId = req.user.userId;
 
   try {
-    const { data: currencies, error: currencyError } = await supabase
+    const { data: currencies, error: curErr } = await supabase
       .from("currencies")
       .select("*");
+    if (curErr) return res.status(500).json({ message: curErr.message });
 
-    if (currencyError) return res.status(400).json({ message: error.message });
+    const { count, error: countErr } = await supabase
+      .from("transactions")
+      .select("*", { count: "exact", head: true })
+      .eq("userId", userId);
+    if (countErr) return res.status(500).json({ message: countErr.message });
 
-    const startIndex = (parseInt(page) - 1) * parseInt(limit);
-    const endIndex = startIndex + parseInt(limit);
-
-    const { data: transactions, error: transactionError } = await supabase
+    const { data: transactionData, error: txErr } = await supabase
       .from("transactions")
       .select("*")
       .eq("userId", userId)
       .order("created_at", { ascending: false })
       .range(startIndex, endIndex);
+    if (txErr) return res.status(500).json({ message: txErr.message });
 
-    if (transactionError)
-      return res.status(400).json({ message: error.message });
-
-    if (!userId) {
-      return res.status(200).json({
-        message: "Please login first to see your transactions.",
-      });
-    }
-
-    const transactionsWithCurrency = transactions.map((transaction) => {
-      const currency = currencies.find(
-        (c) => c.code === transaction.currencyId
-      );
-      return {
-        ...transaction,
-        currency: currency || null,
-      };
+    const transactionsWithCurrency = transactionData.map((tx) => {
+      const currency = currencies.find((c) => c.code === tx.currencyId);
+      return { ...tx, currency: currency || null };
     });
 
     res.json({
       data: transactionsWithCurrency,
-      total: transactions.length,
-      page,
-      limit,
+      total: count,
+      page: pageNum,
+      limit: limitNum,
     });
-  } catch {
-    res.status(500).json({ error: "Failed to read database" });
+  } catch (err) {
+    res.status(500).json({ message: err.message || "Server error" });
   }
 });
 
-app.get("/transactions/:id", async (req, res) => {
+app.get("/transactions/:id", authenticateToken, async (req, res) => {
   const id = req.params.id;
+  const userId = req.user.userId;
 
   try {
     const { data, error } = await supabase
       .from("transactions")
       .select("*")
       .eq("id", id)
+      .eq("userId", userId)
       .select()
       .single();
 
@@ -289,7 +296,7 @@ app.get("/transactions/:id", async (req, res) => {
 });
 
 // Transactions
-app.post("/transactions", async (req, res) => {
+app.post("/transactions", authenticateToken, async (req, res) => {
   try {
     const { data, error } = await supabase
       .from("transactions")
@@ -304,7 +311,7 @@ app.post("/transactions", async (req, res) => {
   }
 });
 
-app.put("/transactions/:id", async (req, res) => {
+app.put("/transactions/:id", authenticateToken, async (req, res) => {
   const { id } = req.params;
   const updatedBody = req.body;
 
@@ -325,7 +332,7 @@ app.put("/transactions/:id", async (req, res) => {
   }
 });
 
-app.delete("/transactions/:id", async (req, res) => {
+app.delete("/transactions/:id", authenticateToken, async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -345,44 +352,50 @@ app.delete("/transactions/:id", async (req, res) => {
 // Upload files to Bunny
 
 const upload = multer({ storage: multer.memoryStorage() });
-app.post("/upload", upload.single("file"), async (req, res) => {
-  const file = req.file;
-  const username = req.body.username;
-  const id = req.body.id;
+app.post(
+  "/upload",
+  authenticateToken,
+  upload.single("file"),
+  async (req, res) => {
+    const file = req.file;
+    const username = req.body.username;
+    const id = req.body.id;
 
-  if (!file) {
-    console.log("❌ No file received");
-    return res.status(400).json({ error: "No file uploaded" });
+    if (!file) {
+      console.log("❌ No file received");
+      return res.status(400).json({ error: "No file uploaded" });
+    }
+
+    const filePath = file.path;
+
+    const uploadUrl = `https://storage.bunnycdn.com/${process.env.BUNNY_STORAGE_ZONE}/${username}/${file.originalname}`;
+
+    try {
+      await axios.put(uploadUrl, file.buffer, {
+        headers: {
+          AccessKey: process.env.BUNNY_API_KEY,
+          "Content-Type": file.mimetype,
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const publicUrl = `${process.env.BUNNY_CDN_URL}/${username}/${file.originalname}`;
+
+      res.json({ id, name: file.originalname, url: publicUrl });
+    } catch (err) {
+      console.error("❌ Upload Failed:", {
+        message: err.message,
+        data: err.response?.data,
+        status: err.response?.status,
+        headers: err.response?.headers,
+      });
+
+      res.status(500).json({
+        error: "Upload failed",
+        details: err.response?.data || err.message,
+      });
+    }
   }
-
-  const filePath = file.path;
-
-  const uploadUrl = `https://storage.bunnycdn.com/${process.env.BUNNY_STORAGE_ZONE}/${username}/${file.originalname}`;
-
-  try {
-    await axios.put(uploadUrl, file.buffer, {
-      headers: {
-        AccessKey: process.env.BUNNY_API_KEY,
-        "Content-Type": file.mimetype,
-      },
-    });
-
-    const publicUrl = `${process.env.BUNNY_CDN_URL}/${username}/${file.originalname}`;
-
-    res.json({ id, name: file.originalname, url: publicUrl });
-  } catch (err) {
-    console.error("❌ Upload Failed:", {
-      message: err.message,
-      data: err.response?.data,
-      status: err.response?.status,
-      headers: err.response?.headers,
-    });
-
-    res.status(500).json({
-      error: "Upload failed",
-      details: err.response?.data || err.message,
-    });
-  }
-});
+);
 
 app.listen(3000, () => console.log("Server running!"));
