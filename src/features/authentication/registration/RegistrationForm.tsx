@@ -6,6 +6,7 @@ import ErrorMessage from "../../../components/forms/ErrorMessage";
 import Button from "../../../components/Button";
 import { nanoid } from "@reduxjs/toolkit";
 import { useAddUserMutation } from "../api/authApi";
+import { toast } from "react-toastify";
 
 const RegistrationForm = () => {
   const [formData, setFormData] = useState<RegistrationState>({
@@ -14,7 +15,6 @@ const RegistrationForm = () => {
     email: "",
     password: "",
   });
-  const [serverError, setServerError] = useState<string>("");
   const [formErrors, setFormErrors] = useState({
     username: "",
     email: "",
@@ -32,6 +32,7 @@ const RegistrationForm = () => {
       username: formData.get("username"),
       email: formData.get("email"),
       password: formData.get("password"),
+      currencies: null,
     });
 
     if (!verifyData.success) {
@@ -46,9 +47,12 @@ const RegistrationForm = () => {
 
     if (verifyData?.success) {
       try {
-        await addUser(verifyData?.data).unwrap();
+        await toast.promise(addUser(verifyData?.data).unwrap(), {
+          pending: "We are verifying your credentials.",
+          success: "You have been registered.",
+        });
       } catch (error: any) {
-        setServerError(error?.data?.message ?? "Uncaught error.");
+        toast.error(error?.data?.message ?? "Uncaught error. Check console.");
       }
     }
   };
@@ -111,11 +115,6 @@ const RegistrationForm = () => {
       <Button type="submit" variant="PRIMARY" ariaLabel="Login current user">
         Login
       </Button>
-      {serverError && (
-        <p className="error" style={{ color: "red", marginBottom: "1rem" }}>
-          {serverError}
-        </p>
-      )}{" "}
     </form>
   );
 };

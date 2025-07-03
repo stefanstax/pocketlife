@@ -6,21 +6,19 @@ import {
 import type { CurrencyState } from "./currencyTypes";
 import { PRIMARY, SHARED } from "../../../app/globalClasses";
 import BlurredSpinner from "../../../components/BlurredSpinner";
-import { useState } from "react";
+import { toast } from "react-toastify";
 
 const CurrencyList = () => {
   const { data } = useGetCurrenciesQuery();
-  const [removeCurrencyById, { isLoading: loadingCurrencies, isSuccess }] =
+  const [removeCurrencyById, { isLoading: loadingCurrencies }] =
     useRemoveCurrencyByIdMutation();
-  const [serverMessage, setServerMessage] = useState<any>();
 
   const handleDelete = async (code: string) => {
-    try {
-      await removeCurrencyById(code).unwrap();
-      setServerMessage(`Currency ${code} has been removed.`);
-    } catch (error: any) {
-      setServerMessage(error?.data?.message ?? "Uncaught error.");
-    }
+    await toast.promise(removeCurrencyById(code).unwrap(), {
+      pending: "Currency is being removed.",
+      success: "Currency has been removed.",
+      error: "Currency could not be removed.",
+    });
   };
 
   if (loadingCurrencies) return <BlurredSpinner />;
@@ -54,11 +52,6 @@ const CurrencyList = () => {
           </div>
         );
       })}
-      {serverMessage || isSuccess ? (
-        <div className="rounded-sm bg-black w-fit text-white p-2">
-          <p>{serverMessage}</p>
-        </div>
-      ) : null}
     </div>
   );
 };

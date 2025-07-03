@@ -1,18 +1,12 @@
-const ServerMessage = ({
-  serverMessage,
-  isError,
-}: {
-  serverMessage: string;
-  isError: boolean;
-}) => {
+import { ToastContainer, toast } from "react-toastify";
+
+const ServerMessage = () => {
+  const notify = () => toast("Wow so easy !");
+
   return (
-    <p
-      className={`bg-black rounded-sm p-2 w-fit ${
-        isError ? "text-red-400" : "text-green-400"
-      } font-[500]`}
-    >
-      {serverMessage}
-    </p>
+    <div className="grid place-items-center h-dvh bg-zinc-900/15">
+      <ToastContainer />
+    </div>
   );
 };
 

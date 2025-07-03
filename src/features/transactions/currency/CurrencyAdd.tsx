@@ -6,7 +6,7 @@ import { useSelector } from "react-redux";
 import type { RootState } from "../../../app/store";
 import { useAddCurrencyMutation } from "./api/currenciesApi";
 import SubmitButton from "../../../components/SubmitButton";
-import ServerError from "../../../components/ServerMessage";
+import { toast } from "react-toastify";
 
 const CurrenciesAdd = () => {
   const { user } = useSelector((state: RootState) => state.auth);
@@ -15,7 +15,6 @@ const CurrenciesAdd = () => {
     name: "",
     symbol: "",
   });
-  const [serverMessage, setServerMessage] = useState<any>();
 
   const [addCurrency, { isLoading, isError }] = useAddCurrencyMutation();
 
@@ -45,10 +44,12 @@ const CurrenciesAdd = () => {
 
     if (verifyData.success) {
       try {
-        await addCurrency(verifyData?.data).unwrap();
-        setServerMessage("Currency has been created successfully.");
+        await toast.promise(addCurrency(verifyData?.data).unwrap(), {
+          pending: "Currency is being created.",
+          success: "Currency has been added.",
+        });
       } catch (error: any) {
-        setServerMessage(error?.data?.message ?? "Error was not caught.");
+        toast.error(error?.data?.message ?? "Uncaught error. Check console.");
       }
     }
   };
@@ -98,10 +99,6 @@ const CurrenciesAdd = () => {
         aria="Create currency"
         label={isLoading ? "Creating..." : "Create currency"}
       />
-
-      {serverMessage && (
-        <ServerError serverMessage={serverMessage} isError={isError} />
-      )}
     </form>
   );
 };
