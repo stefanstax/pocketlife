@@ -31,7 +31,7 @@ const TransactionList = () => {
 
   return (
     <div className="w-full">
-      {data!.data!.length > 0 ? (
+      {data!.total >= 1 ? (
         <div className="flex flex-col justify-start items-start gap-2">
           <TransactionsTable data={data?.data as TransactionWithCurrency[]} />
           {data!.total >= 5 ? (
