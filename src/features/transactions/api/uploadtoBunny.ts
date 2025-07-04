@@ -1,4 +1,5 @@
 import { nanoid } from "@reduxjs/toolkit";
+import { store } from "../../../app/store";
 
 export const uploadFileToBunny = async ({
   file,
@@ -12,11 +13,15 @@ export const uploadFileToBunny = async ({
   formData.append("file", file);
   formData.append("name", file.name);
   formData.append("username", username);
+  const token = store.getState().auth.token;
 
   try {
     const res = await fetch(`${import.meta.env.VITE_API_URL}/upload`, {
       method: "POST",
       body: formData,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     const data = await res.json();

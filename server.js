@@ -382,7 +382,6 @@ app.post(
         headers: {
           AccessKey: process.env.BUNNY_API_KEY,
           "Content-Type": file.mimetype,
-          Authorization: `Bearer ${token}`,
         },
       });
 
