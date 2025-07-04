@@ -10,7 +10,14 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 app.use(helmet());
-app.use(cors());
+app.use(
+  cors({
+    origin: process.env.VITE_WEB_URL,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: false,
+  })
+);
 
 import axios from "axios";
 import jwt from "jsonwebtoken";
