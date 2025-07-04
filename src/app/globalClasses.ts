@@ -13,6 +13,6 @@ export const SHARED =
 export const PRIMARY =
   "bg-[#5152fb] border-[#5152fb] text-white hover:bg-white hover:text-[#5152fb]";
 export const SECONDARY =
-  "bg-white text-[#5152fb] border-black hover:bg-[#5152fb] hover:text-white";
+  "bg-white text-[#5152fb] border-[#5152fb] hover:bg-[#5152fb] hover:text-white";
 export const TERTIARY =
   "bg-transparent border-1 border-black text-black hover:text-white hover:bg-[#5152fb] hover:border-[#5152fb]";

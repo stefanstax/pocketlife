@@ -15,11 +15,13 @@ import { updateUser } from "../../../app/authSlice";
 import { useDispatch } from "react-redux";
 import BlurredSpinner from "../../../components/BlurredSpinner";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router";
 
 const CurrencySelection = () => {
   const { user } = useSelector((state: RootState) => state.auth);
   const { data, isLoading: loadingCurrencies } = useGetCurrenciesQuery();
   const [pickedCurrencies, setPickedCurrencies] = useState<string[]>([]);
+  const navigate = useNavigate();
 
   const [saveFavoriteCurrencies] = useSaveFavoriteCurrenciesMutation();
   const dispatch = useDispatch();
@@ -57,12 +59,13 @@ const CurrencySelection = () => {
     });
 
     dispatch(updateUser(await updatedUser));
+    navigate("/transactions");
   };
 
   if (loadingCurrencies) return <BlurredSpinner />;
 
   return (
-    <section className="w-full p-4 grid grid-cols-1 gap-4 rounded-sm">
+    <section className="mx-auto p-10 grid grid-cols-1 gap-4 rounded-sm">
       <h2 className="text-2xl font-bold text-center">
         Select currencies you would like to use
       </h2>

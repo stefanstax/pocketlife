@@ -48,13 +48,15 @@ export const transactionsApi = createApi({
       }),
       invalidatesTags: ["Transactions"],
     }),
-    updateTransaction: builder.mutation<Transaction, Transaction>({
-      query: (transaction) => ({
-        url: `transactions/${transaction?.id}`,
+    updateTransaction: builder.mutation<
+      Transaction,
+      Partial<Transaction> & Pick<Transaction, "id">
+    >({
+      query: ({ id, ...patch }) => ({
+        url: `transactions/${id}`,
         method: "PUT",
-        body: transaction,
+        body: patch,
       }),
-      invalidatesTags: ["Transactions"],
     }),
     deleteTransaction: builder.mutation<void, string>({
       query: (id) => ({

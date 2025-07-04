@@ -1,13 +1,8 @@
 @import "tailwindcss";
 
 body {
-  background-color: rgb(4, 0, 55);
+  background-color: aliceblue;
   font-family: "Inter";
-  min-height: 100dvh;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  justify-content: center;
 }
 
 .button--submit {

@@ -4,17 +4,17 @@ import cors from "cors";
 import multer from "multer";
 import { supabase } from "./supabaseClient.js";
 import helmet from "helmet";
+import dotenv from "dotenv";
+dotenv.config();
 
 const app = express();
 app.use(express.json());
 app.use(helmet());
 app.use(cors());
 
-import dotenv from "dotenv";
 import axios from "axios";
 import jwt from "jsonwebtoken";
 import { authenticateToken } from "./src/app/middleware/authenticateToken.js";
-dotenv.config();
 
 // Currencies
 app.get("/currencies", authenticateToken, async (req, res) => {

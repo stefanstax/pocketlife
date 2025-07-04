@@ -46,9 +46,11 @@ const EditTransaction = () => {
   const { user } = useSelector((state: RootState) => state.auth);
 
   // Transaction Data
-  const { data: transactionData, isLoading } = useGetTransactionByIdQuery(
-    id || ""
-  );
+  const {
+    data: transactionData,
+    refetch,
+    isLoading,
+  } = useGetTransactionByIdQuery(id || "");
 
   // Update transaction mutation
   const [updateTransaction, { isLoading: updating }] =
@@ -117,6 +119,7 @@ const EditTransaction = () => {
           error: "Transaction couldn't be updated.",
         }
       );
+      refetch();
       navigate("/transactions/");
     }
   };

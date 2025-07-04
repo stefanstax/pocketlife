@@ -8,7 +8,7 @@ const LogoutButton = () => {
     <button
       aria-label="Logout user"
       role="button"
-      className={`${SECONDARY} ${SHARED}`}
+      className={`${SECONDARY} ${SHARED} flex-1`}
       onClick={() => dispatch(logout())}
     >
       Logout
