@@ -59,12 +59,8 @@ const RegistrationForm = () => {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="w-full flex flex-col gap-6 bg-[#1b1918]  p-5 text-white"
-    >
+    <form onSubmit={handleSubmit} className="w-full flex flex-col gap-6">
       <h1 className="text-2xl font-black">Registration</h1>
-      <p>Your password will be hashed.</p>
       {/* Username */}
       <div className={formDiv}>
         <label className={labelClasses}>
@@ -113,8 +109,8 @@ const RegistrationForm = () => {
           placeholder="Password..."
         />
       </div>
-      <Button type="submit" variant="PRIMARY" ariaLabel="Login current user">
-        Login
+      <Button type="submit" variant="PRIMARY" ariaLabel="Register current user">
+        Sign Up
       </Button>
     </form>
   );

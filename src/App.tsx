@@ -15,6 +15,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
 import GuestRoute from "./components/GuestRoute";
 import { ToastContainer } from "react-toastify";
+import ComingSoon from "./pages/ComingSoon";
 
 const App = () => {
   return (
@@ -39,6 +40,8 @@ const App = () => {
             <Route path="select-currencies" element={<CurrencySelection />} />
           </Route>
           {/* Guest Routes */}
+          <Route path="links" element={<ComingSoon />} />
+          <Route path="storage" element={<ComingSoon />} />
           <Route element={<GuestRoute />}>
             <Route path="authentication">
               <Route index element={<Authentication />} />

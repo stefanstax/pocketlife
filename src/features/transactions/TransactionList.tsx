@@ -4,16 +4,17 @@ import { useGetTransactionsQuery } from "./api/transactionsApi";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../app/store";
 import Pagination from "../../components/Pagination";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TransactionsTable from "./TransactionsTable";
 import type { TransactionWithCurrency } from "./transactionTypes";
+import NoDataFallback from "../../components/forms/NoDataFallback";
 
 const TransactionList = () => {
   const { user, token } = useSelector((state: RootState) => state.auth);
   const [page, setPage] = useState(1);
-  const limit = 5;
+  const limit = 10;
 
-  const { data, isLoading } = useGetTransactionsQuery({
+  const { data, refetch, isSuccess, isLoading } = useGetTransactionsQuery({
     userId: user?.id ?? "",
     page,
     limit,
@@ -21,29 +22,31 @@ const TransactionList = () => {
     order: "desc",
   });
 
+  useEffect(() => {
+    if (isSuccess) refetch();
+  }, [isSuccess]);
+
   if (isLoading) {
     return <BlurredSpinner />;
   }
 
-  console.log(user, token);
-
   return (
-    <div className="w-full flex flex-col gap-10">
-      <div className="flex flex-col justify-start items-start gap-2">
-        <TransactionsTable data={data?.data as TransactionWithCurrency[]} />
-        <Pagination
-          page={page}
-          total={data?.total as number}
-          perPage={limit}
-          onPageChange={setPage}
-        />
-      </div>
-      <VariantLink
-        variant="PRIMARY"
-        aria="Go to transaction addition page"
-        label="Add new transaction"
-        link={`${import.meta.env.VITE_WEB_URL}/transactions/add`}
-      />
+    <div className="w-full">
+      {data!.data!.length > 0 ? (
+        <div className="flex flex-col justify-start items-start gap-2">
+          <TransactionsTable data={data?.data as TransactionWithCurrency[]} />
+          {data!.total >= 5 ? (
+            <Pagination
+              page={page}
+              total={data?.total as number}
+              perPage={limit}
+              onPageChange={setPage}
+            />
+          ) : null}
+        </div>
+      ) : (
+        <NoDataFallback dataType="transactions" />
+      )}
     </div>
   );
 };
