@@ -1,7 +1,6 @@
 import type { TransactionWithCurrency } from "./transactionTypes";
 import { Link } from "react-router-dom";
 import { PRIMARY, SHARED } from "../../app/globalClasses";
-import NoDataFallback from "../../components/forms/NoDataFallback";
 import { TbReceiptOff, TbReceiptPound } from "react-icons/tb";
 import Button from "../../components/Button";
 import { FiEdit2 } from "react-icons/fi";

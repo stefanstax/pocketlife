@@ -1,4 +1,3 @@
-import VariantLink from "../../components/VariantLink";
 import BlurredSpinner from "../../components/BlurredSpinner";
 import { useGetTransactionsQuery } from "./api/transactionsApi";
 import { useSelector } from "react-redux";
@@ -10,7 +9,7 @@ import type { TransactionWithCurrency } from "./transactionTypes";
 import NoDataFallback from "../../components/forms/NoDataFallback";
 
 const TransactionList = () => {
-  const { user, token } = useSelector((state: RootState) => state.auth);
+  const { user } = useSelector((state: RootState) => state.auth);
   const [page, setPage] = useState(1);
   const limit = 10;
 
