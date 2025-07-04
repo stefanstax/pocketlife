@@ -2,11 +2,11 @@ import { type ReactNode } from "react";
 
 const Page = ({ children }: { children: ReactNode }) => {
   return (
-    <section className="w-11/12 lg:w-10/12 mx-auto my-4 rounded-lg">
-      <div className="rounded-md bg-white min-h-[600px] p-4 items-start justify-between flex">
-        {children}
-      </div>
-    </section>
+    <div className="w-full min-h-[600px] flex justify-center items-center p-4 lg:p-10">
+      {/* <div className="rounded-md min-h-[600px] p-4 lg:p-10 items-center justify-center flex"> */}
+      {children}
+      {/* </div> */}
+    </div>
   );
 };
 

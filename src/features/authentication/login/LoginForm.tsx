@@ -8,6 +8,7 @@ import type { LoginState } from "./loginTypes";
 import { loginSchemas } from "./loginSchemas";
 import { useLoginUserMutation } from "../api/authApi";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router";
 
 const LoginForm = () => {
   const [formData, setFormData] = useState<LoginState>({
@@ -21,6 +22,7 @@ const LoginForm = () => {
 
   const [loginUser] = useLoginUserMutation();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -46,13 +48,14 @@ const LoginForm = () => {
         const { token, user } = await toast.promise(loginPromise, {
           pending: "Checking your credentials.",
           success: "You have been logged in.",
-          error: "Please check your credentials.",
         });
         dispatch(loginSuccess({ token, user }));
+
         setFormErrors({
           email: "",
           password: "",
         });
+        navigate("/transactions");
       } catch (error: any) {
         toast.error(error?.data?.message ?? "Uncaught error. Check console.");
       }
