@@ -1,0 +1,52 @@
+import { formDiv, input, labelClasses } from "../../../app/globalClasses";
+import FormError from "../../../components/FormError";
+import { useGetPaymentMethodsQuery } from "../paymentMethods/api/paymentMethodsApi";
+
+const TransactionMethod = ({
+  userId,
+  paymentMethodId,
+  setPaymentMethodId,
+  validationError,
+}: {
+  userId: string;
+  paymentMethodId: string | "";
+  setPaymentMethodId: (value: string) => void;
+  validationError?: string;
+}) => {
+  const { data } = useGetPaymentMethodsQuery(userId);
+
+  return (
+    <div className={formDiv}>
+      <label className={labelClasses} htmlFor="method">
+        Transaction Method
+      </label>
+      <div className={`${input} flex flex-wrap gap-2`}>
+        {data?.map((option) => {
+          return (
+            <button
+              key={option.id}
+              className={`${
+                option.id === paymentMethodId
+                  ? "bg-[#5152fb] text-white border-black"
+                  : ""
+              } min-w-[100px] rounded-sm cursor-pointer p-2 border-black border-solid border-1`}
+              type="button"
+              onClick={() => setPaymentMethodId(option.id)}
+            >
+              {option.name}
+            </button>
+          );
+        })}
+      </div>
+      <input
+        type="hidden"
+        name="paymentMethodId"
+        value={paymentMethodId ?? ""}
+        className={input}
+      />
+      {validationError && <FormError fieldError={validationError} />}
+    </div>
+  );
+};
+
+export default TransactionMethod;

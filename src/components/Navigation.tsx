@@ -69,6 +69,20 @@ const Navigation = () => {
       hasParent: false,
       label: "Storage",
     },
+    {
+      path: "/payment-methods",
+      visibleForGuest: true,
+      showInMainNav: true,
+      hasParent: false,
+      label: "Payment Methods",
+    },
+    {
+      path: "/payment-methods/add",
+      visibleForGuest: true,
+      showInMainNav: false,
+      hasParent: true,
+      label: "Add Payment Method",
+    },
   ];
 
   return (

@@ -244,38 +244,55 @@ app.get("/transactions", authenticateToken, async (req, res) => {
   const userId = req.user.userId;
 
   try {
-    const { data: currencies, error: curErr } = await supabase
-      .from("currencies")
-      .select("*");
-    if (curErr) return res.status(500).json({ message: curErr.message });
+    // Fetch currencies and payment methods in parallel
+    const [currRes, payRes] = await Promise.all([
+      supabase.from("currencies").select("*"),
+      supabase.from("payment-methods").select("*").eq("userId", userId),
+    ]);
 
-    const { count, error: countErr } = await supabase
-      .from("transactions")
-      .select("*", { count: "exact", head: true })
-      .eq("userId", userId);
-    if (countErr) return res.status(500).json({ message: countErr.message });
+    if (currRes.error || payRes.error) {
+      return res.status(500).json({
+        message: currRes.error?.message || payRes.error?.message,
+      });
+    }
 
-    const { data: transactionData, error: txErr } = await supabase
+    const currencies = currRes.data;
+    const paymentMethods = payRes.data;
+
+    // Fetch paginated transactions and total count in one call
+    const {
+      data: transactions,
+      error,
+      count,
+    } = await supabase
       .from("transactions")
-      .select("*")
+      .select("*", { count: "exact" }) // include count and data
       .eq("userId", userId)
       .order("created_at", { ascending: false })
       .range(startIndex, endIndex);
-    if (txErr) return res.status(500).json({ message: txErr.message });
 
-    const transactionsWithCurrency = transactionData.map((tx) => {
-      const currency = currencies.find((c) => c.code === tx.currencyId);
-      return { ...tx, currency: currency || null };
+    if (error) return res.status(500).json({ message: error.message });
+
+    // Single pass merge
+    const enriched = transactions.map((tx) => {
+      const currency = currencies.find((c) => c.code === tx.currencyId) || null;
+      const paymentMethod =
+        paymentMethods.find((p) => p.id === tx.paymentMethodId) || null;
+      return {
+        ...tx,
+        currency,
+        paymentMethod,
+      };
     });
 
-    res.json({
-      data: transactionsWithCurrency,
+    return res.json({
+      data: enriched,
       total: count,
       page: pageNum,
       limit: limitNum,
     });
   } catch (err) {
-    res.status(500).json({ message: err.message || "Server error" });
+    return res.status(500).json({ message: err.message || "Server error" });
   }
 });
 
@@ -403,5 +420,107 @@ app.post(
     }
   }
 );
+
+// Payment Methods
+app.get("/payment-methods", authenticateToken, async (req, res) => {
+  const userId = req.user?.userId;
+
+  try {
+    const { data } = await supabase
+      .from("payment-methods")
+      .select("*")
+      .eq("userId", userId);
+
+    return res.status(200).json(data);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+});
+
+app.get("/payment-methods/:id", authenticateToken, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const { data, error } = await supabase
+      .from("payment-methods")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+    if (error)
+      return res
+        .status(400)
+        .json({ message: "Payment method couldn't be found" });
+
+    return res.status(200).json(data);
+  } catch (error) {
+    return res.status(500).json({ message: error?.message });
+  }
+});
+
+app.post("/payment-methods", authenticateToken, async (req, res) => {
+  const userId = req.user?.userId;
+  const { name, type } = req.body;
+
+  const sentData = {
+    userId,
+    name,
+    type,
+  };
+
+  try {
+    const { data, error } = await supabase
+      .from("payment-methods")
+      .insert([sentData])
+      .select();
+
+    if (error) return res.status(400).json({ message: error });
+
+    return res.status(201).json(data);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+});
+
+app.put("/payment-methods/:id", authenticateToken, async (req, res) => {
+  const { id } = req.params;
+  const updatedBody = req.body;
+
+  try {
+    const { data, error } = await supabase
+      .from("payment-methods")
+      .update(updatedBody)
+      .eq("id", id)
+      .single();
+
+    if (error)
+      return res
+        .status(400)
+        .json({ message: "Payment method couldn't be updated." });
+
+    return res.status(200).json(data);
+  } catch (error) {
+    return res.status(500).json({ message: error?.message });
+  }
+});
+
+app.delete("/payment-methods/:id", authenticateToken, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const { error } = await supabase
+      .from("payment-methods")
+      .delete()
+      .eq("id", id);
+
+    if (error)
+      res.status(400).json({ message: "Payment method couldn't be deleted." });
+    return res
+      .status(200)
+      .json({ message: "Payment method has been deleted." });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+});
 
 app.listen(3000, () => console.log("Server running!"));

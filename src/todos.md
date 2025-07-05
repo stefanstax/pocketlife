@@ -11,14 +11,15 @@
 - [] Recognize if note contains a possible words which would make the transaction business context - and notify user to make sure it's not a business transaction
 - [] Open receipts route
 - [] Transaction categories
-- [] Transaction payment method cash/card
 - [] Delete old receipt when new one gets uploaded to the same transaction
-- [] Fully integrate errros into currencies forms
-- [] Add toaster or other type of notifiers to alert user on certain interactions
 - [] Relocate receipt upload errors from the server onto frontend for info
+- [] Email authentication with magic link or codes
 
 / Done
 
+- [x] Fully integrate errros into currencies forms
+- [x] Add toaster or other type of notifiers to alert user on certain interactions
+- [x] Transaction payment method cash/card
 - [x] Re-write currencies completely, do not allow manual creation rather check which user would like to user from a globally accessible currencies
 - [x] Open DEV branch
 - [x] Add ability to open mobile camera to capture a receipt

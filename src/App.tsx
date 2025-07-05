@@ -16,6 +16,9 @@ import AdminRoute from "./components/AdminRoute";
 import GuestRoute from "./components/GuestRoute";
 import { ToastContainer } from "react-toastify";
 import ComingSoon from "./pages/ComingSoon";
+import PaymentMethodAdd from "./features/transactions/paymentMethods/PaymentMethodAdd";
+import PaymentMethodsList from "./features/transactions/paymentMethods/PaymentMethodsList";
+import PaymentMethodEdit from "./features/transactions/paymentMethods/PaymentMethodEdit";
 
 const App = () => {
   return (
@@ -38,6 +41,11 @@ const App = () => {
               <Route path=":id" element={<EditTransaction />} />
             </Route>
             <Route path="select-currencies" element={<CurrencySelection />} />
+            <Route path="payment-methods">
+              <Route index element={<PaymentMethodsList />} />
+              <Route path="add" element={<PaymentMethodAdd />} />
+              <Route path=":id" element={<PaymentMethodEdit />} />
+            </Route>
           </Route>
           {/* Guest Routes */}
           <Route path="links" element={<ComingSoon />} />
