@@ -15,6 +15,7 @@ import { transactionsApi } from "../features/transactions/api/transactionsApi";
 import { authApi } from "../features/authentication/api/authApi";
 import { categoriesApi } from "../features/transactions/category/api/categoriesApi";
 import { currenciesApi } from "../features/transactions/currency/api/currenciesApi";
+import { paymentMethodsApi } from "../features/transactions/paymentMethods/api/paymentMethodsApi";
 
 const authPersistConfig = {
   key: "auth",
@@ -29,6 +30,7 @@ const rootReducer = combineReducers({
   [authApi.reducerPath]: authApi.reducer,
   [categoriesApi.reducerPath]: categoriesApi.reducer,
   [currenciesApi.reducerPath]: currenciesApi.reducer,
+  [paymentMethodsApi.reducerPath]: paymentMethodsApi.reducer,
 });
 
 // Configure store
@@ -42,7 +44,8 @@ export const store = configureStore({
     })
       .concat(authApi.middleware)
       .concat(currenciesApi.middleware)
-      .concat(transactionsApi.middleware),
+      .concat(transactionsApi.middleware)
+      .concat(paymentMethodsApi.middleware),
 });
 
 // Persistor

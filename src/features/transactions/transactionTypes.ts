@@ -1,4 +1,5 @@
 import type { CurrencyState } from "./currency/currencyTypes";
+import type { PaymentMethod } from "./paymentMethods/paymentMethodsTypes";
 
 export interface Transaction {
   id: string;
@@ -9,15 +10,20 @@ export interface Transaction {
   currencyId: string;
   title: string;
   note: string;
+  paymentMethodId: string;
   type: TransactionTypes;
   context: TransactionContexts;
   receipt?: Receipt;
 }
 
-export type TransactionClone = Omit<Transaction, "id" | "currency">;
+export type TransactionClone = Omit<
+  Transaction,
+  "id" | "currency" | "paymentMethod"
+>;
 
-export interface TransactionWithCurrency extends Transaction {
+export interface EnrichedTransaction extends Transaction {
   currency: CurrencyState;
+  paymentMethod: PaymentMethod;
 }
 
 export interface PaginatatedTransactions {

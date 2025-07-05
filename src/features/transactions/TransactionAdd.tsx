@@ -19,6 +19,7 @@ import TransactionNote from "./fields/TransactionNote";
 import { useAddTransactionMutation } from "./api/transactionsApi";
 import UploadField from "../../components/forms/UploadFile";
 import { toast } from "react-toastify";
+import TransactionMethod from "./fields/TransactionMethod";
 
 const TransactionAdd = () => {
   const [title, setTitle] = useState<string>("");
@@ -28,6 +29,7 @@ const TransactionAdd = () => {
   const [note, setNote] = useState<string>("");
   const [type, setType] = useState<TransactionTypes | "">("");
   const [receipt, setReceipt] = useState<Receipt | null>(null);
+  const [paymentMethodId, setPaymentMethodId] = useState<string | "">("");
   const [formErrors, setFormErrors] = useState<Partial<Record<string, string>>>(
     {}
   );
@@ -49,6 +51,7 @@ const TransactionAdd = () => {
       updated_at: null,
       note: formData.get("note"),
       type: formData.get("type"),
+      paymentMethodId: formData.get("method"),
       context: formData.get("context"),
       receipt: receipt,
       userId: user?.id,
@@ -82,6 +85,7 @@ const TransactionAdd = () => {
       setType("");
       setContext("");
       setCurrencyId("");
+      setPaymentMethodId("");
       setReceipt(null);
     }
   };
@@ -105,6 +109,13 @@ const TransactionAdd = () => {
         type={type}
         setType={setType}
         validationError={formErrors?.type}
+      />
+      {/* Method */}
+      <TransactionMethod
+        userId={user?.id ?? ""}
+        paymentMethodId={paymentMethodId ?? ""}
+        setPaymentMethodId={setPaymentMethodId}
+        validationError={formErrors?.method}
       />
       {/* Currency */}
       <TransactionCurrency

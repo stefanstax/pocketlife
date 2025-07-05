@@ -24,6 +24,7 @@ import {
 import BlurredSpinner from "../../components/BlurredSpinner";
 import UploadField from "../../components/forms/UploadFile";
 import { toast } from "react-toastify";
+import TransactionMethod from "./fields/TransactionMethod";
 
 const EditTransaction = () => {
   const [title, setTitle] = useState<string>("");
@@ -33,6 +34,7 @@ const EditTransaction = () => {
   const [type, setType] = useState<TransactionTypes | "">("");
   const [context, setContext] = useState<TransactionContexts | "">("");
   const [receipt, setReceipt] = useState<Receipt | null>(null);
+  const [paymentMethodId, setPaymentMethodId] = useState<string | "">("");
   const [formErrors, setFormErrors] = useState<Partial<Record<string, string>>>(
     {}
   );
@@ -75,6 +77,7 @@ const EditTransaction = () => {
       setType(transactionData?.type);
       setNote(transactionData?.note);
       setContext(transactionData?.context);
+      setPaymentMethodId(transactionData?.paymentMethodId);
     }
   }, [transactionData]);
 
@@ -91,6 +94,7 @@ const EditTransaction = () => {
       created_at: transactionData?.created_at,
       updated_at: new Date().toISOString(),
       note: formData.get("note"),
+      paymentMethodId: formData.get("paymentMethodId"),
       type: formData.get("type"),
       context: formData.get("context"),
       receipt: receipt,
@@ -156,6 +160,12 @@ const EditTransaction = () => {
         type={type}
         setType={setType}
         validationError={formErrors?.type}
+      />
+      <TransactionMethod
+        userId={user?.id ?? ""}
+        paymentMethodId={paymentMethodId as string}
+        setPaymentMethodId={setPaymentMethodId}
+        validationError={formErrors?.method}
       />
       <TransactionCurrency
         currencies={user?.currencies ?? []}

@@ -1,5 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type {
+  EnrichedTransaction,
   PaginatatedTransactions,
   Transaction,
   TransactionClone,
@@ -40,7 +41,7 @@ export const transactionsApi = createApi({
     getTransactionById: builder.query<Transaction, string>({
       query: (id) => `transactions/${id}`,
     }),
-    addTransaction: builder.mutation<Transaction, TransactionClone>({
+    addTransaction: builder.mutation<EnrichedTransaction, TransactionClone>({
       query: (transaction) => ({
         url: "transactions",
         method: "POST",

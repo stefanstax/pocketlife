@@ -1,4 +1,4 @@
-import type { TransactionWithCurrency } from "./transactionTypes";
+import type { EnrichedTransaction } from "./transactionTypes";
 import { Link } from "react-router-dom";
 import { PRIMARY, SHARED } from "../../app/globalClasses";
 import { TbReceiptOff, TbReceiptPound } from "react-icons/tb";
@@ -14,7 +14,7 @@ import {
 import { toast } from "react-toastify";
 
 type Props = {
-  data: TransactionWithCurrency[];
+  data: EnrichedTransaction[];
 };
 
 const TransactionsTable = ({ data }: Props) => {
@@ -31,7 +31,7 @@ const TransactionsTable = ({ data }: Props) => {
     }
   };
 
-  const handleClone = async (transaction: TransactionWithCurrency) => {
+  const handleClone = async (transaction: EnrichedTransaction) => {
     const { currency, id, ...rest } = transaction;
     const clonedTransaction = {
       ...rest,
@@ -57,6 +57,9 @@ const TransactionsTable = ({ data }: Props) => {
               What was charged
             </th>
             <th className={`${tableColumnPadding} min-w-[200px]`}>How much</th>
+            <th className={`${tableColumnPadding} min-w-[200px]`}>
+              paymentMethodId
+            </th>
             <th className={`${tableColumnPadding} min-w-[200px]`}>Note</th>
             <th className={`${tableColumnPadding} min-w-[200px]`}>
               Receipt/Invoice
@@ -77,6 +80,7 @@ const TransactionsTable = ({ data }: Props) => {
               note,
               created_at,
               updated_at,
+              paymentMethod,
               context,
               receipt,
             } = transaction;
@@ -125,6 +129,7 @@ const TransactionsTable = ({ data }: Props) => {
                   {currency?.symbol}
                   {amount.toFixed(2)}
                 </td>
+                <td className={tableColumnPadding}>{paymentMethod?.name}</td>
                 <td className={`${tableColumnPadding}`}>
                   {note?.trim() ? note : "-"}
                 </td>

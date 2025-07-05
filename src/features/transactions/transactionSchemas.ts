@@ -22,6 +22,9 @@ export const transactionSchema = z.object({
   context: z.enum(["PERSONAL", "BUSINESS"], {
     message: "Please select transaction context",
   }),
+  paymentMethodId: z
+    .string()
+    .nonempty({ message: "Please select a payment method." }),
   receipt: z
     .object({
       id: z.string(),
