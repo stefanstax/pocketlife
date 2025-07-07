@@ -8,7 +8,6 @@ import {
   FaCalendar,
   FaCreditCard,
   FaNoteSticky,
-  FaPlus,
   FaReceipt,
   FaRegClone,
   FaUserTie,
