@@ -1,168 +1,93 @@
 import { useSelector } from "react-redux";
 import type { RootState } from "../app/store";
-import { NavLink } from "react-router";
+import { NavLink, useLocation, useNavigate } from "react-router";
 import LoginButton from "./LoginButton";
-import { PRIMARY, SECONDARY, SHARED } from "../app/globalClasses";
+import { SECONDARY, SHARED } from "../app/globalClasses";
 import LogoutButton from "./LogoutButton";
-import { IoLockClosed } from "react-icons/io5";
-import { useState } from "react";
-import { AiOutlineMenuFold } from "react-icons/ai";
-import { FaReceipt } from "react-icons/fa6";
-import { MdCurrencyExchange } from "react-icons/md";
-import { VscIndent } from "react-icons/vsc";
-import { IoIosCheckbox } from "react-icons/io";
+import { FaLock, FaArrowLeft } from "react-icons/fa6";
+import { links } from "./navigationLinks";
 
 const Navigation = () => {
   const { user, token } = useSelector((state: RootState) => state.auth);
-  const [showNav, setShowNav] = useState(false);
 
-  const links = [
-    {
-      path: "/transactions",
-      visibleForGuest: true,
-      showInMainNav: true,
-      hasParent: false,
-      label: "Transactions",
-      icon: <FaReceipt />,
-    },
-    {
-      path: "/transactions/add",
-      visibleForGuest: true,
-      showInMainNav: false,
-      hasParent: true,
-      label: "Add Transaction",
-    },
-    {
-      path: "/select-currencies",
-      visibleForGuest: true,
-      showInMainNav: true,
-      hasParent: false,
-      label: "Toggle Currencies",
-      icon: <IoIosCheckbox />,
-    },
-    {
-      path: "/currencies",
-      visibleForGuest: false,
-      showInMainNav: true,
-      hasParent: false,
-      label: "Currencies",
-      icon: <MdCurrencyExchange />,
-    },
-    {
-      path: "/currencies/add",
-      visibleForGuest: false,
-      showInMainNav: false,
-      hasParent: true,
-      label: "Add Currency",
-    },
-    {
-      path: "/links",
-      visibleForGuest: true,
-      showInMainNav: true,
-      hasParent: false,
-      label: "Links",
-    },
-    {
-      path: "/storage",
-      visibleForGuest: true,
-      showInMainNav: true,
-      hasParent: false,
-      label: "Storage",
-    },
-    {
-      path: "/payment-methods",
-      visibleForGuest: true,
-      showInMainNav: true,
-      hasParent: false,
-      label: "Payment Methods",
-    },
-    {
-      path: "/payment-methods/add",
-      visibleForGuest: true,
-      showInMainNav: false,
-      hasParent: true,
-      label: "Add Payment Method",
-    },
-  ];
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const childrenLinks = links.filter((link) => link?.child === true);
+  const parentLinks = links.filter((link) => link?.child === false);
 
   return (
-    <nav className="w-full mx-auto p-4 bg-gray-950 h-[80px] lg:gap-4 flex flex-wrap items-center justify-between">
-      <h1 className="text-2xl text-gray-200 font-black">PocketLife</h1>
+    <nav className="w-full">
+      <div className="w-full mx-auto p-4 bg-gray-950 lg:gap-4 flex flex-wrap items-center justify-between">
+        <h1 className="text-2xl text-gray-200 font-black">PocketLife</h1>
 
-      <div className={`flex text-gray-300 items-center gap-4 hidden lg:flex`}>
-        {links.map((link) => {
-          return (
-            <NavLink
-              key={link?.path}
-              to={link?.path}
-              className={({ isActive }) =>
-                `flex gap-2 items-center ${
-                  !link?.visibleForGuest &&
-                  user?.email !== import.meta.env.VITE_ADMIN_EMAIL
-                    ? "opacity-50 pointer-events-none"
-                    : null
-                } ${link?.showInMainNav ? "block" : "hidden"} ${
-                  isActive ? "text-[#5152fb]" : "text-gray-200"
-                }`
-              }
-            >
-              {!link?.visibleForGuest &&
-                user?.email !== import.meta.env.VITE_ADMIN_EMAIL && (
-                  <IoLockClosed />
-                )}
-              {link?.icon} {link?.label}
-            </NavLink>
-          );
-        })}
+        <div className={`text-gray-300 items-center gap-4 hidden lg:flex`}>
+          {parentLinks?.map((link) => {
+            return (
+              <NavLink
+                to={link?.url}
+                className={({ isActive }) =>
+                  `flex gap-2 items-center ${
+                    user?.email !== import.meta.env.VITE_ADMIN_EMAIL
+                      ? "opacity-50 pointer-events-none"
+                      : null
+                  } ${isActive ? "text-white" : "text-gray-400"}`
+                }
+              >
+                {(link?.locked || user?.email) &&
+                  user?.email !== import.meta.env.VITE_ADMIN_EMAIL && (
+                    <FaLock />
+                  )}
+                {link?.label}
+              </NavLink>
+            );
+          })}
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          {!token && (
+            <>
+              <NavLink
+                to="/authentication/registration"
+                className={`${SECONDARY} ${SHARED}`}
+              >
+                Sign Up
+              </NavLink>
+              <LoginButton />
+            </>
+          )}
+          {token && <LogoutButton />}
+        </div>
       </div>
-
-      <div className="flex flex-wrap gap-2">
-        <AiOutlineMenuFold
-          fontSize={30}
-          onClick={() => setShowNav(!showNav)}
-          className={`min-w-[50px] ${PRIMARY} ${SHARED}`}
-        />
-        {!token && (
-          <>
-            <NavLink
-              to="/authentication/registration"
-              className={`${SECONDARY} ${SHARED}`}
-            >
-              Sign Up
-            </NavLink>
-            <LoginButton />
-          </>
+      <div className="w-full overflow-x-auto lg:overflow-x-hidden flex items-center gap-4 justify-start lg:justify-center bg-blue-100 p-4 text-black font-[500] text-center">
+        {location?.pathname !== "/" && (
+          <button
+            aria-label="Go to previous page"
+            onClick={() => navigate(-1)}
+            className="text-sm flex items-center gap-2 cursor-pointer"
+          >
+            <FaArrowLeft /> Back
+          </button>
         )}
-        {token && <LogoutButton />}
-      </div>
-      <div
-        className={`top-[80px] absolute left-0 w-full lg:w-[300px] min-h-[100dvh] bg-gray-950 flex flex-col z-99 p-10 text-gray-300 items-start gap-4 ${
-          showNav === false && "hidden"
-        }`}
-      >
-        {links.map((link) => {
-          return (
-            <NavLink
-              key={link?.path}
-              onClick={() => setShowNav(false)}
-              to={link?.path}
-              className={({ isActive }) =>
-                `flex gap-2 items-center ${
-                  !link?.visibleForGuest &&
-                  user?.email !== import.meta.env.VITE_ADMIN_EMAIL
-                    ? "opacity-50 pointer-events-none"
-                    : null
-                } ${isActive ? "text-[#5152fb]" : "text-gray-200"}`
-              }
-            >
-              {!link?.visibleForGuest &&
-                user?.email !== import.meta.env.VITE_ADMIN_EMAIL && (
-                  <IoLockClosed />
-                )}
-              {link?.hasParent ? <VscIndent /> : null}
-              {link?.icon} {link?.label}
-            </NavLink>
-          );
+        {childrenLinks.map((link) => {
+          if (location?.pathname.includes(link?.parent)) {
+            return (
+              <NavLink
+                key={link?.url}
+                className={`min-w-fit text-sm ${
+                  link.locked ||
+                  (user?.email !== import.meta.env.VITE_ADMIN_EMAIL &&
+                    "opacity-50 pointer-events-none")
+                } ${
+                  location?.pathname === link?.url &&
+                  "opacity-50 pointer-events-none"
+                }`}
+                to={link?.url}
+              >
+                {link?.label}
+              </NavLink>
+            );
+          }
         })}
       </div>
     </nav>

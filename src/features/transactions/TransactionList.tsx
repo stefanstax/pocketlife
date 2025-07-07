@@ -4,9 +4,9 @@ import { useSelector } from "react-redux";
 import type { RootState } from "../../app/store";
 import Pagination from "../../components/Pagination";
 import { useEffect, useState } from "react";
-import TransactionsTable from "./TransactionsTable";
 import NoDataFallback from "../../components/forms/NoDataFallback";
 import type { EnrichedTransaction } from "./transactionTypes";
+import TransactionGrid from "./TransactionsGrid";
 
 const TransactionList = () => {
   const { user } = useSelector((state: RootState) => state.auth);
@@ -33,7 +33,7 @@ const TransactionList = () => {
     <div className="w-full">
       {data!.total >= 1 ? (
         <div className="flex flex-col justify-start items-start gap-2">
-          <TransactionsTable data={data?.data as EnrichedTransaction[]} />
+          <TransactionGrid data={data?.data as EnrichedTransaction[]} />
           {data!.total >= 5 ? (
             <Pagination
               page={page}

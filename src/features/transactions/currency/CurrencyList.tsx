@@ -26,53 +26,38 @@ const CurrencyList = () => {
 
   if (loadingCurrencies) return <BlurredSpinner />;
 
-  const tableColumnPadding = "p-4";
   return (
     <>
-      <div className="w-full overflow-x-auto rounded-sm">
-        <table className="w-full table-auto">
-          <thead className="bg-blue-50 text-[#5152fb] sticky top-0 z-10">
-            <tr>
-              <th className={`${tableColumnPadding} min-w-[200px]`}>Code</th>
-              <th className={`${tableColumnPadding} min-w-[200px]`}>Symbol</th>
-              <th className={`${tableColumnPadding} min-w-[200px]`}>Name</th>
-
-              <th className={`${tableColumnPadding} min-w-[200px]`}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data?.map((currency: CurrencyState) => {
-              const { code, symbol, name } = currency;
-              return (
-                <tr
-                  key={code}
-                  className="border-b text-center border-[#5152fb] hover:bg-[#f4f4ff] transition"
+      <div className="w-full grid grid-cols-1 lg:grid-cols-4 gap-4">
+        {data?.map((currency: CurrencyState) => {
+          const { code, symbol, name } = currency;
+          return (
+            <div
+              key={code}
+              className="bg-gray-950 rounded-lg p-4 text-white flex flex-col gap-4"
+            >
+              <div className="flex items-center gap-2">
+                <p>{symbol}</p>
+                <p>{code}</p>
+              </div>
+              <p className="font-bold">{name}</p>
+              <div className="grid grid-cols-2 gap-4">
+                <Link
+                  className={`${PRIMARY} ${SHARED}`}
+                  to={`/currencies/${code}`}
                 >
-                  <td className={`${tableColumnPadding}`}>{code}</td>
-                  <td className={`${tableColumnPadding}`}>{symbol}</td>
-                  <td className={`${tableColumnPadding}`}>{name}</td>
-
-                  <td
-                    className={`${tableColumnPadding} grid grid-cols-2 gap-2`}
-                  >
-                    <Link
-                      className={`${PRIMARY} ${SHARED}`}
-                      to={`/currencies/${code}`}
-                    >
-                      <FiEdit2 />
-                    </Link>
-                    <button
-                      onClick={() => handleDelete(code)}
-                      className="flex items-center justify-center border cursor-pointer border-black-400 bg-black p-2 text-white hover:text-neutral-700 hover:bg-transparent rounded-sm"
-                    >
-                      <AiOutlineDelete />
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                  <FiEdit2 />
+                </Link>
+                <button
+                  className={`${PRIMARY} ${SHARED}`}
+                  onClick={() => handleDelete(code)}
+                >
+                  <AiOutlineDelete />
+                </button>
+              </div>
+            </div>
+          );
+        })}
       </div>
       {!data?.length && <NoDataFallback dataType="Currencies" />}
     </>

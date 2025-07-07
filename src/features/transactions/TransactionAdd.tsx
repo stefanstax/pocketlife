@@ -51,7 +51,7 @@ const TransactionAdd = () => {
       updated_at: null,
       note: formData.get("note"),
       type: formData.get("type"),
-      paymentMethodId: formData.get("method"),
+      paymentMethodId: formData.get("paymentMethodId"),
       context: formData.get("context"),
       receipt: receipt,
       userId: user?.id,
@@ -66,6 +66,7 @@ const TransactionAdd = () => {
         ])
       );
       setFormErrors(fieldErrors);
+
       return;
     }
 
