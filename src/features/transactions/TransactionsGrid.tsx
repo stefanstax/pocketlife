@@ -18,6 +18,7 @@ import {
   useDeleteTransactionMutation,
 } from "./api/transactionsApi";
 import { toast } from "react-toastify";
+import { useGetPaymentMethodsQuery } from "./paymentMethods/api/paymentMethodsApi";
 
 type Props = {
   data: EnrichedTransaction[];
@@ -25,6 +26,7 @@ type Props = {
 
 const TransactionGrid = ({ data }: Props) => {
   const [deleteTransaction] = useDeleteTransactionMutation();
+  const { data: paymentMethods } = useGetPaymentMethodsQuery();
 
   const [addTransaction] = useAddTransactionMutation();
 
@@ -52,7 +54,24 @@ const TransactionGrid = ({ data }: Props) => {
   };
 
   return (
-    <div className="w-full h-[400px] overflow-y-auto lg:h-full gap-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
+    <div className="w-full gap-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
+      <div className="w-full col-span-1 flex gap-2 mb-2 overflow-x-auto md:col-span-4 lg:col-span-5">
+        {paymentMethods?.map((paymentMethod) => {
+          const mapOverBudgets = paymentMethod?.budgets?.map((budget) => {
+            return (
+              <p className="text-sm">
+                {budget?.currencyId} - {budget?.amount.toFixed(2)}
+              </p>
+            );
+          });
+          return (
+            <div className="bg-gray-950 rounded-lg p-4 flex flex-col gap-2 text-white min-w-[200px] w-full">
+              <p className="font-bold">{paymentMethod?.name}</p>
+              {mapOverBudgets}
+            </div>
+          );
+        })}
+      </div>
       {data.map((transaction) => {
         const {
           title,
@@ -81,16 +100,14 @@ const TransactionGrid = ({ data }: Props) => {
             </div>
             <p className="font-bold">{title}</p>
             <p
-              className={`${
+              className={`inline-block text-transparent bg-clip-text ${
                 type === "EXPENSE"
-                  ? "text-red-500"
-                  : type === "SAVINGS"
-                  ? "text-blue-500"
-                  : "text-green-500"
+                  ? "bg-gradient-to-r from-red-300 via-red-500 to-red-900"
+                  : "bg-gradient-to-r from-green-300 via-green-500 to-green-900"
               } font-bold`}
             >
               {currency?.symbol}
-              {amount}
+              {amount.toFixed(2)}
             </p>
             <p className="text-sm font-bold flex items-center gap-2">
               <FaUserTie className="min-w-[16px]" />

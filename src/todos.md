@@ -1,11 +1,12 @@
 / Bugs
 
-- [] Fix date entries to be unanymous
-- [] URL currently are missing / which breaks the API
+- [x] Fix date entries to be unanymous
+- [x] URL currently are missing / which breaks the API
 - [] Currencies added, after removal stay inside of user's data - On currency removal without previously setting it to non-favorite also remove from the user's currencies db column
 
 / New Ideas / Improvements
 
+- [] Redux to make state updates across the app more smooth and consistent
 - [] Add ability to delete transaction / for business with each delete also remove images which were previously uploaded to the cloud \*somewhere
 - Add validation errors for each form
 - [] Recognize if note contains a possible words which would make the transaction business context - and notify user to make sure it's not a business transaction

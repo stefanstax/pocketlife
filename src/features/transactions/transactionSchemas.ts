@@ -16,7 +16,7 @@ export const transactionSchema = z.object({
     .string()
     .nonempty({ message: "Transaction currency must be selected" }),
   note: z.string(),
-  type: z.enum(["INCOME", "EXPENSE", "SAVINGS"], {
+  type: z.enum(["INCOME", "EXPENSE"], {
     message: "Please select transaction type",
   }),
   context: z.enum(["PERSONAL", "BUSINESS"], {
@@ -25,6 +25,7 @@ export const transactionSchema = z.object({
   paymentMethodId: z
     .string()
     .nonempty({ message: "Please select a payment method." }),
+  budgetId: z.string(),
   receipt: z
     .object({
       id: z.string(),
