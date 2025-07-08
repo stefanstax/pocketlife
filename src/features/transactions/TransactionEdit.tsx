@@ -132,29 +132,30 @@ const EditTransaction = () => {
 
     if (result.success) {
       try {
-        if (type === "EXPENSE") {
-          dispatch(
-            substractAmount({
-              budgetId: String(findBudget?.id),
-              currencyId,
-              amount: Number(amount),
-            })
-          );
-        } else {
-          dispatch(
-            addAmount({
-              budgetId: String(findBudget?.id),
-              currencyId,
-              amount: Number(amount),
-            })
-          );
+        if (transactionData?.amount !== amount) {
+          if (type === "EXPENSE") {
+            dispatch(
+              substractAmount({
+                budgetId: String(findBudget?.id),
+                currencyId,
+                amount: Number(amount),
+              })
+            );
+          } else {
+            dispatch(
+              addAmount({
+                budgetId: String(findBudget?.id),
+                currencyId,
+                amount: Number(amount),
+              })
+            );
+          }
         }
         await toast.promise(
           updateTransaction(result?.data as Transaction).unwrap(),
           {
             pending: "Transaction is being updated.",
             success: "Transaction has been updated.",
-            error: "Transaction couldn't be updated.",
           }
         );
         refetch();

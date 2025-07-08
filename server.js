@@ -22,6 +22,7 @@ app.use(
 import axios from "axios";
 import jwt from "jsonwebtoken";
 import { authenticateToken } from "./src/app/middleware/authenticateToken.js";
+import { current } from "@reduxjs/toolkit";
 
 // Currencies
 app.get("/currencies", authenticateToken, async (req, res) => {
@@ -378,42 +379,62 @@ app.put("/transactions/:id", authenticateToken, async (req, res) => {
   const { budgetId, paymentMethodId, type, amount } = updatedBody;
 
   try {
-    const { data: paymentMethod } = await supabase
-      .from("payment-methods")
-      .select("budgets")
-      .eq("id", paymentMethodId)
+    const { data: currentTransaction } = await supabase
+      .from("transactions")
+      .select("*")
+      .eq("id", id)
       .single();
 
-    const budgets = paymentMethod?.budgets || [];
-    const findBudget = budgets.find((budget) => budget?.id === budgetId);
+    const {
+      amount: amountBeforeUpdate,
+      type: typeBeforeUpdate,
+      paymentMethodId: paymentMethodBeforeUpdate,
+      budgetId: budgetBeforeUpdate,
+    } = currentTransaction;
 
-    if (findBudget) {
-      if (type === "EXPENSE") {
-        findBudget.amount -= Number(amount);
-        if (findBudget.amount < 0) {
-          return res.status(400).json({
-            message: "Insufficient budget amount. Feel free to top up.",
-          });
+    if (
+      amountBeforeUpdate !== amount ||
+      typeBeforeUpdate !== type ||
+      paymentMethodBeforeUpdate !== paymentMethodId ||
+      budgetBeforeUpdate !== budgetId
+    ) {
+      const { data: paymentMethod } = await supabase
+        .from("payment-methods")
+        .select("budgets")
+        .eq("id", paymentMethodId)
+        .single();
+
+      const budgets = paymentMethod?.budgets || [];
+      const findBudget = budgets.find((budget) => budget?.id === budgetId);
+
+      if (findBudget) {
+        if (type === "EXPENSE") {
+          findBudget.amount -= Number(amount);
+          if (findBudget.amount < 0) {
+            return res.status(400).json({
+              message: "Insufficient budget amount. Feel free to top up.",
+            });
+          }
+        } else if (type === "INCOME") {
+          findBudget.amount += Number(amount);
+        } else {
+          return res.status(400).json({ message: "Invalid transaction type." });
         }
-      } else if (type === "INCOME") {
-        findBudget.amount += Number(amount);
-      } else {
-        return res.status(400).json({ message: "Invalid transaction type." });
-      }
-    } else
-      return res
-        .status(400)
-        .json({ message: "We couldn't locate payment method's budget." });
+      } else
+        return res
+          .status(400)
+          .json({ message: "We couldn't locate payment method's budget." });
 
-    const { error: updateErrorBudgets } = await supabase
-      .from("payment-methods")
-      .update({ budgets })
-      .eq("id", paymentMethodId);
+      const { error: updateErrorBudgets } = await supabase
+        .from("payment-methods")
+        .update({ budgets })
+        .eq("id", paymentMethodId);
 
-    if (updateErrorBudgets)
-      return res
-        .status(400)
-        .json({ message: "Payment method budget hasn't been updated." });
+      if (updateErrorBudgets)
+        return res
+          .status(400)
+          .json({ message: "Payment method budget hasn't been updated." });
+    }
 
     const { data, error } = await supabase
       .from("transactions")
