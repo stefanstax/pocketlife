@@ -65,7 +65,7 @@ const CurrencySelection = () => {
   if (loadingCurrencies) return <BlurredSpinner />;
 
   return (
-    <section className="mx-auto p-10 grid grid-cols-1 gap-4 rounded-sm">
+    <section className="mx-auto p-10 grid grid-cols-1 gap-4 rounded-lg">
       <h2 className="text-2xl font-bold text-center">
         Select currencies you would like to use
       </h2>

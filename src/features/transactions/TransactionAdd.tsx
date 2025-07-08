@@ -20,6 +20,7 @@ import { useAddTransactionMutation } from "./api/transactionsApi";
 import UploadField from "../../components/forms/UploadFile";
 import { toast } from "react-toastify";
 import TransactionMethod from "./fields/TransactionMethod";
+import { useGetPaymentMethodByIdQuery } from "./paymentMethods/api/paymentMethodsApi";
 
 const TransactionAdd = () => {
   const [title, setTitle] = useState<string>("");
@@ -37,6 +38,14 @@ const TransactionAdd = () => {
   const [addTransaction, { isLoading: creatingTransaction }] =
     useAddTransactionMutation();
 
+  const { data: paymentMethod } = useGetPaymentMethodByIdQuery(
+    paymentMethodId ?? ""
+  );
+
+  const findBudgetId = paymentMethod?.budgets?.find(
+    (budgetId) => budgetId?.currencyId === currencyId
+  );
+
   const { user } = useSelector((state: RootState) => state.auth);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -52,6 +61,7 @@ const TransactionAdd = () => {
       note: formData.get("note"),
       type: formData.get("type"),
       paymentMethodId: formData.get("paymentMethodId"),
+      budgetId: findBudgetId,
       context: formData.get("context"),
       receipt: receipt,
       userId: user?.id,
@@ -120,7 +130,7 @@ const TransactionAdd = () => {
       />
       {/* Currency */}
       <TransactionCurrency
-        currencies={user?.currencies ?? []}
+        currencies={paymentMethod?.budgets ?? []}
         currencyId={currencyId}
         setCurrencyId={setCurrencyId}
         validationError={formErrors?.currencyId}

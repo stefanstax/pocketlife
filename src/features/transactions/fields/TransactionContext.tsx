@@ -25,7 +25,7 @@ const TransactionContext = ({
             <button
               key={option.name}
               type="button"
-              className={`min-w-[100px] rounded-sm border-1 border-solid border-black px-4  py-2 ${
+              className={`min-w-[100px] rounded-lg border-1 border-solid border-black px-4  py-2 ${
                 option.name === context
                   ? "bg-[#5152fb] text-white border-black"
                   : ""

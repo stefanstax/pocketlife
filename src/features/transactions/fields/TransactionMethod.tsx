@@ -3,7 +3,6 @@ import FormError from "../../../components/FormError";
 import { useGetPaymentMethodsQuery } from "../paymentMethods/api/paymentMethodsApi";
 
 const TransactionMethod = ({
-  userId,
   paymentMethodId,
   setPaymentMethodId,
   validationError,
@@ -13,7 +12,7 @@ const TransactionMethod = ({
   setPaymentMethodId: (value: string) => void;
   validationError?: string;
 }) => {
-  const { data } = useGetPaymentMethodsQuery(userId);
+  const { data } = useGetPaymentMethodsQuery();
 
   return (
     <div className={formDiv}>
@@ -29,7 +28,7 @@ const TransactionMethod = ({
                 option.id === paymentMethodId
                   ? "bg-[#5152fb] text-white border-black"
                   : ""
-              } min-w-[100px] rounded-sm cursor-pointer p-2 border-black border-solid border-1`}
+              } min-w-[100px] rounded-lg cursor-pointer p-2 border-black border-solid border-1`}
               type="button"
               onClick={() => setPaymentMethodId(option.id)}
             >

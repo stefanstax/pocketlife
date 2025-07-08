@@ -8,7 +8,6 @@ import {
   FaCalendar,
   FaCreditCard,
   FaNoteSticky,
-  FaPlus,
   FaReceipt,
   FaRegClone,
   FaUserTie,
@@ -19,6 +18,7 @@ import {
   useDeleteTransactionMutation,
 } from "./api/transactionsApi";
 import { toast } from "react-toastify";
+import { useGetPaymentMethodsQuery } from "./paymentMethods/api/paymentMethodsApi";
 
 type Props = {
   data: EnrichedTransaction[];
@@ -26,6 +26,7 @@ type Props = {
 
 const TransactionGrid = ({ data }: Props) => {
   const [deleteTransaction] = useDeleteTransactionMutation();
+  const { data: paymentMethods } = useGetPaymentMethodsQuery();
 
   const [addTransaction] = useAddTransactionMutation();
 
@@ -54,6 +55,23 @@ const TransactionGrid = ({ data }: Props) => {
 
   return (
     <div className="w-full h-[400px] overflow-y-auto lg:h-full gap-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
+      <div className="w-full col-span-5 flex gap-2 mb-2">
+        {paymentMethods?.map((paymentMethod) => {
+          const mapOverBudgets = paymentMethod?.budgets?.map((budget) => {
+            return (
+              <p className="text-sm">
+                {budget?.currencyId} - {budget?.amount}
+              </p>
+            );
+          });
+          return (
+            <div className="bg-gray-950 rounded-lg p-2 my-2 text-white min-w-[200px]">
+              <p className="font-bold">{paymentMethod?.name}</p>
+              {mapOverBudgets}
+            </div>
+          );
+        })}
+      </div>
       {data.map((transaction) => {
         const {
           title,

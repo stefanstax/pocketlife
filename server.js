@@ -321,6 +321,25 @@ app.get("/transactions/:id", authenticateToken, async (req, res) => {
 
 // Transactions
 app.post("/transactions", authenticateToken, async (req, res) => {
+  const { budgetId } = req.body;
+
+  try {
+    const { data: paymentMethods } = await supabase
+      .from("payment-methods")
+      .eq("id", req.body.paymentMethodId)
+      .single();
+
+    const budgets = paymentMethods.budgets || [];
+    const findSpecificBudgetId = getBudgets.find(
+      (budget) => budget?.id === budgetId
+    );
+
+    const { data } = await supabase
+      .from("payment-methods")
+      .eq("id", req.body.paymentMethodId)
+      .update([]);
+  } catch (error) {}
+
   try {
     const { data, error } = await supabase
       .from("transactions")
@@ -460,12 +479,13 @@ app.get("/payment-methods/:id", authenticateToken, async (req, res) => {
 
 app.post("/payment-methods", authenticateToken, async (req, res) => {
   const userId = req.user?.userId;
-  const { name, type } = req.body;
+  const { name, type, budgets } = req.body;
 
   const sentData = {
     userId,
     name,
     type,
+    budgets,
   };
 
   try {

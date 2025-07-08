@@ -25,6 +25,7 @@ import BlurredSpinner from "../../components/BlurredSpinner";
 import UploadField from "../../components/forms/UploadFile";
 import { toast } from "react-toastify";
 import TransactionMethod from "./fields/TransactionMethod";
+import { useGetPaymentMethodByIdQuery } from "./paymentMethods/api/paymentMethodsApi";
 
 const EditTransaction = () => {
   const [title, setTitle] = useState<string>("");
@@ -46,6 +47,10 @@ const EditTransaction = () => {
 
   // User Data
   const { user } = useSelector((state: RootState) => state.auth);
+
+  const { data: paymentMethod } = useGetPaymentMethodByIdQuery(
+    paymentMethodId ?? ""
+  );
 
   // Transaction Data
   const {
@@ -168,7 +173,7 @@ const EditTransaction = () => {
         validationError={formErrors?.method}
       />
       <TransactionCurrency
-        currencies={user?.currencies ?? []}
+        currencies={paymentMethod?.budgets ?? []}
         currencyId={currencyId as string}
         setCurrencyId={setCurrencyId}
         validationError={formErrors?.currencyId}
@@ -188,7 +193,7 @@ const EditTransaction = () => {
             hasFile={
               <a
                 target="_blank"
-                className={`border-1 border-solid border-black px-4 text-white rounded-sm py-2 ${
+                className={`border-1 border-solid border-black px-4 text-white rounded-lg py-2 ${
                   receipt?.url && "bg-[#5152fb]"
                 }`}
                 href={receipt?.url}
