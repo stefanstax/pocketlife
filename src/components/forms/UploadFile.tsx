@@ -64,7 +64,7 @@ const UploadField = ({
         <div className="flex gap-2 items-center flex-wrap">
           <button
             type="button"
-            className="border-1 border-solid px-4 rounded-sm py-2"
+            className="border-1 border-solid px-4 rounded-lg py-2"
             onClick={handleFileClick}
           >
             Upload New Receipt

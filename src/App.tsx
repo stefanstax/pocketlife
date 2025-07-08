@@ -26,12 +26,13 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
+          {/* Admin Routes */}
           <Route element={<AdminRoute />}>
             <Route path="currencies">
               <Route index element={<CurrencyList />} />
               <Route path="add" element={<CurrenciesAdd />} />
               <Route path=":id" element={<CurrencyEdit />} />
-            </Route>{" "}
+            </Route>
           </Route>
           <Route element={<ProtectedRoute />}>
             {/* Protected Routes */}

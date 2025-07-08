@@ -20,6 +20,12 @@ import { useAddTransactionMutation } from "./api/transactionsApi";
 import UploadField from "../../components/forms/UploadFile";
 import { toast } from "react-toastify";
 import TransactionMethod from "./fields/TransactionMethod";
+import { useGetPaymentMethodByIdQuery } from "./paymentMethods/api/paymentMethodsApi";
+import { useDispatch } from "react-redux";
+import {
+  addAmount,
+  substractAmount,
+} from "./paymentMethods/api/paymentMethodsSlice";
 
 const TransactionAdd = () => {
   const [title, setTitle] = useState<string>("");
@@ -34,8 +40,18 @@ const TransactionAdd = () => {
     {}
   );
 
+  const dispatch = useDispatch();
+
   const [addTransaction, { isLoading: creatingTransaction }] =
     useAddTransactionMutation();
+
+  const { data: paymentMethod } = useGetPaymentMethodByIdQuery(
+    paymentMethodId ?? ""
+  );
+
+  const findBudget = paymentMethod?.budgets?.find(
+    (budgetId) => budgetId?.currencyId === currencyId
+  );
 
   const { user } = useSelector((state: RootState) => state.auth);
 
@@ -52,6 +68,7 @@ const TransactionAdd = () => {
       note: formData.get("note"),
       type: formData.get("type"),
       paymentMethodId: formData.get("paymentMethodId"),
+      budgetId: findBudget?.id,
       context: formData.get("context"),
       receipt: receipt,
       userId: user?.id,
@@ -71,23 +88,43 @@ const TransactionAdd = () => {
     }
 
     if (verifiedData.success) {
-      await toast.promise(
-        addTransaction(verifiedData?.data as Transaction).unwrap(),
-        {
-          pending: "Transaction is being created.",
-          success: "Transaction has been created.",
-          error: "Transaction couldn't be created.",
+      try {
+        if (type === "EXPENSE") {
+          dispatch(
+            substractAmount({
+              budgetId: String(findBudget?.id),
+              currencyId,
+              amount: Number(amount),
+            })
+          );
+        } else {
+          dispatch(
+            addAmount({
+              budgetId: String(findBudget?.id),
+              currencyId,
+              amount: Number(amount),
+            })
+          );
         }
-      );
-      setTitle("");
-      setAmount("");
-      setCurrencyId("");
-      setNote("");
-      setType("");
-      setContext("");
-      setCurrencyId("");
-      setPaymentMethodId("");
-      setReceipt(null);
+
+        await addTransaction(verifiedData.data as Transaction).unwrap();
+
+        toast.success("Transaction has been created.");
+
+        setTitle("");
+        setAmount("");
+        setCurrencyId("");
+        setNote("");
+        setType("");
+        setContext("");
+        setCurrencyId("");
+        setPaymentMethodId("");
+        setReceipt(null);
+      } catch (error: any) {
+        toast.error(
+          error?.data?.message || error.message || "Something went wrong"
+        );
+      }
     }
   };
 
@@ -120,7 +157,7 @@ const TransactionAdd = () => {
       />
       {/* Currency */}
       <TransactionCurrency
-        currencies={user?.currencies ?? []}
+        currencies={paymentMethod?.budgets ?? []}
         currencyId={currencyId}
         setCurrencyId={setCurrencyId}
         validationError={formErrors?.currencyId}

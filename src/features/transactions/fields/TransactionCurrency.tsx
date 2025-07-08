@@ -1,5 +1,6 @@
 import { formDiv, input, labelClasses } from "../../../app/globalClasses";
 import FormError from "../../../components/FormError";
+import type { Budget } from "../paymentMethods/paymentMethodsTypes";
 
 const TransactionCurrency = ({
   currencies,
@@ -7,11 +8,13 @@ const TransactionCurrency = ({
   setCurrencyId,
   validationError,
 }: {
-  currencies: string[];
+  currencies: Budget[] | string[];
   currencyId: string | "";
   setCurrencyId: (value: string) => void;
   validationError?: string;
 }) => {
+  console.log(currencies);
+
   return (
     <div className={formDiv}>
       <label className={labelClasses} htmlFor="currency">
@@ -19,20 +22,37 @@ const TransactionCurrency = ({
       </label>
       <div className={`${input} flex flex-wrap gap-2`}>
         {currencies?.map((curr) => {
-          return (
-            <button
-              key={curr}
-              type="button"
-              className={`${
-                currencyId === curr
-                  ? "bg-[#5152fb] text-white border-black"
-                  : ""
-              } min-w-[100px] rounded-sm cursor-pointer p-2 border-black border-solid border-1`}
-              onClick={() => setCurrencyId(curr)}
-            >
-              {curr}
-            </button>
-          );
+          if (typeof curr === "object" && curr !== null && "id" in curr) {
+            return (
+              <button
+                key={curr.id}
+                type="button"
+                className={`text-sm font-[600] ${
+                  currencyId === curr.currencyId
+                    ? "bg-gray-950 text-white border-black"
+                    : ""
+                } min-w-[100px] rounded-lg cursor-pointer p-2 border-black border-solid border-1`}
+                onClick={() => setCurrencyId(curr.currencyId)}
+              >
+                {curr.currencyId}
+              </button>
+            );
+          } else {
+            return (
+              <button
+                key={curr as string}
+                type="button"
+                className={`${
+                  currencyId === curr
+                    ? "bg-gray-950 text-white border-black"
+                    : ""
+                } min-w-[100px] rounded-lg cursor-pointer p-2 border-black border-solid border-1`}
+                onClick={() => setCurrencyId(curr as string)}
+              >
+                {curr}
+              </button>
+            );
+          }
         })}
       </div>
       <input

@@ -19,7 +19,7 @@ export const paymentMethodsApi = createApi({
   }),
   tagTypes: ["PaymentMethods"],
   endpoints: (builder) => ({
-    getPaymentMethods: builder.query<PaymentMethod[], string>({
+    getPaymentMethods: builder.query<PaymentMethod[], void>({
       query: () => "payment-methods",
       providesTags: ["PaymentMethods"],
     }),

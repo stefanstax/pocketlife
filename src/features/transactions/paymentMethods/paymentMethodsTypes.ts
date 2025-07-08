@@ -8,10 +8,6 @@ export type PaymentMethodTypes =
 
 export const paymentMethodOptions = [
   {
-    name: "Pick one",
-    type: "",
-  },
-  {
     name: "Cash",
     type: "cash",
   },
@@ -45,4 +41,11 @@ export interface PaymentMethod extends PaymentMethodFormData {
 export interface PaymentMethodFormData {
   name: string;
   type: PaymentMethodTypes | null;
+  budgets: Budget[];
+}
+
+export interface Budget {
+  id: string;
+  currencyId: string;
+  amount: number | 0;
 }

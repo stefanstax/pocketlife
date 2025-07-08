@@ -7,18 +7,33 @@ import {
 import { paymentMethodsSchema } from "./paymentMethodsSchema";
 import { useAddPaymentMethodMutation } from "./api/paymentMethodsApi";
 import { toast } from "react-toastify";
-import { formDiv, input, labelClasses } from "../../../app/globalClasses";
+import {
+  formDiv,
+  input,
+  labelClasses,
+  PRIMARY,
+  SHARED,
+  TERTIARY,
+} from "../../../app/globalClasses";
 import SubmitButton from "../../../components/SubmitButton";
 import FormError from "../../../components/FormError";
+import TransactionCurrency from "../fields/TransactionCurrency";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../../app/store";
+import TransactionAmount from "../fields/TransactionAmount";
+import { nanoid } from "@reduxjs/toolkit";
 
 const PaymentMethodAdd = () => {
   const [formData, setFormData] = useState<PaymentMethodFormData>({
     name: "",
     type: null,
+    budgets: [{ id: nanoid(), currencyId: "", amount: 0 }],
   });
   const [formErrors, setFormErrors] = useState<Partial<Record<string, string>>>(
     {}
   );
+
+  const { user } = useSelector((state: RootState) => state.auth);
 
   const [addPaymentMethod, { isLoading: creatingPaymentMethod }] =
     useAddPaymentMethodMutation();
@@ -26,14 +41,11 @@ const PaymentMethodAdd = () => {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event?.preventDefault();
 
-    const formData = new FormData(event.currentTarget);
-
-    const verifyData = paymentMethodsSchema.safeParse({
-      name: formData.get("name"),
-      type: formData.get("type"),
-    });
+    const verifyData = paymentMethodsSchema.safeParse(formData);
 
     if (verifyData?.error) {
+      console.log(verifyData?.error);
+
       const flattenErrors = verifyData?.error.flatten();
       const fieldErrors = Object.fromEntries(
         Object.entries(flattenErrors.fieldErrors).map(([key, val]) => [
@@ -52,6 +64,61 @@ const PaymentMethodAdd = () => {
         error: "Payment method couldn't be created.",
       });
     }
+  };
+
+  const updateBudget = (
+    id: string,
+    field: "currencyId" | "amount",
+    value: string | number
+  ) => {
+    setFormData((prev) => {
+      const currentIndex = prev.budgets.findIndex((b) => b.id === id);
+      if (currentIndex === -1) return prev; // Budget not found, no update
+
+      const newCurrency = field === "currencyId" ? String(value) : null;
+      const newAmount = field === "amount" ? Number(value) : null;
+
+      if (field === "currencyId") {
+        const duplicateIndex = prev.budgets.findIndex(
+          (b, i) => b.currencyId === newCurrency && b.id !== id
+        );
+        if (duplicateIndex !== -1) {
+          toast.warning(`Currency ${newCurrency} is already added.`);
+          return prev;
+        }
+      }
+
+      const newBudgets = prev.budgets.map((budget) => {
+        if (budget.id !== id) return budget;
+        return {
+          ...budget,
+          currencyId: newCurrency ?? budget.currencyId,
+          amount: newAmount ?? budget.amount,
+        };
+      });
+
+      return {
+        ...prev,
+        budgets: newBudgets,
+      };
+    });
+  };
+
+  const addBudget = () => {
+    setFormData({
+      ...formData,
+      budgets: [
+        ...formData.budgets,
+        { id: nanoid(), currencyId: "", amount: 0 },
+      ],
+    });
+  };
+
+  const removeBudget = (id: string) => {
+    setFormData({
+      ...formData,
+      budgets: formData?.budgets.filter((i) => i?.id !== id),
+    });
   };
 
   return (
@@ -73,25 +140,76 @@ const PaymentMethodAdd = () => {
         <label htmlFor="type" className={labelClasses}>
           Type
         </label>
-        <select name="type" className={input}>
+        <div className={`${input} flex items-center gap-2`}>
           {paymentMethodOptions.map((paymentMethod) => {
             return (
-              <option
-                value={paymentMethod?.type}
-                onChange={() =>
-                  setFormData({
-                    ...formData,
-                    type: paymentMethod?.type as PaymentMethod["type"],
-                  })
-                }
-              >
-                {paymentMethod?.name}
-              </option>
+              <>
+                <button
+                  key={paymentMethod?.type}
+                  type="button"
+                  className={`${
+                    formData?.type === paymentMethod?.type
+                      ? "bg-gray-950 text-white border-black"
+                      : ""
+                  } min-w-[100px] rounded-lg cursor-pointer p-2 border-black border-solid border-1`}
+                  onClick={() =>
+                    setFormData({
+                      ...formData,
+                      type: paymentMethod?.type as PaymentMethod["type"],
+                    })
+                  }
+                >
+                  {paymentMethod?.name}
+                </button>
+                <input type="hidden" name="type" value={paymentMethod?.type} />
+              </>
             );
           })}
-        </select>
+        </div>
+
         {formErrors?.type && <FormError fieldError={formErrors?.type} />}
       </div>
+      {formData?.budgets?.map((budget) => {
+        return (
+          <div
+            key={budget?.id}
+            className="grid grid-cols-1 justify-start items-start gap-4"
+          >
+            <TransactionCurrency
+              currencies={user?.currencies || []}
+              currencyId={budget?.currencyId}
+              setCurrencyId={(value) =>
+                updateBudget(budget?.id, "currencyId", value)
+              }
+              validationError={formErrors?.currencyId}
+            />
+
+            <TransactionAmount
+              amount={budget?.amount}
+              setAmount={(value) => updateBudget(budget?.id, "amount", value)}
+              validationError={formErrors?.amount}
+            />
+            <button
+              aria-label="Remove payment method budget"
+              type="button"
+              className={`${TERTIARY} ${SHARED}`}
+              onClick={() => removeBudget(budget?.id)}
+            >
+              Remove Budget
+            </button>
+          </div>
+        );
+      })}
+      {formErrors?.budgets && <FormError fieldError={formErrors?.budgets} />}
+      <button
+        type="button"
+        aria-label="Add payment method budget"
+        className={`${PRIMARY} ${SHARED}`}
+        onClick={addBudget}
+      >
+        Add Budget
+      </button>
+
       <SubmitButton
         aria="Create transaction"
         label={creatingPaymentMethod ? "Creating..." : "Create"}
