@@ -5,6 +5,7 @@
 - Create payment methods
 - Choose favorite currencies
 - Create transactions
+- NEW! Create budgets under payment methods
 - Upload receipts from device or take with a device camera
 - All data has been protected by your own device keys upon registration and login which prevents any malicious use from third party
 - Coming soon:
@@ -14,6 +15,6 @@
 
 ### Future Ideas
 
-- Run whole project on a dedicated server to not rely on Render, Vercel and others, better security for data, more control to harden possible breaches
-- Run public links like LinkTree and others for free
-- Upload files and share with others sorta like WeTransfer but with higher limits for free
+- [x] Run whole project on a dedicated server to not rely on Render, Vercel and others, better security for data, more control to harden possible breaches
+- V3 | Run public links like LinkTree and others for free
+- V2 | Upload files and share with others sorta like WeTransfer but with higher limits for free
