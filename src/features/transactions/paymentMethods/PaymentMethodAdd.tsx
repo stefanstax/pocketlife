@@ -80,7 +80,7 @@ const PaymentMethodAdd = () => {
 
       if (field === "currencyId") {
         const duplicateIndex = prev.budgets.findIndex(
-          (b, i) => b.currencyId === newCurrency && b.id !== id
+          (budget) => budget.currencyId === newCurrency && budget.id !== id
         );
         if (duplicateIndex !== -1) {
           toast.warning(`Currency ${newCurrency} is already added.`);
