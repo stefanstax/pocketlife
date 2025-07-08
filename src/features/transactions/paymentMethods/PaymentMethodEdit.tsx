@@ -168,7 +168,7 @@ const PaymentMethodEdit = () => {
                   type="button"
                   className={`${
                     formData?.type === paymentMethod?.type
-                      ? "bg-[#5152fb] text-white border-black"
+                      ? "bg-gray-950 text-white border-black"
                       : ""
                   } min-w-[100px] rounded-lg cursor-pointer p-2 border-black border-solid border-1`}
                   onClick={() =>

@@ -11,6 +11,7 @@ export interface Transaction {
   title: string;
   note: string;
   paymentMethodId: string;
+  budgetId: string;
   type: TransactionTypes;
   context: TransactionContexts;
   receipt?: Receipt;
@@ -33,14 +34,10 @@ export interface PaginatatedTransactions {
   limit: number;
 }
 
-export type TransactionTypes = "INCOME" | "EXPENSE" | "SAVINGS";
+export type TransactionTypes = "INCOME" | "EXPENSE";
 export type TransactionContexts = "PERSONAL" | "BUSINESS";
 
-export const transactionTypes = [
-  { name: "EXPENSE" },
-  { name: "INCOME" },
-  { name: "SAVINGS" },
-];
+export const transactionTypes = [{ name: "EXPENSE" }, { name: "INCOME" }];
 
 export interface TransactionCurrency extends Transaction {
   id: string;

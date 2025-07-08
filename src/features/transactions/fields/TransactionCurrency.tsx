@@ -27,9 +27,9 @@ const TransactionCurrency = ({
               <button
                 key={curr.id}
                 type="button"
-                className={`${
+                className={`text-sm font-[600] ${
                   currencyId === curr.currencyId
-                    ? "bg-[#5152fb] text-white border-black"
+                    ? "bg-gray-950 text-white border-black"
                     : ""
                 } min-w-[100px] rounded-lg cursor-pointer p-2 border-black border-solid border-1`}
                 onClick={() => setCurrencyId(curr.currencyId)}
@@ -44,7 +44,7 @@ const TransactionCurrency = ({
                 type="button"
                 className={`${
                   currencyId === curr
-                    ? "bg-[#5152fb] text-white border-black"
+                    ? "bg-gray-950 text-white border-black"
                     : ""
                 } min-w-[100px] rounded-lg cursor-pointer p-2 border-black border-solid border-1`}
                 onClick={() => setCurrencyId(curr as string)}

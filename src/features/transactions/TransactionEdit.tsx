@@ -26,6 +26,11 @@ import UploadField from "../../components/forms/UploadFile";
 import { toast } from "react-toastify";
 import TransactionMethod from "./fields/TransactionMethod";
 import { useGetPaymentMethodByIdQuery } from "./paymentMethods/api/paymentMethodsApi";
+import { useDispatch } from "react-redux";
+import {
+  addAmount,
+  substractAmount,
+} from "./paymentMethods/api/paymentMethodsSlice";
 
 const EditTransaction = () => {
   const [title, setTitle] = useState<string>("");
@@ -40,6 +45,8 @@ const EditTransaction = () => {
     {}
   );
 
+  const dispatch = useDispatch();
+
   // Transaction ID
   const { id } = useParams();
 
@@ -50,6 +57,10 @@ const EditTransaction = () => {
 
   const { data: paymentMethod } = useGetPaymentMethodByIdQuery(
     paymentMethodId ?? ""
+  );
+
+  const findBudget = paymentMethod?.budgets?.find(
+    (budgetId) => budgetId?.currencyId === currencyId
   );
 
   // Transaction Data
@@ -100,6 +111,7 @@ const EditTransaction = () => {
       updated_at: new Date().toISOString(),
       note: formData.get("note"),
       paymentMethodId: formData.get("paymentMethodId"),
+      budgetId: findBudget?.id,
       type: formData.get("type"),
       context: formData.get("context"),
       receipt: receipt,
@@ -107,7 +119,6 @@ const EditTransaction = () => {
 
     if (!result.success) {
       const flattened = result.error.flatten();
-
       const fieldErrors = Object.fromEntries(
         Object.entries(flattened.fieldErrors)?.map(([key, val]) => [
           key,
@@ -120,16 +131,37 @@ const EditTransaction = () => {
     }
 
     if (result.success) {
-      await toast.promise(
-        updateTransaction(result?.data as Transaction).unwrap(),
-        {
-          pending: "Transaction is being updated.",
-          success: "Transaction has been updated.",
-          error: "Transaction couldn't be updated.",
+      try {
+        if (type === "EXPENSE") {
+          dispatch(
+            substractAmount({
+              budgetId: String(findBudget?.id),
+              currencyId,
+              amount: Number(amount),
+            })
+          );
+        } else {
+          dispatch(
+            addAmount({
+              budgetId: String(findBudget?.id),
+              currencyId,
+              amount: Number(amount),
+            })
+          );
         }
-      );
-      refetch();
-      navigate("/transactions/");
+        await toast.promise(
+          updateTransaction(result?.data as Transaction).unwrap(),
+          {
+            pending: "Transaction is being updated.",
+            success: "Transaction has been updated.",
+            error: "Transaction couldn't be updated.",
+          }
+        );
+        refetch();
+        navigate("/transactions/");
+      } catch (error: any) {
+        toast.error(error?.data?.message ?? "Uncaught error.");
+      }
     }
   };
 
@@ -194,7 +226,7 @@ const EditTransaction = () => {
               <a
                 target="_blank"
                 className={`border-1 border-solid border-black px-4 text-white rounded-lg py-2 ${
-                  receipt?.url && "bg-[#5152fb]"
+                  receipt?.url && "bg-gray-950"
                 }`}
                 href={receipt?.url}
               >

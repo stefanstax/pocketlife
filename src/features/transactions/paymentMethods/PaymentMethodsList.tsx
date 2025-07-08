@@ -33,7 +33,7 @@ const PaymentMethodsList = () => {
                 })}
               </div>
             )}
-            <div className="w-full grid grid-cols-2 gap-4">
+            <div className="w-full grid grid-cols-2 gap-4 border-t border-gray-800 pt-4">
               <Link
                 className={`${PRIMARY} ${SHARED}`}
                 to={`/payment-methods/${id}`}

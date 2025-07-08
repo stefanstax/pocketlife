@@ -11,8 +11,8 @@ export const input = "border-1 border-t-0 px-4 py-2 rounded-b-sm";
 export const SHARED =
   "p-1 border-1 rounded-lg cursor-pointer flex gap-2 items-center justify-center min-h-[42px]";
 export const PRIMARY =
-  "bg-gray-900 border-gray-900 text-white hover:bg-white hover:text-gray-900";
+  "bg-gray-800 border-gray-800 text-white hover:bg-white hover:text-gray-900";
 export const SECONDARY =
-  "bg-white text-[#5152fb] border-[#5152fb] hover:bg-[#5152fb] hover:text-white";
+  "bg-gray-600 text-white border-white hover:bg-white hover:text-black min-w-[100px]";
 export const TERTIARY =
-  "bg-transparent border-1 border-black text-black hover:text-white hover:bg-[#5152fb] hover:border-[#5152fb]";
+  "bg-transparent border-1 border-black text-black hover:text-white hover:bg-gray-950 hover:border-gray-950";

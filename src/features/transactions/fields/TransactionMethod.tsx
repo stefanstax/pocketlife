@@ -24,15 +24,15 @@ const TransactionMethod = ({
           return (
             <button
               key={option.id}
-              className={`${
+              className={`text-sm font-[600] ${
                 option.id === paymentMethodId
-                  ? "bg-[#5152fb] text-white border-black"
+                  ? "bg-gray-950 text-white border-black"
                   : ""
               } min-w-[100px] rounded-lg cursor-pointer p-2 border-black border-solid border-1`}
               type="button"
               onClick={() => setPaymentMethodId(option.id)}
             >
-              {option.name}
+              {option.name.toUpperCase()}
             </button>
           );
         })}

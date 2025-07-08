@@ -321,44 +321,100 @@ app.get("/transactions/:id", authenticateToken, async (req, res) => {
 
 // Transactions
 app.post("/transactions", authenticateToken, async (req, res) => {
-  const { budgetId } = req.body;
+  const { budgetId, paymentMethodId, amount, type } = req.body;
 
   try {
-    const { data: paymentMethods } = await supabase
+    const { data: paymentMethod } = await supabase
       .from("payment-methods")
-      .eq("id", req.body.paymentMethodId)
+      .select("budgets")
+      .eq("id", paymentMethodId)
       .single();
 
-    const budgets = paymentMethods.budgets || [];
-    const findSpecificBudgetId = getBudgets.find(
-      (budget) => budget?.id === budgetId
-    );
+    const budgets = paymentMethod?.budgets || [];
+    const findBudget = budgets.find((budget) => budget?.id === budgetId);
 
-    const { data } = await supabase
+    if (findBudget) {
+      if (type === "EXPENSE") {
+        findBudget.amount -= Number(amount);
+        if (findBudget.amount < 0) {
+          return res.status(400).json({
+            message: "Insufficient budget amount. Feel free to top up.",
+          });
+        }
+      } else if (type === "INCOME") {
+        findBudget.amount += Number(amount);
+      } else {
+        return res.status(400).json({ message: "Invalid transaction type." });
+      }
+    } else
+      return res
+        .status(400)
+        .json({ message: "We couldn't locate payment method's budget." });
+
+    const { error: updateError } = await supabase
       .from("payment-methods")
-      .eq("id", req.body.paymentMethodId)
-      .update([]);
-  } catch (error) {}
+      .update({ budgets })
+      .eq("id", paymentMethodId);
 
-  try {
-    const { data, error } = await supabase
+    if (updateError)
+      return res.status(500).json({ message: updateError.message });
+
+    const { data, error: insertError } = await supabase
       .from("transactions")
-      .insert(req.body);
+      .insert([req.body]);
 
-    if (error) return res.status(400).json({ message: error.message });
+    if (insertError)
+      return res.status(400).json({ message: insertError.message });
+
     return res.status(201).json(data);
   } catch (error) {
-    return res.status(500).json({
-      message: error.message,
-    });
+    return res.status(500).json({ message: error.message });
   }
 });
 
 app.put("/transactions/:id", authenticateToken, async (req, res) => {
   const { id } = req.params;
   const updatedBody = req.body;
+  const { budgetId, paymentMethodId, type, amount } = updatedBody;
 
   try {
+    const { data: paymentMethod } = await supabase
+      .from("payment-methods")
+      .select("budgets")
+      .eq("id", paymentMethodId)
+      .single();
+
+    const budgets = paymentMethod?.budgets || [];
+    const findBudget = budgets.find((budget) => budget?.id === budgetId);
+
+    if (findBudget) {
+      if (type === "EXPENSE") {
+        findBudget.amount -= Number(amount);
+        if (findBudget.amount < 0) {
+          return res.status(400).json({
+            message: "Insufficient budget amount. Feel free to top up.",
+          });
+        }
+      } else if (type === "INCOME") {
+        findBudget.amount += Number(amount);
+      } else {
+        return res.status(400).json({ message: "Invalid transaction type." });
+      }
+    } else
+      return res
+        .status(400)
+        .json({ message: "We couldn't locate payment method's budget." });
+
+    const { error: updateErrorBudgets } = await supabase
+      .from("payment-methods")
+      .update({ budgets })
+      .eq("id", paymentMethodId);
+
+    if (updateErrorBudgets)
+      return res
+        .status(400)
+        .json({ message: "Payment method budget hasn't been updated." });
+
     const { data, error } = await supabase
       .from("transactions")
       .update(updatedBody)
@@ -379,12 +435,48 @@ app.delete("/transactions/:id", authenticateToken, async (req, res) => {
   const { id } = req.params;
 
   try {
+    const { data: transaction } = await supabase
+      .from("transactions")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+    const { paymentMethodId, type, amount, budgetId } = transaction;
+
+    const { data: paymentMethod } = await supabase
+      .from("payment-methods")
+      .select("budgets")
+      .eq("id", paymentMethodId)
+      .single();
+
+    const budgets = paymentMethod?.budgets || [];
+    const findBudget = budgets.find((budget) => budget?.id === budgetId);
+
+    if (findBudget) {
+      if (type === "EXPENSE") {
+        findBudget.amount += amount;
+      } else if (type === "INCOME") {
+        findBudget.amount -= amount;
+        if (findBudget.amount < 0) {
+          return res
+            .status(400)
+            .json({ message: "Invalid budget state after reversal" });
+        }
+      } else {
+        return res.status(400).json({ message: "Invalid transaction type" });
+      }
+    }
+
+    await supabase
+      .from("payment-methods")
+      .update({ budgets })
+      .eq("id", paymentMethodId);
+
     const { error } = await supabase.from("transactions").delete().eq("id", id);
-    if (id)
+    if (error)
       return res
         .status(400)
         .json({ message: "Please double check delete parameters." });
-    if (error) return res.status(400).json({ message: error?.message });
 
     return res.status(200).json({ message: "Transaction has been deleted." });
   } catch (error) {
