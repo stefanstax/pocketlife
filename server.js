@@ -22,6 +22,7 @@ app.use(
 import axios from "axios";
 import jwt from "jsonwebtoken";
 import { authenticateToken } from "./src/app/middleware/authenticateToken.js";
+import { current } from "@reduxjs/toolkit";
 
 // Currencies
 app.get("/currencies", authenticateToken, async (req, res) => {
@@ -378,56 +379,134 @@ app.put("/transactions/:id", authenticateToken, async (req, res) => {
   const { budgetId, paymentMethodId, type, amount } = updatedBody;
 
   try {
-    const { data: paymentMethod } = await supabase
-      .from("payment-methods")
-      .select("budgets")
-      .eq("id", paymentMethodId)
+    const { data: currentTransaction, error: txError } = await supabase
+      .from("transactions")
+      .select("*")
+      .eq("id", id)
       .single();
 
-    const budgets = paymentMethod?.budgets || [];
-    const findBudget = budgets.find((budget) => budget?.id === budgetId);
+    if (txError || !currentTransaction) {
+      return res.status(404).json({ message: "Transaction not found." });
+    }
 
-    if (findBudget) {
+    const {
+      amount: amountBeforeUpdate,
+      type: typeBeforeUpdate,
+      budgetId: budgetBeforeUpdate,
+      paymentMethodId: paymentMethodBeforeUpdate,
+    } = currentTransaction;
+
+    const needsRecalculation =
+      amountBeforeUpdate !== amount ||
+      typeBeforeUpdate !== type ||
+      budgetBeforeUpdate !== budgetId ||
+      paymentMethodBeforeUpdate !== paymentMethodId;
+
+    if (needsRecalculation) {
+      const { data: newPaymentMethod, error: newPMError } = await supabase
+        .from("payment-methods")
+        .select("*")
+        .eq("id", paymentMethodId)
+        .single();
+
+      if (newPMError || !newPaymentMethod) {
+        return res
+          .status(400)
+          .json({ message: "New payment method not found." });
+      }
+
+      let oldPaymentMethod = newPaymentMethod;
+
+      if (paymentMethodBeforeUpdate !== paymentMethodId) {
+        const { data: oldPM, error: oldPMError } = await supabase
+          .from("payment-methods")
+          .select("*")
+          .eq("id", paymentMethodBeforeUpdate)
+          .single();
+
+        if (oldPMError || !oldPM) {
+          return res
+            .status(400)
+            .json({ message: "Old payment method not found." });
+        }
+
+        oldPaymentMethod = oldPM;
+      }
+
+      const oldBudgets = [...(oldPaymentMethod.budgets || [])];
+      const toBeReconciledBudget = oldBudgets.find(
+        (buget) => buget.id === budgetBeforeUpdate
+      );
+
+      if (toBeReconciledBudget) {
+        if (typeBeforeUpdate === "EXPENSE") {
+          toBeReconciledBudget.amount += amountBeforeUpdate;
+        } else if (typeBeforeUpdate === "INCOME") {
+          toBeReconciledBudget.amount -= amountBeforeUpdate;
+        }
+      }
+
+      const newBudgets = [...(newPaymentMethod.budgets || [])];
+      const targetBudget = newBudgets.find((b) => b.id === budgetId);
+
+      if (!targetBudget) {
+        return res
+          .status(400)
+          .json({ message: "Target budget not found in payment method." });
+      }
+
       if (type === "EXPENSE") {
-        findBudget.amount -= Number(amount);
-        if (findBudget.amount < 0) {
-          return res.status(400).json({
-            message: "Insufficient budget amount. Feel free to top up.",
-          });
+        targetBudget.amount -= Number(amount);
+        if (targetBudget.amount < 0) {
+          return res
+            .status(400)
+            .json({ message: "Insufficient budget. Top up required." });
         }
       } else if (type === "INCOME") {
-        findBudget.amount += Number(amount);
+        targetBudget.amount += Number(amount);
       } else {
         return res.status(400).json({ message: "Invalid transaction type." });
       }
-    } else
-      return res
-        .status(400)
-        .json({ message: "We couldn't locate payment method's budget." });
 
-    const { error: updateErrorBudgets } = await supabase
-      .from("payment-methods")
-      .update({ budgets })
-      .eq("id", paymentMethodId);
+      if (paymentMethodBeforeUpdate !== paymentMethodId) {
+        const { error: updateOldError } = await supabase
+          .from("payment-methods")
+          .update({ budgets: oldBudgets })
+          .eq("id", paymentMethodBeforeUpdate);
 
-    if (updateErrorBudgets)
-      return res
-        .status(400)
-        .json({ message: "Payment method budget hasn't been updated." });
+        if (updateOldError) {
+          return res
+            .status(400)
+            .json({ message: "Failed to update old payment method budgets." });
+        }
+      }
 
-    const { data, error } = await supabase
+      const { error: updateNewError } = await supabase
+        .from("payment-methods")
+        .update({ budgets: newBudgets })
+        .eq("id", paymentMethodId);
+
+      if (updateNewError) {
+        return res
+          .status(400)
+          .json({ message: "Failed to update new payment method budgets." });
+      }
+    }
+
+    const { data: updatedTx, error: updateTxError } = await supabase
       .from("transactions")
       .update(updatedBody)
       .eq("id", id)
       .select()
       .single();
 
-    if (error) return res.status(400).json({ message: error.message });
-    return res.status(200).json(data);
+    if (updateTxError) {
+      return res.status(400).json({ message: updateTxError.message });
+    }
+
+    return res.status(200).json(updatedTx);
   } catch (error) {
-    return res.status(500).json({
-      message: error.message,
-    });
+    return res.status(500).json({ message: error.message });
   }
 });
 
