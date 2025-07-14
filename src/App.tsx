@@ -19,6 +19,8 @@ import ComingSoon from "./pages/ComingSoon";
 import PaymentMethodAdd from "./features/transactions/paymentMethods/PaymentMethodAdd";
 import PaymentMethodsList from "./features/transactions/paymentMethods/PaymentMethodsList";
 import PaymentMethodEdit from "./features/transactions/paymentMethods/PaymentMethodEdit";
+import Recovery from "./features/recovery/Recovery";
+import UserProfile from "./features/users/UserProfile";
 
 const App = () => {
   return (
@@ -35,6 +37,7 @@ const App = () => {
             </Route>
           </Route>
           <Route element={<ProtectedRoute />}>
+            <Route path="users/:id" element={<UserProfile />} />
             {/* Protected Routes */}
             <Route path="transactions">
               <Route index element={<TransactionList />} />
@@ -57,6 +60,7 @@ const App = () => {
               <Route path="login" element={<Login />} />
               <Route path="registration" element={<Registration />} />
             </Route>
+            <Route path="recovery/:recoveryUrl" element={<Recovery />} />
           </Route>
         </Route>
       </Routes>

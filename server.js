@@ -134,12 +134,14 @@ app.get("/users", authenticateToken, async (req, res) => {
 
 app.get("/users/:id", authenticateToken, async (req, res) => {
   const id = req.params.id;
+
   try {
     const { data, error } = await supabase
       .from("users")
       .select("*")
-      .eq("id", id)
+      .eq("username", id)
       .single();
+
     if (error) return res.status(400).json({ message: error.message });
     res.status(200).json(data);
   } catch (error) {
@@ -148,26 +150,28 @@ app.get("/users/:id", authenticateToken, async (req, res) => {
 });
 
 app.post("/users", async (req, res) => {
-  const { username, email, password } = req.body;
+  const { username, name, email, passcode, securityName, recoveryUrl } =
+    req.body;
 
-  const hashed = await bcrypt.hash(password, 10);
+  const hashPasscode = await bcrypt.hash(passcode, 10);
   const newUserData = {
     username,
     email,
-    password: hashed,
+    name,
+    passcode: hashPasscode,
+    securityName,
+    recoveryUrl,
   };
 
   try {
     const { data: existing } = await supabase
       .from("users")
       .select("*")
-      .or(`email.eq.${email},username.eq.${username}`)
-      .maybeSingle();
+      .eq("email", email)
+      .single();
 
     if (existing)
-      return res
-        .status(409)
-        .json({ message: "Either email or username already exist." });
+      return res.status(409).json({ message: "Email already taken." });
 
     const { data, error } = await supabase.from("users").insert([newUserData]);
     if (error) return res.status(400).json({ message: error.message });
@@ -189,17 +193,16 @@ app.put("/users/:id", authenticateToken, async (req, res) => {
       .eq("id", id)
       .select()
       .single();
+
     if (error) return res.status(400).json({ message: error.message });
-    res
-      .status(200)
-      .json({ message: "User has been successfully updated.", ...data });
+    res.status(200).json(data);
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
 });
 
 app.post("/login", async (req, res) => {
-  const { email, password } = req.body;
+  const { email, passcode } = req.body;
 
   try {
     const { data, error } = await supabase
@@ -212,22 +215,22 @@ app.post("/login", async (req, res) => {
       return res.status(401).json({ message: "User was not found." });
     }
 
-    const isMatch = await bcrypt.compare(password, data.password);
+    const isMatchPasscode = await bcrypt.compare(passcode, data.passcode);
 
-    if (!isMatch) {
+    if (!isMatchPasscode) {
       return res
         .status(401)
         .json({ message: "Double check your credentials." });
     }
 
-    const { password: _, ...user } = data;
+    const { passcode: _, ...user } = data;
     const token = jwt.sign(
       {
         userId: user?.id,
         email: user?.email,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "7d" }
+      { expiresIn: "30d" }
     );
 
     return res.status(201).json({ token, user });
@@ -245,7 +248,6 @@ app.get("/transactions", authenticateToken, async (req, res) => {
   const userId = req.user.userId;
 
   try {
-    // Fetch currencies and payment methods in parallel
     const [currRes, payRes] = await Promise.all([
       supabase.from("currencies").select("*"),
       supabase.from("payment-methods").select("*").eq("userId", userId),
@@ -260,21 +262,19 @@ app.get("/transactions", authenticateToken, async (req, res) => {
     const currencies = currRes.data;
     const paymentMethods = payRes.data;
 
-    // Fetch paginated transactions and total count in one call
     const {
       data: transactions,
       error,
       count,
     } = await supabase
       .from("transactions")
-      .select("*", { count: "exact" }) // include count and data
+      .select("*", { count: "exact" })
       .eq("userId", userId)
       .order("created_at", { ascending: false })
       .range(startIndex, endIndex);
 
     if (error) return res.status(500).json({ message: error.message });
 
-    // Single pass merge
     const enriched = transactions.map((tx) => {
       const currency = currencies.find((c) => c.code === tx.currencyId) || null;
       const paymentMethod =
@@ -711,6 +711,56 @@ app.delete("/payment-methods/:id", authenticateToken, async (req, res) => {
       .json({ message: "Payment method has been deleted." });
   } catch (error) {
     return res.status(500).json({ message: error.message });
+  }
+});
+
+app.post("/recovery/:slug", async (req, res) => {
+  const { slug } = req.params;
+  const { securityName } = req.body;
+
+  try {
+    const { data: user, error } = await supabase
+      .from("users")
+      .select("*")
+      .eq("recoveryUrl", slug)
+      .single();
+
+    if (error || !user) {
+      return res.status(404).json({ message: "Recovery link not found." });
+    }
+
+    if (user.securityName !== securityName) {
+      return res.status(401).json({ message: "Incorrect security name." });
+    }
+
+    return res.status(200).json({ message: "Verified" });
+  } catch (err) {
+    res.status(500).json({ message: "Server error." });
+  }
+});
+
+app.post("/recovery/:slug/reset", async (req, res) => {
+  const { slug } = req.params;
+  const { newPasscode } = req.body;
+
+  try {
+    const { data: user, error } = await supabase
+      .from("users")
+      .select("*")
+      .eq("recoveryUrl", slug)
+      .single();
+
+    if (error || !user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    const hashed = await bcrypt.hash(newPasscode, 10);
+
+    await supabase.from("users").update({ passcode: hashed }).eq("id", user.id);
+
+    res.status(200).json({ message: "Passcode updated successfully." });
+  } catch (err) {
+    res.status(500).json({ message: "Server error." });
   }
 });
 

@@ -1,6 +1,5 @@
 import { useState, type FormEvent } from "react";
 import { formDiv, input, labelClasses } from "../../../app/globalClasses";
-import ErrorMessage from "../../../components/forms/ErrorMessage";
 import { useDispatch } from "react-redux";
 import { loginSuccess } from "../../../app/authSlice";
 import Button from "../../../components/Button";
@@ -9,16 +8,16 @@ import { loginSchemas } from "./loginSchemas";
 import { useLoginUserMutation } from "../api/authApi";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router";
+import FormError from "../../../components/FormError";
 
 const LoginForm = () => {
   const [formData, setFormData] = useState<LoginState>({
     email: "",
-    password: "",
+    passcode: "",
   });
-  const [formErrors, setFormErrors] = useState({
-    email: "",
-    password: "",
-  });
+  const [formErrors, setFormErrors] = useState<Partial<Record<string, string>>>(
+    {}
+  );
 
   const [loginUser] = useLoginUserMutation();
   const dispatch = useDispatch();
@@ -30,16 +29,21 @@ const LoginForm = () => {
 
     const verifyData = loginSchemas.safeParse({
       email: formData.get("email"),
-      password: formData.get("password"),
+      passcode: formData.get("passcode"),
     });
 
     if (!verifyData.success) {
-      const errors = verifyData.error.flatten().fieldErrors;
+      console.log(verifyData?.error.flatten());
 
-      setFormErrors({
-        email: errors.email?.join(", ") || "",
-        password: errors.password?.join(", ") || "",
-      });
+      const flattenErrors = verifyData.error.flatten();
+      const fieldErrors = Object.fromEntries(
+        Object.entries(flattenErrors.fieldErrors).map(([key, val]) => [
+          key,
+          val[0],
+        ])
+      );
+
+      setFormErrors(fieldErrors);
     }
 
     if (verifyData.success) {
@@ -51,11 +55,15 @@ const LoginForm = () => {
         });
         dispatch(loginSuccess({ token, user }));
 
-        setFormErrors({
-          email: "",
-          password: "",
-        });
-        navigate("/transactions");
+        setFormErrors({});
+        if (user?.currencies) {
+          navigate("/select-currencies");
+          // Not ideal when cache is wiped
+        } else if (user?.paymentMethods) {
+          navigate("/payment-methods");
+        } else {
+          navigate("/transactions");
+        }
       } catch (error: any) {
         toast.error(error?.data?.message ?? "Uncaught error. Check console.");
       }
@@ -67,9 +75,7 @@ const LoginForm = () => {
       <h1 className="text-2xl font-black">Login Form</h1>
       {/* Email */}
       <div className={formDiv}>
-        <label className={labelClasses}>
-          Email <ErrorMessage field={formErrors.email} />{" "}
-        </label>
+        <label className={labelClasses}>Email</label>
         <input
           className={input}
           type="email"
@@ -78,22 +84,21 @@ const LoginForm = () => {
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
           placeholder="Your email"
         />
+        <FormError fieldError={formErrors?.email} />
       </div>
-      {/* Password */}
       <div className={formDiv}>
-        <label className={labelClasses}>
-          Password <ErrorMessage field={formErrors.password} />
-        </label>
+        <label className={labelClasses}>Passcode</label>
         <input
           className={input}
-          type="password"
-          name="password"
-          value={formData.password}
+          type="text"
+          name="passcode"
+          value={formData.passcode}
           onChange={(e) =>
-            setFormData({ ...formData, password: e.target.value })
+            setFormData({ ...formData, passcode: e.target.value })
           }
-          placeholder="Your password"
+          placeholder="Your passcode"
         />
+        <FormError fieldError={formErrors?.passcode} />
       </div>
       <Button type="submit" variant="PRIMARY" ariaLabel="Login current user">
         Login

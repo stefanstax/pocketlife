@@ -1,23 +1,30 @@
 / Bugs
 
-- [x] Fix date entries to be unanymous
-- [x] URL currently are missing / which breaks the API
 - [] Currencies added, after removal stay inside of user's data - On currency removal without previously setting it to non-favorite also remove from the user's currencies db column
 
 / New Ideas / Improvements
 
+- [] Hide Transaction Currency and Transaction Methods if none have been added
+- [] Add date and time for transaction as an input
 - [] Redux to make state updates across the app more smooth and consistent
 - [] Add ability to delete transaction / for business with each delete also remove images which were previously uploaded to the cloud \*somewhere
-- Add validation errors for each form
 - [] Recognize if note contains a possible words which would make the transaction business context - and notify user to make sure it's not a business transaction
 - [] Open receipts route
 - [] Transaction categories
 - [] Delete old receipt when new one gets uploaded to the same transaction
 - [] Relocate receipt upload errors from the server onto frontend for info
 - [] Email authentication with magic link or codes
+- [] Add profile where user can update data
+- [] Add paymentMethodIDs to user's data
 
 / Done
 
+- [x] Add option for automatic user generation upon registration -> Helps with locking popular username for users who do not use the system
+- [x] Fix date entries to be unanymous
+- [x] URL currently are missing / which breaks the API
+- [x] Add budget reconciliation upon swapping methods or currencies
+- [x] Replace password with a 6 digit passcode
+- [x] Add passcode reset option
 - [x] Fully integrate errros into currencies forms
 - [x] Add toaster or other type of notifiers to alert user on certain interactions
 - [x] Transaction payment method cash/card

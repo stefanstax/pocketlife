@@ -16,6 +16,7 @@ import { useDispatch } from "react-redux";
 import BlurredSpinner from "../../../components/BlurredSpinner";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router";
+import { useGetPaymentMethodsQuery } from "../paymentMethods/api/paymentMethodsApi";
 
 const CurrencySelection = () => {
   const { user } = useSelector((state: RootState) => state.auth);
@@ -24,6 +25,7 @@ const CurrencySelection = () => {
   const navigate = useNavigate();
 
   const [saveFavoriteCurrencies] = useSaveFavoriteCurrenciesMutation();
+  const { data: hasPaymentMethods } = useGetPaymentMethodsQuery();
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -47,25 +49,32 @@ const CurrencySelection = () => {
   };
 
   const saveToFavorites = async () => {
-    const updatedUser = saveFavoriteCurrencies({
-      userId: user?.id ?? "",
-      currencies: pickedCurrencies,
-    }).unwrap();
+    try {
+      const updatedUser = saveFavoriteCurrencies({
+        userId: user?.id ?? "",
+        currencies: pickedCurrencies,
+      }).unwrap();
 
-    await toast.promise(updatedUser, {
-      pending: "Favorite currencies are being added.",
-      success: "Favorite currencies have been saved.",
-      error: "Favorite currencies could not be saved.",
-    });
+      await toast.promise(updatedUser, {
+        pending: "Favorite currencies are being added.",
+        success: "Favorite currencies have been saved.",
+      });
 
-    dispatch(updateUser(await updatedUser));
-    navigate("/transactions");
+      dispatch(updateUser(await updatedUser));
+      if (hasPaymentMethods) {
+        navigate("/transactions");
+      } else {
+        navigate("/payment-methods");
+      }
+    } catch (error: any) {
+      return toast.error(error?.data?.message ?? "Uncaught error.");
+    }
   };
 
   if (loadingCurrencies) return <BlurredSpinner />;
 
   return (
-    <section className="mx-auto p-10 grid grid-cols-1 gap-4 rounded-lg">
+    <section className="w-full mx-auto grid grid-cols-1 gap-4 rounded-lg">
       <h2 className="text-2xl font-bold text-center">
         Select currencies you would like to use
       </h2>

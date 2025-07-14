@@ -1,20 +1,23 @@
 import { useSelector } from "react-redux";
 import type { RootState } from "../app/store";
-import { NavLink, useLocation, useNavigate } from "react-router";
+import { NavLink, useLocation } from "react-router";
 import LoginButton from "./LoginButton";
 import { SECONDARY, SHARED } from "../app/globalClasses";
 import LogoutButton from "./LogoutButton";
-import { FaLock, FaArrowLeft } from "react-icons/fa6";
+import { FaLock } from "react-icons/fa6";
 import { links } from "./navigationLinks";
 
 const Navigation = () => {
   const { user, token } = useSelector((state: RootState) => state.auth);
 
   const location = useLocation();
-  const navigate = useNavigate();
 
-  const childrenLinks = links.filter((link) => link?.child === true);
-  const parentLinks = links.filter((link) => link?.child === false);
+  const childrenLinks = links.filter(
+    (link) => link?.child === true && link?.admin === false
+  );
+  const parentLinks = links.filter(
+    (link) => link?.child === false && link?.admin === false
+  );
 
   return (
     <nav className="w-full">
@@ -28,17 +31,13 @@ const Navigation = () => {
                 key={link?.url}
                 to={link?.url}
                 className={({ isActive }) =>
-                  `flex gap-2 items-center ${
-                    user?.email !== import.meta.env.VITE_ADMIN_EMAIL
-                      ? "opacity-50 pointer-events-none"
-                      : null
-                  } ${isActive ? "text-blue-200" : "text-white"}`
+                  `flex gap-2 items-center text-white ${
+                    isActive ? "font-bold" : ""
+                  }`
                 }
               >
-                {(link?.locked || user?.email) &&
-                  user?.email !== import.meta.env.VITE_ADMIN_EMAIL && (
-                    <FaLock />
-                  )}
+                {user?.email !== import.meta.env.VITE_ADMIN_EMAIL &&
+                  link?.admin && <FaLock />}
                 {link?.label}
               </NavLink>
             );
@@ -58,6 +57,14 @@ const Navigation = () => {
             </>
           )}
           {token && <LogoutButton />}
+          {token && (
+            <NavLink
+              className={`${SECONDARY} ${SHARED}`}
+              to={`/users/${user?.id}`}
+            >
+              Edit Profile
+            </NavLink>
+          )}
         </div>
       </div>
       <div className="w-full lg:hidden overflow-x-auto lg:overflow-x-hidden flex items-center gap-4 justify-start lg:justify-center bg-gray-950 p-4 text-white font-[500] text-center">
@@ -68,14 +75,11 @@ const Navigation = () => {
               to={link?.url}
               className={({ isActive }) =>
                 `flex lg:hidden gap-2 items-center ${
-                  user?.email !== import.meta.env.VITE_ADMIN_EMAIL
-                    ? "opacity-50 pointer-events-none"
-                    : null
-                } ${isActive ? "opacity-50 pointer-events-none" : "text-white"}`
+                  isActive ? "font-bold" : ""
+                }`
               }
             >
-              {(link?.locked || user?.email) &&
-                user?.email !== import.meta.env.VITE_ADMIN_EMAIL && <FaLock />}
+              {user?.email !== import.meta.env.VITE_ADMIN_EMAIL && <FaLock />}
               {link?.label}
             </NavLink>
           );
@@ -83,7 +87,7 @@ const Navigation = () => {
       </div>
       {location?.pathname !== "/" && (
         <div className="w-full overflow-x-auto lg:overflow-x-hidden flex items-center gap-4 justify-start lg:justify-center bg-gray-950 p-4 text-white font-[500] text-center">
-          {location?.pathname !== "/" && (
+          {/* {location?.pathname !== "/" && (
             <button
               aria-label="Go to previous page"
               onClick={() => navigate(-1)}
@@ -91,27 +95,18 @@ const Navigation = () => {
             >
               <FaArrowLeft /> Back
             </button>
-          )}
+          )} */}
 
           {childrenLinks.map((link) => {
-            if (location?.pathname.includes(link?.parent)) {
-              return (
-                <NavLink
-                  key={link?.url}
-                  className={`min-w-fit text-sm ${
-                    link.locked ||
-                    (user?.email !== import.meta.env.VITE_ADMIN_EMAIL &&
-                      "opacity-50 pointer-events-none")
-                  } ${
-                    location?.pathname === link?.url &&
-                    "opacity-50 pointer-events-none"
-                  }`}
-                  to={link?.url}
-                >
-                  {link?.label}
-                </NavLink>
-              );
-            }
+            return (
+              <NavLink
+                key={link?.url}
+                className={`min-w-fit text-sm`}
+                to={link?.url}
+              >
+                {link?.label}
+              </NavLink>
+            );
           })}
         </div>
       )}

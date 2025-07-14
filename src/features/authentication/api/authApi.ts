@@ -17,7 +17,7 @@ export const authApi = createApi({
     }),
     loginUser: builder.mutation<
       UserWithToken,
-      { email: string; password: string }
+      { email: string; passcode: string }
     >({
       query: (credentials) => ({
         url: "login",
