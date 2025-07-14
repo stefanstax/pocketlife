@@ -25,6 +25,7 @@ export const paymentMethodsApi = createApi({
     }),
     getPaymentMethodById: builder.query<PaymentMethod, string>({
       query: (id) => `/payment-methods/${id}`,
+      providesTags: ["PaymentMethods"],
     }),
     addPaymentMethod: builder.mutation<PaymentMethod, PaymentMethodFormData>({
       query: (paymentMethod) => ({

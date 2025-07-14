@@ -5,7 +5,11 @@ export interface User {
   id: string;
   username: string;
   email: string;
+  name: string;
   currencies: string[];
+  passcode: string;
+  securityName: string;
+  recoveryUrl: string;
   paymentMethods: PaymentMethod[];
 }
 

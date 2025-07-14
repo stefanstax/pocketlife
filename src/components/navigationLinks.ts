@@ -4,7 +4,7 @@ export const links = [
     label: "Transactions",
     icon: "FaReceipt",
     child: false,
-    locked: false,
+    admin: false,
     parent: "",
   },
   {
@@ -12,7 +12,7 @@ export const links = [
     label: "Add a Transaction",
     icon: "FaPlus",
     child: true,
-    locked: false,
+    admin: false,
     parent: "transactions",
   },
   {
@@ -20,7 +20,7 @@ export const links = [
     label: "Currencies",
     icon: "FaGear",
     child: true,
-    locked: true,
+    admin: true,
     parent: "transactions",
   },
   {
@@ -28,7 +28,7 @@ export const links = [
     label: "Add Currency",
     icon: "FaPlus",
     child: true,
-    locked: true,
+    admin: true,
     parent: "currencies",
   },
   {
@@ -36,7 +36,7 @@ export const links = [
     label: "Select currencies to use",
     icon: "FaGear",
     child: true,
-    locked: false,
+    admin: false,
     parent: "transactions",
   },
   {
@@ -44,14 +44,14 @@ export const links = [
     label: "Payment Methods",
     icon: "FaGear",
     child: true,
-    locked: false,
+    admin: false,
     parent: "transactions",
   },
   {
     url: "/payment-methods/add",
     label: "Add a payment method",
     child: true,
-    locked: false,
+    admin: false,
     parent: "payment-methods",
   },
 ];

@@ -22,6 +22,8 @@ import { useSelector } from "react-redux";
 import type { RootState } from "../../../app/store";
 import TransactionAmount from "../fields/TransactionAmount";
 import { nanoid } from "@reduxjs/toolkit";
+import { useDispatch } from "react-redux";
+import { updateUser } from "../../../app/authSlice";
 
 const PaymentMethodAdd = () => {
   const [formData, setFormData] = useState<PaymentMethodFormData>({
@@ -33,6 +35,7 @@ const PaymentMethodAdd = () => {
     {}
   );
 
+  const dispatch = useDispatch();
   const { user } = useSelector((state: RootState) => state.auth);
 
   const [addPaymentMethod, { isLoading: creatingPaymentMethod }] =
@@ -44,8 +47,6 @@ const PaymentMethodAdd = () => {
     const verifyData = paymentMethodsSchema.safeParse(formData);
 
     if (verifyData?.error) {
-      console.log(verifyData?.error);
-
       const flattenErrors = verifyData?.error.flatten();
       const fieldErrors = Object.fromEntries(
         Object.entries(flattenErrors.fieldErrors).map(([key, val]) => [
@@ -63,6 +64,16 @@ const PaymentMethodAdd = () => {
         success: "Payment method added.",
         error: "Payment method couldn't be created.",
       });
+      // Store payment methods to user's slice
+      dispatch(
+        updateUser({
+          ...user,
+          paymentMethods: [
+            ...(user?.paymentMethods as PaymentMethod[]),
+            verifyData?.data as PaymentMethod,
+          ],
+        })
+      );
     }
   };
 
@@ -140,7 +151,7 @@ const PaymentMethodAdd = () => {
         <label htmlFor="type" className={labelClasses}>
           Type
         </label>
-        <div className={`${input} flex items-center gap-2`}>
+        <div className={`${input} flex flex-wrap items-center gap-2`}>
           {paymentMethodOptions.map((paymentMethod) => {
             return (
               <>

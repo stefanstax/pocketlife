@@ -1,4 +1,4 @@
 export interface LoginState {
   email: string;
-  password: string;
+  passcode: string | "";
 }

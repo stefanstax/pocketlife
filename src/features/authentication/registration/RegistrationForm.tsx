@@ -2,45 +2,56 @@ import { useState, type FormEvent } from "react";
 import { registrationSchema } from "./registrationSchemas";
 import { formDiv, input, labelClasses } from "../../../app/globalClasses";
 import { type RegistrationState } from "./registrationTypes";
-import ErrorMessage from "../../../components/forms/ErrorMessage";
 import Button from "../../../components/Button";
 import { useAddUserMutation } from "../api/authApi";
 import { toast } from "react-toastify";
+import FormError from "../../../components/FormError";
+import { generateUsername } from "../../../app/generateUsername";
+import { useNavigate } from "react-router";
 
 const RegistrationForm = () => {
   const [formData, setFormData] = useState<RegistrationState>({
     username: "",
     email: "",
-    password: "",
+    name: "",
+    securityName: "",
+    recoveryUrl: "",
     currencies: [],
+    passcode: 0 || "",
   });
-  const [formErrors, setFormErrors] = useState({
-    username: "",
-    email: "",
-    password: "",
-  });
+  const [formErrors, setFormErrors] = useState<Partial<Record<string, string>>>(
+    {}
+  );
 
   const [addUser] = useAddUserMutation();
+  const navigate = useNavigate();
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
 
     const verifyData = registrationSchema.safeParse({
-      username: formData.get("username"),
+      username: generateUsername(),
       email: formData.get("email"),
-      password: formData.get("password"),
+      name: formData.get("name"),
+      recoveryUrl: formData.get("recoveryUrl"),
+      securityName: formData.get("securityName"),
+      passcode: formData.get("passcode"),
+      paymentMethodIds: [],
       currencies: [],
     });
 
     if (!verifyData.success) {
-      const errors = verifyData.error.flatten().fieldErrors;
+      console.log(verifyData?.error.flatten());
 
-      setFormErrors({
-        username: errors?.username?.join(", ") || "",
-        email: errors?.email?.join(", ") || "",
-        password: errors?.password?.join(", ") || "",
-      });
+      const flattenErrors = verifyData.error.flatten();
+      const fieldErrors = Object.fromEntries(
+        Object.entries(flattenErrors.fieldErrors).map(([key, val]) => [
+          key,
+          val[0],
+        ])
+      );
+      setFormErrors(fieldErrors);
     }
 
     if (verifyData?.success) {
@@ -52,6 +63,7 @@ const RegistrationForm = () => {
             success: "You have been registered.",
           }
         );
+        navigate("/authentication/login");
       } catch (error: any) {
         toast.error(error?.data?.message ?? "Uncaught error. Check console.");
       }
@@ -59,29 +71,26 @@ const RegistrationForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full flex flex-col gap-6">
+    <form onSubmit={handleSubmit} className="w-full grid grid-cols-1 gap-6">
       <h1 className="text-2xl font-black">Registration</h1>
-      {/* Username */}
+      {/* Name */}
       <div className={formDiv}>
-        <label className={labelClasses}>
-          Make a Username <ErrorMessage field={formErrors.username} />
-        </label>
+        <label className={labelClasses}>Name</label>
         <input
           className={input}
           type="text"
-          name="username"
-          value={formData.username}
+          name="name"
+          value={formData.name}
           onChange={(event) =>
-            setFormData({ ...formData, username: event.target.value })
+            setFormData({ ...formData, name: event.target.value })
           }
-          placeholder="Username..."
+          placeholder="Name..."
         />
+        <FormError fieldError={formErrors?.name} />
       </div>
       {/* Email */}
       <div className={formDiv}>
-        <label className={labelClasses}>
-          Business or Personal Email <ErrorMessage field={formErrors.email} />
-        </label>
+        <label className={labelClasses}>Business or Personal Email</label>
         <input
           className={input}
           type="email"
@@ -92,22 +101,51 @@ const RegistrationForm = () => {
           }
           placeholder="Email..."
         />
+        <FormError fieldError={formErrors?.email} />
       </div>
-      {/* Password */}
       <div className={formDiv}>
-        <label className={labelClasses}>
-          Password <ErrorMessage field={formErrors.password} />
-        </label>
+        <label className={labelClasses}>Passcode</label>
         <input
           className={input}
-          type="password"
-          name="password"
-          value={formData.password}
+          type="number"
+          name="passcode"
+          value={formData.passcode}
           onChange={(event) =>
-            setFormData({ ...formData, password: event.target.value })
+            setFormData({ ...formData, passcode: +event.target.value })
           }
-          placeholder="Password..."
+          placeholder="6 Digit Passcode"
         />
+        <FormError fieldError={formErrors?.passcode} />
+      </div>
+      {/* Recovery URl */}
+      <div className={formDiv}>
+        <label className={labelClasses}>Recovery URL</label>
+        <input
+          className={input}
+          type="text"
+          name="recoveryUrl"
+          value={formData.recoveryUrl}
+          onChange={(event) =>
+            setFormData({ ...formData, recoveryUrl: event.target.value })
+          }
+          placeholder="Example mayareco or sara123"
+        />
+        <FormError fieldError={formErrors?.recoveryUrl} />
+      </div>
+      {/* Security Name */}
+      <div className={formDiv}>
+        <label className={labelClasses}>Security Name</label>
+        <input
+          className={input}
+          type="text"
+          name="securityName"
+          value={formData.securityName}
+          onChange={(event) =>
+            setFormData({ ...formData, securityName: event.target.value })
+          }
+          placeholder="Pick ONE word to be your security name"
+        />
+        <FormError fieldError={formErrors?.securityName} />
       </div>
       <Button type="submit" variant="PRIMARY" ariaLabel="Register current user">
         Sign Up
