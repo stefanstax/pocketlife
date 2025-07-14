@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import FormError from "../../components/FormError";
+import { useParams } from "react-router-dom";
 import { input, labelClasses, formDiv } from "../../app/globalClasses";
 import Button from "../../components/Button";
 import { toast } from "react-toastify";
@@ -13,11 +12,7 @@ const Recovery = () => {
   const { recoveryUrl } = useParams<{ recoveryUrl: string }>();
   const [securityName, setSecurityName] = useState("");
   const [newPasscode, setNewPasscode] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
   const [step, setStep] = useState<"verify" | "reset">("verify");
-
-  const navigate = useNavigate();
 
   const [verifySecurityName] = useVerifySecurityNameMutation();
   const [resetPasscode] = useResetPasscodeMutation();
@@ -61,7 +56,6 @@ const Recovery = () => {
           >
             Verify
           </Button>
-          <FormError fieldError={error || undefined} />
         </div>
       ) : (
         <div className={formDiv}>
@@ -80,7 +74,6 @@ const Recovery = () => {
           >
             Reset Passcode
           </Button>
-          <FormError fieldError={error || undefined} />
         </div>
       )}
     </div>

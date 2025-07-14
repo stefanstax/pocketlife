@@ -8,7 +8,6 @@ import { toast } from "react-toastify";
 import FormError from "../../../components/FormError";
 import { generateUsername } from "../../../app/generateUsername";
 import { useNavigate } from "react-router";
-import { nanoid } from "@reduxjs/toolkit";
 
 const RegistrationForm = () => {
   const [formData, setFormData] = useState<RegistrationState>({

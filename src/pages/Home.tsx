@@ -1,10 +1,9 @@
 import { useSelector } from "react-redux";
 import type { RootState } from "../app/store";
 import { Link } from "react-router";
-import { FaLock } from "react-icons/fa";
 
 const Home = () => {
-  const { user, token } = useSelector((state: RootState) => state.auth);
+  const { user } = useSelector((state: RootState) => state.auth);
 
   const BlockImage = ({ src, alt }: { src: string; alt: string }) => {
     return (
