@@ -20,12 +20,12 @@ import { useAddTransactionMutation } from "./api/transactionsApi";
 import UploadField from "../../components/forms/UploadFile";
 import { toast } from "react-toastify";
 import TransactionMethod from "./fields/TransactionMethod";
-import { useGetPaymentMethodByIdQuery } from "./paymentMethods/api/paymentMethodsApi";
 import { useDispatch } from "react-redux";
 import {
   addAmount,
   substractAmount,
 } from "./paymentMethods/api/paymentMethodsSlice";
+import { useGetPaymentMethodByIdQuery } from "./paymentMethods/api/paymentMethodsApi";
 
 const TransactionAdd = () => {
   const [title, setTitle] = useState<string>("");
@@ -41,6 +41,7 @@ const TransactionAdd = () => {
   );
 
   const dispatch = useDispatch();
+  const { user } = useSelector((state: RootState) => state.auth);
 
   const [addTransaction, { isLoading: creatingTransaction }] =
     useAddTransactionMutation();
@@ -52,8 +53,6 @@ const TransactionAdd = () => {
   const findBudget = paymentMethod?.budgets?.find(
     (budgetId) => budgetId?.currencyId === currencyId
   );
-
-  const { user } = useSelector((state: RootState) => state.auth);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -149,19 +148,23 @@ const TransactionAdd = () => {
         validationError={formErrors?.type}
       />
       {/* Method */}
-      <TransactionMethod
-        userId={user?.id ?? ""}
-        paymentMethodId={paymentMethodId ?? ""}
-        setPaymentMethodId={setPaymentMethodId}
-        validationError={formErrors?.method}
-      />
+      {paymentMethod && (
+        <TransactionMethod
+          userId={user?.id ?? ""}
+          paymentMethodId={paymentMethodId ?? ""}
+          setPaymentMethodId={setPaymentMethodId}
+          validationError={formErrors?.method}
+        />
+      )}
       {/* Currency */}
-      <TransactionCurrency
-        currencies={paymentMethod?.budgets ?? []}
-        currencyId={currencyId}
-        setCurrencyId={setCurrencyId}
-        validationError={formErrors?.currencyId}
-      />
+      {paymentMethod?.budgets && (
+        <TransactionCurrency
+          currencies={paymentMethod?.budgets ?? []}
+          currencyId={currencyId}
+          setCurrencyId={setCurrencyId}
+          validationError={formErrors?.currencyId}
+        />
+      )}
       {/* Business or Personal Toggle */}
       <TransactionContext
         context={context}

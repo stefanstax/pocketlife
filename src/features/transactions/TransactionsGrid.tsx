@@ -18,15 +18,15 @@ import {
   useDeleteTransactionMutation,
 } from "./api/transactionsApi";
 import { toast } from "react-toastify";
-import { useGetPaymentMethodsQuery } from "./paymentMethods/api/paymentMethodsApi";
+import type { PaymentMethod } from "./paymentMethods/paymentMethodsTypes";
 
 type Props = {
   data: EnrichedTransaction[];
+  paymentMethods: PaymentMethod[];
 };
 
-const TransactionGrid = ({ data }: Props) => {
+const TransactionGrid = ({ data, paymentMethods }: Props) => {
   const [deleteTransaction] = useDeleteTransactionMutation();
-  const { data: paymentMethods } = useGetPaymentMethodsQuery();
 
   const [addTransaction] = useAddTransactionMutation();
 
@@ -54,112 +54,121 @@ const TransactionGrid = ({ data }: Props) => {
   };
 
   return (
-    <div className="w-full gap-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
-      <div className="w-full col-span-1 flex gap-2 mb-2 overflow-x-auto md:col-span-4 lg:col-span-5">
-        {paymentMethods?.map((paymentMethod) => {
+    <>
+      <div className="w-full grid grid-cols-1 lg:grid-cols-4 gap-4 mb-2 overflow-x-auto">
+        {paymentMethods?.map((paymentMethod: PaymentMethod) => {
           const mapOverBudgets = paymentMethod?.budgets?.map((budget) => {
             return (
-              <p className="text-sm">
-                {budget?.currencyId} - {budget?.amount.toFixed(2)}
+              <p className="flex gap-2 items-center bg-green-200 p-2 rounded-lg text-black text-sm">
+                <span>{budget?.currencyId}</span>
+                <span>{budget?.amount.toFixed(2)}</span>
               </p>
             );
           });
           return (
-            <div className="bg-gray-950 rounded-lg p-4 flex flex-col gap-2 text-white min-w-[200px] w-full">
-              <p className="font-bold">{paymentMethod?.name}</p>
+            <div className="col-span-1 rounded-lg shadow-md p-4 flex flex-wrap items-center gap-2 bg-white">
+              <p className="font-black w-full min-w-[150px]">
+                {paymentMethod?.name}
+              </p>
               {mapOverBudgets}
             </div>
           );
         })}
       </div>
-      {data.map((transaction) => {
-        const {
-          title,
-          amount,
-          note,
-          type,
-          currency,
-          receipt,
-          paymentMethod,
-          created_at,
-          context,
-        } = transaction;
+      <div className="w-full gap-4 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4">
+        {data.map((transaction) => {
+          const {
+            title,
+            amount,
+            note,
+            type,
+            currency,
+            receipt,
+            paymentMethod,
+            created_at,
+            context,
+          } = transaction;
 
-        const createdDate = new Date(created_at).toLocaleDateString();
-        const createdTime = new Date(created_at).toLocaleTimeString();
-        return (
-          <div
-            key={transaction?.id}
-            className="flex flex-col justify-between items-stretch gap-4 bg-gray-950 rounded-lg text-white p-4 shadow-lg"
-          >
-            <div className="flex items-center gap-2">
-              <span className="text-sm flex items-center gap-2">
-                <FaCalendar className="min-w-[16px]" />
-                {createdDate} - {createdTime}
-              </span>
-            </div>
-            <p className="font-bold">{title}</p>
-            <p
-              className={`inline-block text-transparent bg-clip-text ${
-                type === "EXPENSE"
-                  ? "bg-gradient-to-r from-red-300 via-red-500 to-red-900"
-                  : "bg-gradient-to-r from-green-300 via-green-500 to-green-900"
-              } font-bold`}
+          const createdDate = new Date(created_at).toLocaleDateString();
+          const createdTime = new Date(created_at).toLocaleTimeString();
+          return (
+            <div
+              key={transaction?.id}
+              className="flex flex-1 flex-col justify-between items-stretch gap-4 bg-white rounded-lg p-4 shadow-md"
             >
-              {currency?.symbol}
-              {amount.toFixed(2)}
-            </p>
-            <p className="text-sm font-bold flex items-center gap-2">
-              <FaUserTie className="min-w-[16px]" />
-              {context}
-            </p>
-            <p className="flex items-center gap-2 text-sm">
-              <FaCreditCard className="min-w-[16px]" />
-              {paymentMethod?.name}
-            </p>
-            <p className="text-sm flex items-center gap-2">
-              <FaNoteSticky className="min-w-[16px]" />
-              {note?.length ? note : "Note not provided."}
-            </p>
-            <div className="grid gap-4 grid-cols-4 border-t-1 border-gray-900 pt-4">
-              <Link
-                className={`${PRIMARY} ${SHARED}`}
-                to={`/transactions/${transaction?.id}`}
+              <div className="flex items-center gap-2">
+                <span className="text-sm flex items-center gap-2">
+                  <FaCalendar className="min-w-[16px]" />
+                  {createdDate} - {createdTime}
+                </span>
+              </div>
+              <p className="font-bold">{title}</p>
+              <p
+                className={`inline-block text-transparent bg-clip-text ${
+                  type === "EXPENSE"
+                    ? "bg-gradient-to-r from-red-300 via-red-500 to-red-900"
+                    : "bg-gradient-to-r from-green-300 via-green-500 to-green-900"
+                } font-bold`}
               >
-                <FiEdit2 className="min-w-[16px]" />
-              </Link>
-              <Button
-                type="button"
-                ariaLabel="Edit transaction"
-                variant="PRIMARY"
-                onClick={() => handleClone(transaction)}
-              >
-                <FaRegClone className="min-w-[16px]" />
-              </Button>
-              <Button
-                type="button"
-                ariaLabel="Edit transaction"
-                variant="PRIMARY"
-                onClick={() => handleDelete(transaction?.id)}
-              >
-                <AiOutlineDelete className="min-w-[16px]" />
-              </Button>
-              {receipt?.url ? (
-                <Link to={`${receipt?.url}`} className={`${PRIMARY} ${SHARED}`}>
-                  <FaReceipt />
-                </Link>
-              ) : (
-                <p
-                  className={`${PRIMARY} ${SHARED} opacity-50 pointer-events-none`}
+                {currency?.symbol}
+                {amount.toFixed(2)}
+              </p>
+              <p className="text-sm font-bold flex items-center gap-2">
+                <FaUserTie className="min-w-[16px]" />
+                {context}
+              </p>
+              <p className="flex items-center gap-2 text-sm">
+                <FaCreditCard className="min-w-[16px]" />
+                {paymentMethod?.name}
+              </p>
+              <p className="text-sm flex items-center gap-2">
+                <FaNoteSticky className="min-w-[16px]" />
+                {note?.length ? note : "Note not provided."}
+              </p>
+              <div className="grid gap-4 grid-cols-4 border-t-1 border-gray-900 pt-4">
+                <Link
+                  className={`${PRIMARY} ${SHARED}`}
+                  to={`/transactions/${transaction?.id}`}
                 >
-                  <FaReceipt className={"min-w-[16px]"} />
-                </p>
-              )}
+                  <FiEdit2 className="min-w-[16px]" />
+                </Link>
+                <Button
+                  type="button"
+                  ariaLabel="Edit transaction"
+                  variant="PRIMARY"
+                  onClick={() => handleClone(transaction)}
+                >
+                  <FaRegClone className="min-w-[16px]" />
+                </Button>
+                <Button
+                  type="button"
+                  ariaLabel="Edit transaction"
+                  variant="PRIMARY"
+                  onClick={() => handleDelete(transaction?.id)}
+                >
+                  <AiOutlineDelete className="min-w-[16px]" />
+                </Button>
+                {receipt?.url ? (
+                  <Link
+                    to={`${receipt?.url}`}
+                    target="_blank"
+                    className={`${PRIMARY} ${SHARED}`}
+                  >
+                    <FaReceipt />
+                  </Link>
+                ) : (
+                  <p
+                    className={`${PRIMARY} ${SHARED} opacity-50 pointer-events-none`}
+                  >
+                    <FaReceipt className={"min-w-[16px]"} />
+                  </p>
+                )}
+              </div>
             </div>
-          </div>
-        );
-      })}
-    </div>
+          );
+        })}
+      </div>
+    </>
   );
 };
 

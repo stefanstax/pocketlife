@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 body {
-  background-color: aliceblue;
+  background: linear-gradient(135deg, #dbeafe, #afdde5, #cce3f5);
   font-family: "Inter";
 }
 

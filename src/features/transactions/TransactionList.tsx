@@ -7,13 +7,21 @@ import { useEffect, useState } from "react";
 import NoDataFallback from "../../components/forms/NoDataFallback";
 import type { EnrichedTransaction } from "./transactionTypes";
 import TransactionGrid from "./TransactionsGrid";
+import { useGetPaymentMethodsQuery } from "./paymentMethods/api/paymentMethodsApi";
+import type { PaymentMethod } from "./paymentMethods/paymentMethodsTypes";
 
 const TransactionList = () => {
   const { user } = useSelector((state: RootState) => state.auth);
+  const { data: paymentMethods } = useGetPaymentMethodsQuery();
   const [page, setPage] = useState(1);
   const limit = 10;
 
-  const { data, refetch, isSuccess, isLoading } = useGetTransactionsQuery({
+  const {
+    data,
+    refetch,
+    isSuccess,
+    isLoading: transactionsLoading,
+  } = useGetTransactionsQuery({
     userId: user?.id ?? "",
     page,
     limit,
@@ -25,16 +33,17 @@ const TransactionList = () => {
     if (isSuccess) refetch();
   }, [isSuccess]);
 
-  if (isLoading) {
-    return <BlurredSpinner />;
-  }
+  if (transactionsLoading) return <BlurredSpinner />;
 
   return (
     <div className="w-full">
-      {data!.total >= 1 ? (
+      {data && data?.total >= 1 ? (
         <div className="flex flex-col justify-start items-start gap-2">
-          <TransactionGrid data={data?.data as EnrichedTransaction[]} />
-          {data!.total >= 5 ? (
+          <TransactionGrid
+            data={data?.data as EnrichedTransaction[]}
+            paymentMethods={paymentMethods as PaymentMethod[]}
+          />
+          {data!.total >= 11 ? (
             <Pagination
               page={page}
               total={data?.total as number}

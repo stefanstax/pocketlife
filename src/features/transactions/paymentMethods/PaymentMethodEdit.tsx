@@ -26,6 +26,9 @@ import type { RootState } from "../../../app/store";
 import TransactionAmount from "../fields/TransactionAmount";
 import { nanoid } from "@reduxjs/toolkit";
 import { useParams } from "react-router";
+import { useDispatch } from "react-redux";
+import { updateUser } from "../../../app/authSlice";
+import BlurredSpinner from "../../../components/BlurredSpinner";
 
 const PaymentMethodEdit = () => {
   const [formData, setFormData] = useState<PaymentMethodFormData>({
@@ -39,13 +42,15 @@ const PaymentMethodEdit = () => {
     {}
   );
 
+  const dispatch = useDispatch();
   const { user } = useSelector((state: RootState) => state.auth);
 
-  const { data } = useGetPaymentMethodByIdQuery(id || "");
+  const { data, isLoading } = useGetPaymentMethodByIdQuery(id || "");
   const [editPaymentMethod] = useEditPaymentMethodMutation();
 
   useEffect(() => {
     setFormData({
+      id,
       name: data?.name,
       type: data?.type,
       budgets: data?.budgets,
@@ -80,6 +85,16 @@ const PaymentMethodEdit = () => {
           success: "Payment method updated.",
           error: "Payment method couldn't be updated.",
         }
+      );
+      // Store payment methods to user's slice
+      dispatch(
+        updateUser({
+          ...user,
+          paymentMethods: [
+            ...(user?.paymentMethods as PaymentMethod[]),
+            verifyData?.data as PaymentMethod,
+          ],
+        })
       );
     }
   };
@@ -140,6 +155,8 @@ const PaymentMethodEdit = () => {
     }));
   };
 
+  if (isLoading) return <BlurredSpinner />;
+
   return (
     <form onSubmit={handleSubmit} className="w-full grid grid-cols-1 gap-4">
       <div className={formDiv}>
@@ -160,7 +177,7 @@ const PaymentMethodEdit = () => {
         <label htmlFor="type" className={labelClasses}>
           Type
         </label>
-        <div className={`${input} flex items-center gap-2`}>
+        <div className={`${input} flex flex-wrap items-center gap-2`}>
           {paymentMethodOptions.map((paymentMethod) => {
             return (
               <Fragment key={paymentMethod?.type}>

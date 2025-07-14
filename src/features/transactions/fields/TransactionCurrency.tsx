@@ -13,8 +13,6 @@ const TransactionCurrency = ({
   setCurrencyId: (value: string) => void;
   validationError?: string;
 }) => {
-  console.log(currencies);
-
   return (
     <div className={formDiv}>
       <label className={labelClasses} htmlFor="currency">

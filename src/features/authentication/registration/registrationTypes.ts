@@ -1,6 +1,9 @@
 export interface RegistrationState {
   username: string;
   email: string;
-  password: string;
+  name: string;
+  passcode: number | "";
+  securityName: string;
+  recoveryUrl: string;
   currencies: string[];
 }

@@ -5,7 +5,7 @@ import { SECONDARY, SHARED } from "../app/globalClasses";
 const Registration = () => {
   return (
     <section className="w-full flex justify-center items-center flex-col gap-4">
-      <div className="min-w-full lg:min-w-[600px] flex flex-col items-center justify-center gap-4">
+      <div className="w-full max-w-[800px] flex flex-col items-center justify-center gap-4">
         <RegistrationForm />
         <p>OR</p>
         <Link
