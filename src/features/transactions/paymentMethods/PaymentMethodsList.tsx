@@ -7,6 +7,8 @@ import Button from "../../../components/Button";
 import { PRIMARY, SHARED } from "../../../app/globalClasses";
 import BlurredSpinner from "../../../components/BlurredSpinner";
 import NoDataFallback from "../../../components/forms/NoDataFallback";
+import { FiEdit2 } from "react-icons/fi";
+import { AiOutlineDelete } from "react-icons/ai";
 
 const PaymentMethodsList = () => {
   const [deletePaymentMethod] = useDeletePaymentMethodMutation();
@@ -17,12 +19,12 @@ const PaymentMethodsList = () => {
   return (
     <>
       {data && data?.length > 0 ? (
-        <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="w-full grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {data?.map((paymentMethod) => {
             const { id, name, type, budgets } = paymentMethod;
             return (
               <div
-                key={name}
+                key={id}
                 className="bg-white rounded-lg shadow-md p-4 flex flex-col gap-4"
               >
                 <p className="text-sm text-cyan-950 font-black">
@@ -34,9 +36,9 @@ const PaymentMethodsList = () => {
                     <p>Balance: </p>
                     {budgets.map((budget) => {
                       return (
-                        <p>
+                        <p key={budget?.id}>
                           {budget?.currencyId}
-                          {budget?.amount}
+                          {budget?.amount.toFixed(2)}
                         </p>
                       );
                     })}
@@ -47,14 +49,14 @@ const PaymentMethodsList = () => {
                     className={`${PRIMARY} ${SHARED}`}
                     to={`/payment-methods/${id}`}
                   >
-                    Edit
+                    <FiEdit2 />
                   </Link>
                   <Button
                     ariaLabel="Delete payment method"
                     variant="PRIMARY"
                     onClick={() => deletePaymentMethod(id)}
                   >
-                    Delete
+                    <AiOutlineDelete />
                   </Button>
                 </div>
               </div>

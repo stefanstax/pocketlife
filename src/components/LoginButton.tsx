@@ -1,11 +1,11 @@
 import { Link } from "react-router";
-import { SECONDARY, SHARED } from "../app/globalClasses";
+import { PRIMARY, SECONDARY, SHARED } from "../app/globalClasses";
 
 const LoginButton = () => {
   return (
     <Link
       aria-label="Go to login page"
-      className={`${SECONDARY} ${SHARED}`}
+      className={`${PRIMARY} ${SHARED}`}
       to="authentication/login"
     >
       Login

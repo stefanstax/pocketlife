@@ -91,17 +91,17 @@ const TransactionAdd = () => {
         if (type === "EXPENSE") {
           dispatch(
             substractAmount({
-              budgetId: String(findBudget?.id),
+              budgetId: findBudget?.id as string,
               currencyId,
-              amount: Number(amount),
+              amount: +amount,
             })
           );
         } else {
           dispatch(
             addAmount({
-              budgetId: String(findBudget?.id),
+              budgetId: findBudget?.id as string,
               currencyId,
-              amount: Number(amount),
+              amount: +amount,
             })
           );
         }
@@ -120,9 +120,7 @@ const TransactionAdd = () => {
         setPaymentMethodId("");
         setReceipt(null);
       } catch (error: any) {
-        toast.error(
-          error?.data?.message || error.message || "Something went wrong"
-        );
+        toast.error(error?.data?.message ?? "Uncaught error.");
       }
     }
   };

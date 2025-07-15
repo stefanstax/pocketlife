@@ -7,7 +7,7 @@ const budgetSchema = z.object({
 });
 
 export const paymentMethodsSchema = z.object({
-  id: z.string(),
+  id: z.string().optional(),
   name: z
     .string()
     .min(4, { message: "Payment method must have a minimum of 4 characters." }),
