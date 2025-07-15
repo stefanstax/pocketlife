@@ -2,9 +2,8 @@ import { useSelector } from "react-redux";
 import type { RootState } from "../app/store";
 import { NavLink, useLocation } from "react-router";
 import LoginButton from "./LoginButton";
-import { SECONDARY, SHARED } from "../app/globalClasses";
+import { PRIMARY, SECONDARY, SHARED } from "../app/globalClasses";
 import LogoutButton from "./LogoutButton";
-import { FaLock } from "react-icons/fa6";
 import { links } from "./navigationLinks";
 
 const Navigation = () => {
@@ -36,8 +35,6 @@ const Navigation = () => {
                   }`
                 }
               >
-                {user?.email !== import.meta.env.VITE_ADMIN_EMAIL &&
-                  link?.admin && <FaLock />}
                 {link?.label}
               </NavLink>
             );
@@ -59,7 +56,7 @@ const Navigation = () => {
           {token && <LogoutButton />}
           {token && (
             <NavLink
-              className={`${SECONDARY} ${SHARED}`}
+              className={`${PRIMARY} ${SHARED} min-w-[100px]`}
               to={`/users/${user?.id}`}
             >
               Edit Profile
@@ -79,7 +76,6 @@ const Navigation = () => {
                 }`
               }
             >
-              {user?.email !== import.meta.env.VITE_ADMIN_EMAIL && <FaLock />}
               {link?.label}
             </NavLink>
           );
