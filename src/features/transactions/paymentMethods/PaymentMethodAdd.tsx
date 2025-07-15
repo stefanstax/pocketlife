@@ -154,7 +154,7 @@ const PaymentMethodAdd = () => {
         <div className={`${input} flex flex-wrap items-center gap-2`}>
           {paymentMethodOptions.map((paymentMethod) => {
             return (
-              <>
+              <div key={paymentMethod?.name}>
                 <button
                   key={paymentMethod?.type}
                   type="button"
@@ -173,7 +173,7 @@ const PaymentMethodAdd = () => {
                   {paymentMethod?.name}
                 </button>
                 <input type="hidden" name="type" value={paymentMethod?.type} />
-              </>
+              </div>
             );
           })}
         </div>

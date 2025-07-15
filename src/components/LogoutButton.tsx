@@ -1,6 +1,6 @@
 import { useDispatch } from "react-redux";
 import { logout } from "../app/authSlice";
-import { SECONDARY, SHARED } from "../app/globalClasses";
+import { PRIMARY, SECONDARY, SHARED } from "../app/globalClasses";
 
 const LogoutButton = () => {
   const dispatch = useDispatch();
@@ -8,7 +8,7 @@ const LogoutButton = () => {
     <button
       aria-label="Logout user"
       role="button"
-      className={`${SECONDARY} ${SHARED} flex-1`}
+      className={`${PRIMARY} ${SHARED} flex-1 min-w-[100px]`}
       onClick={() => dispatch(logout())}
     >
       Logout

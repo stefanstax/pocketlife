@@ -55,19 +55,25 @@ const TransactionGrid = ({ data, paymentMethods }: Props) => {
 
   return (
     <>
-      <div className="w-full grid grid-cols-1 lg:grid-cols-4 gap-4 mb-2 overflow-x-auto">
+      <div className="w-full flex gap-4 mb-2 min-w-full overflow-x-auto">
         {paymentMethods?.map((paymentMethod: PaymentMethod) => {
           const mapOverBudgets = paymentMethod?.budgets?.map((budget) => {
             return (
-              <p className="flex gap-2 items-center bg-green-200 p-2 rounded-lg text-black text-sm">
+              <p
+                key={budget?.id}
+                className="flex gap-2 items-center border border-gray-950 p-2 rounded-lg text-black text-sm"
+              >
                 <span>{budget?.currencyId}</span>
                 <span>{budget?.amount.toFixed(2)}</span>
               </p>
             );
           });
           return (
-            <div className="col-span-1 rounded-lg shadow-md p-4 flex flex-wrap items-center gap-2 bg-white">
-              <p className="font-black w-full min-w-[150px]">
+            <div
+              key={paymentMethod?.id}
+              className="min-w-fit rounded-lg shadow-md p-4 flex justify-between items-center gap-2 bg-white"
+            >
+              <p className="font-bold w-full min-w-[150px] mr-4">
                 {paymentMethod?.name}
               </p>
               {mapOverBudgets}
