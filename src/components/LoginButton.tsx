@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import { PRIMARY, SECONDARY, SHARED } from "../app/globalClasses";
+import { PRIMARY, SHARED } from "../app/globalClasses";
 
 const LoginButton = () => {
   return (
