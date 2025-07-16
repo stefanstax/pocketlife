@@ -16,18 +16,56 @@ const Home = () => {
   };
 
   return (
-    <section className="w-full flex flex-col gap-4 justify-center items-center">
+    <section className="w-full my-10 flex flex-col gap-4 justify-center items-center">
       <div className="flex flex-col gap-10 items-center">
-        <h1 className="text-4xl lg:text-8xl font-black">{user?.username}</h1>
-        <h2 className="text-2xl lg:text-4xl font-bold">
-          What shall we do today?
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <h1 className="text-4xl font-black mb-10">
+          {user?.name}, what shall we do today?
+        </h1>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
           <Link
             to="/transactions"
             className="flex flex-col bg-gray-950 rounded-lg shadow-[0_35px_35px_rgba(0,0,0,0.6)] relative hover:ring-4 transition-all"
           >
-            <BlockImage src="src/assets/images/transactions-tab.webp" alt="" />
+            <BlockImage
+              src="https://maypact-transactions.b-cdn.net/Transactions%20Illustration.webp"
+              alt=""
+            />
+            <h3 className="text-white text-2xl font-bold text-center absolute bottom-0 bg-[#30303080] backdrop-blur-sm w-full py-4 rounded-b-lg">
+              Transactions
+            </h3>
+          </Link>
+          <Link
+            to="/#"
+            className="blur-md opacity-75 pointer-events-none flex flex-col bg-gray-950 rounded-lg shadow-[0_35px_35px_rgba(0,0,0,0.6)] relative hover:ring-4 transition-all"
+          >
+            <BlockImage
+              src="https://maypact-transactions.b-cdn.net/Transactions%20Illustration.webp"
+              alt=""
+            />
+            <h3 className="text-white text-2xl font-bold text-center absolute bottom-0 bg-[#30303080] backdrop-blur-sm w-full py-4 rounded-b-lg">
+              Transactions
+            </h3>
+          </Link>
+          <Link
+            to="/#"
+            className="blur-md opacity-75 pointer-events-none flex flex-col bg-gray-950 rounded-lg shadow-[0_35px_35px_rgba(0,0,0,0.6)] relative hover:ring-4 transition-all"
+          >
+            <BlockImage
+              src="https://maypact-transactions.b-cdn.net/Transactions%20Illustration.webp"
+              alt=""
+            />
+            <h3 className="text-white text-2xl font-bold text-center absolute bottom-0 bg-[#30303080] backdrop-blur-sm w-full py-4 rounded-b-lg">
+              Transactions
+            </h3>
+          </Link>
+          <Link
+            to="/#"
+            className="blur-md opacity-75 pointer-events-none flex flex-col bg-gray-950 rounded-lg shadow-[0_35px_35px_rgba(0,0,0,0.6)] relative hover:ring-4 transition-all"
+          >
+            <BlockImage
+              src="https://maypact-transactions.b-cdn.net/Transactions%20Illustration.webp"
+              alt=""
+            />
             <h3 className="text-white text-2xl font-bold text-center absolute bottom-0 bg-[#30303080] backdrop-blur-sm w-full py-4 rounded-b-lg">
               Transactions
             </h3>

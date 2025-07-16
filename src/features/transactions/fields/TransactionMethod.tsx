@@ -28,7 +28,7 @@ const TransactionMethod = ({
                 option.id === paymentMethodId
                   ? "bg-gray-950 text-white border-black"
                   : ""
-              } min-w-[100px] rounded-lg cursor-pointer p-2 border-black border-solid border-1`}
+              } min-w-[100px] rounded-full cursor-pointer p-2 border-black border-solid border-1`}
               type="button"
               onClick={() => setPaymentMethodId(option.id)}
             >

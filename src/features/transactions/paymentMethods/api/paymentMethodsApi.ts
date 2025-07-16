@@ -3,7 +3,7 @@ import type { RootState } from "../../../../app/store";
 import type {
   PaymentMethod,
   PaymentMethodFormData,
-} from "../paymentMethodsTypes";
+} from "../types/paymentMethodsTypes";
 
 export const paymentMethodsApi = createApi({
   reducerPath: "payment-methods",

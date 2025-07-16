@@ -1,6 +1,6 @@
 import { useDispatch } from "react-redux";
 import { logout } from "../app/authSlice";
-import { PRIMARY, SECONDARY, SHARED } from "../app/globalClasses";
+import { PRIMARY, SHARED } from "../app/globalClasses";
 
 const LogoutButton = () => {
   const dispatch = useDispatch();

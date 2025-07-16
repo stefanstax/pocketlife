@@ -3,8 +3,8 @@ import {
   paymentMethodOptions,
   type PaymentMethod,
   type PaymentMethodFormData,
-} from "./paymentMethodsTypes";
-import { paymentMethodsSchema } from "./paymentMethodsSchema";
+} from "./types/paymentMethodsTypes";
+import { paymentMethodsSchema } from "./schemas/paymentMethodsSchema";
 import {
   useEditPaymentMethodMutation,
   useGetPaymentMethodByIdQuery,
@@ -29,6 +29,7 @@ import { useParams } from "react-router";
 import { useDispatch } from "react-redux";
 import { updateUser } from "../../../app/authSlice";
 import BlurredSpinner from "../../../components/BlurredSpinner";
+import { useGetCurrenciesQuery } from "../currency/api/currenciesApi";
 
 const PaymentMethodEdit = () => {
   const [formData, setFormData] = useState<PaymentMethodFormData>({
@@ -44,6 +45,7 @@ const PaymentMethodEdit = () => {
 
   const dispatch = useDispatch();
   const { user } = useSelector((state: RootState) => state.auth);
+  const { data: currencies } = useGetCurrenciesQuery();
 
   const { data, isLoading } = useGetPaymentMethodByIdQuery(id || "");
   const [editPaymentMethod] = useEditPaymentMethodMutation();
@@ -212,7 +214,7 @@ const PaymentMethodEdit = () => {
             className="grid grid-cols-1 justify-start items-start gap-4"
           >
             <TransactionCurrency
-              currencies={user?.currencies || []}
+              currencies={currencies || []}
               currencyId={budget?.currencyId}
               setCurrencyId={(value) =>
                 updateBudget(budget?.id, "currencyId", value)

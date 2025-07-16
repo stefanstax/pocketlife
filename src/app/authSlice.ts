@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { PaymentMethod } from "../features/transactions/paymentMethods/paymentMethodsTypes";
+import type { PaymentMethod } from "../features/transactions/paymentMethods/types/paymentMethodsTypes";
 
 export interface User {
   id: string;

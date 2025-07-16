@@ -34,9 +34,9 @@ const CurrencyList = () => {
           return (
             <div
               key={code}
-              className="bg-gray-950 rounded-lg p-4 text-white flex flex-col gap-4"
+              className="bg-white shadow-md border-2 rounded-lg p-4 flex flex-col gap-4"
             >
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 border-1 rounded-full w-fit px-2">
                 <p>{symbol}</p>
                 <p>{code}</p>
               </div>
