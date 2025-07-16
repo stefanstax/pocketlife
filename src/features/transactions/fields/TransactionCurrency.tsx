@@ -1,6 +1,7 @@
 import { formDiv, input, labelClasses } from "../../../app/globalClasses";
 import FormError from "../../../components/FormError";
-import type { Budget } from "../paymentMethods/paymentMethodsTypes";
+import type { CurrencyState } from "../currency/currencyTypes";
+import type { Budget } from "../paymentMethods/types/paymentMethodsTypes";
 
 const TransactionCurrency = ({
   currencies,
@@ -8,50 +9,62 @@ const TransactionCurrency = ({
   setCurrencyId,
   validationError,
 }: {
-  currencies: Budget[] | string[];
+  currencies: CurrencyState[] | Budget[];
   currencyId: string | "";
   setCurrencyId: (value: string) => void;
   validationError?: string;
 }) => {
+  // Check what type of array is incoming prop of currencies
+  function isCurrencyArray(
+    data: CurrencyState[] | Budget[]
+  ): data is CurrencyState[] {
+    return "symbol" in (data?.[0] ?? {});
+  }
+
+  function isBudgetArray(data: CurrencyState[] | Budget[]): data is Budget[] {
+    return "amount" in (data?.[0] ?? {});
+  }
+
   return (
     <div className={formDiv}>
       <label className={labelClasses} htmlFor="currency">
         Select Currency
       </label>
       <div className={`${input} flex flex-wrap gap-2`}>
-        {currencies?.map((curr) => {
-          if (typeof curr === "object" && curr !== null && "id" in curr) {
+        {isCurrencyArray(currencies) &&
+          currencies?.map((curr) => {
             return (
               <button
-                key={curr.id}
+                key={curr?.code}
                 type="button"
                 className={`text-sm font-[600] ${
-                  currencyId === curr.currencyId
+                  currencyId === curr?.code
                     ? "bg-gray-950 text-white border-black"
                     : ""
-                } min-w-[100px] rounded-lg cursor-pointer p-2 border-black border-solid border-1`}
-                onClick={() => setCurrencyId(curr.currencyId)}
+                } min-w-[100px] rounded-full cursor-pointer p-2 border-black border-solid border-1`}
+                onClick={() => setCurrencyId(curr?.code)}
               >
-                {curr.currencyId}
+                {curr?.code}
               </button>
             );
-          } else {
+          })}
+        {isBudgetArray(currencies) &&
+          currencies?.map((curr) => {
             return (
               <button
-                key={curr as string}
+                key={curr?.id}
                 type="button"
-                className={`${
-                  currencyId === curr
+                className={`text-sm font-[600] ${
+                  currencyId === curr?.currencyId
                     ? "bg-gray-950 text-white border-black"
                     : ""
-                } min-w-[100px] rounded-lg cursor-pointer p-2 border-black border-solid border-1`}
-                onClick={() => setCurrencyId(curr as string)}
+                } min-w-[100px] rounded-full cursor-pointer p-2 border-black border-solid border-1`}
+                onClick={() => setCurrencyId(curr?.currencyId)}
               >
-                {curr}
+                {curr?.currencyId}
               </button>
             );
-          }
-        })}
+          })}
       </div>
       <input
         className={input}

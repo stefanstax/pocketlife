@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { Budget } from "../paymentMethodsTypes";
+import type { Budget } from "../types/paymentMethodsTypes";
 
 interface BudgetState {
   budgets: Budget[];

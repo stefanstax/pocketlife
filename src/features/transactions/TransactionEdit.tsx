@@ -64,15 +64,12 @@ const EditTransaction = () => {
   );
 
   // Transaction Data
-  const {
-    data: transactionData,
-    refetch,
-    isLoading,
-  } = useGetTransactionByIdQuery(id || "");
+  const { data: transactionData, isLoading } = useGetTransactionByIdQuery(
+    id || ""
+  );
 
   // Update transaction mutation
-  const [updateTransaction, { isLoading: updating }] =
-    useUpdateTransactionMutation();
+  const [updateTransaction] = useUpdateTransactionMutation();
 
   const currenciesMatch = user?.currencies?.includes(
     transactionData?.currencyId ?? ""
@@ -158,7 +155,6 @@ const EditTransaction = () => {
             success: "Transaction has been updated.",
           }
         );
-        refetch();
         navigate("/transactions/");
       } catch (error: any) {
         toast.error(error?.data?.message ?? "Uncaught error.");
@@ -166,7 +162,7 @@ const EditTransaction = () => {
     }
   };
 
-  if (isLoading || updating) return <BlurredSpinner />;
+  if (isLoading) return <BlurredSpinner />;
 
   return (
     <form onSubmit={handleSubmit} className="w-full flex flex-col gap-4">
@@ -226,7 +222,7 @@ const EditTransaction = () => {
             hasFile={
               <a
                 target="_blank"
-                className={`border-1 border-solid border-black px-4 text-white rounded-lg py-2 ${
+                className={`border-1 border-solid border-black px-4 text-white rounded-full py-2 ${
                   receipt?.url && "bg-gray-950"
                 }`}
                 href={receipt?.url}

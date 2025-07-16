@@ -33,8 +33,6 @@ const LoginForm = () => {
     });
 
     if (!verifyData.success) {
-      console.log(verifyData?.error.flatten());
-
       const flattenErrors = verifyData.error.flatten();
       const fieldErrors = Object.fromEntries(
         Object.entries(flattenErrors.fieldErrors).map(([key, val]) => [

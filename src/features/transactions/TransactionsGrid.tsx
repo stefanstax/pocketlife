@@ -18,7 +18,7 @@ import {
   useDeleteTransactionMutation,
 } from "./api/transactionsApi";
 import { toast } from "react-toastify";
-import type { PaymentMethod } from "./paymentMethods/paymentMethodsTypes";
+import type { PaymentMethod } from "./paymentMethods/types/paymentMethodsTypes";
 
 type Props = {
   data: EnrichedTransaction[];
@@ -55,13 +55,13 @@ const TransactionGrid = ({ data, paymentMethods }: Props) => {
 
   return (
     <>
-      <div className="w-full flex gap-4 mb-2 min-w-full overflow-x-auto">
+      <div className="w-full flex gap-4 py-4 mb-2 min-w-full overflow-x-auto">
         {paymentMethods?.map((paymentMethod: PaymentMethod) => {
           const mapOverBudgets = paymentMethod?.budgets?.map((budget) => {
             return (
               <p
                 key={budget?.id}
-                className="flex gap-2 items-center border border-gray-950 p-2 rounded-lg text-black text-sm"
+                className="flex gap-2 items-center border border-gray-950 px-2 rounded-full text-black text-sm"
               >
                 <span>{budget?.currencyId}</span>
                 <span>{budget?.amount.toFixed(2)}</span>
@@ -71,7 +71,7 @@ const TransactionGrid = ({ data, paymentMethods }: Props) => {
           return (
             <div
               key={paymentMethod?.id}
-              className="min-w-fit rounded-lg shadow-md p-4 flex justify-between items-center gap-2 bg-white"
+              className="min-w-fit border-2 rounded-lg shadow-md p-4 flex justify-between items-center gap-2 bg-white"
             >
               <p className="font-bold w-full min-w-[150px] mr-4">
                 {paymentMethod?.name}
@@ -100,7 +100,7 @@ const TransactionGrid = ({ data, paymentMethods }: Props) => {
           return (
             <div
               key={transaction?.id}
-              className="flex flex-1 flex-col justify-between items-stretch gap-4 bg-white rounded-lg p-4 shadow-md"
+              className="flex flex-1 border-2 flex-col justify-between items-stretch gap-4 bg-white rounded-lg p-4 shadow-md"
             >
               <div className="flex items-center gap-2">
                 <span className="text-sm flex items-center gap-2">
@@ -110,10 +110,8 @@ const TransactionGrid = ({ data, paymentMethods }: Props) => {
               </div>
               <p className="font-bold">{title}</p>
               <p
-                className={`inline-block text-transparent bg-clip-text ${
-                  type === "EXPENSE"
-                    ? "bg-gradient-to-r from-red-300 via-red-500 to-red-900"
-                    : "bg-gradient-to-r from-green-300 via-green-500 to-green-900"
+                className={`inline-block ${
+                  type === "EXPENSE" ? "text-red-600" : "text-green-600"
                 } font-bold`}
               >
                 {currency?.symbol}
