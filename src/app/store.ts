@@ -13,7 +13,6 @@ import {
 import storage from "redux-persist/lib/storage";
 import { transactionsApi } from "../features/transactions/api/transactionsApi";
 import { authApi } from "../features/authentication/api/authApi";
-import { categoriesApi } from "../features/transactions/category/api/categoriesApi";
 import { currenciesApi } from "../features/transactions/currency/api/currenciesApi";
 import { paymentMethodsApi } from "../features/transactions/paymentMethods/api/paymentMethodsApi";
 import { recoveryApi } from "../features/recovery/api/recoveryApi";
@@ -30,7 +29,6 @@ const rootReducer = combineReducers({
   auth: persistReducer(authPersistConfig, authReducer),
   [transactionsApi.reducerPath]: transactionsApi.reducer,
   [authApi.reducerPath]: authApi.reducer,
-  [categoriesApi.reducerPath]: categoriesApi.reducer,
   [currenciesApi.reducerPath]: currenciesApi.reducer,
   [paymentMethodsApi.reducerPath]: paymentMethodsApi.reducer,
   [recoveryApi.reducerPath]: recoveryApi.reducer,

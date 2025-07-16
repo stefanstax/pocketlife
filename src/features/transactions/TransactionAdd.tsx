@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { transactionSchema } from "./transactionSchemas";
+import { transactionSchema } from "./schemas/transactionSchemas";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../app/store";
 import {
@@ -7,7 +7,7 @@ import {
   type Transaction,
   type TransactionContexts,
   type TransactionTypes,
-} from "./transactionTypes";
+} from "./types/transactionTypes";
 import SubmitButton from "../../components/SubmitButton";
 // Form Fields
 import TransactionTitle from "./fields/TransactionTitle";

@@ -14,8 +14,9 @@ const Recovery = () => {
   const [newPasscode, setNewPasscode] = useState("");
   const [step, setStep] = useState<"verify" | "reset">("verify");
 
-  const [verifySecurityName] = useVerifySecurityNameMutation();
-  const [resetPasscode] = useResetPasscodeMutation();
+  const [verifySecurityName, { isLoading: verifying }] =
+    useVerifySecurityNameMutation();
+  const [resetPasscode, { isLoading: resetting }] = useResetPasscodeMutation();
 
   const handleVerify = async () => {
     const serverRes = await verifySecurityName({
@@ -25,11 +26,17 @@ const Recovery = () => {
 
     if (serverRes?.data?.message === "Verified") {
       setStep("reset");
-      toast.success("You are who you say you are.");
+      toast.success("Wow, look at that, it's correct.");
+    } else {
+      toast.error("Security name is not correct");
     }
   };
 
   const handleReset = async () => {
+    if (newPasscode?.length < 6 || newPasscode?.length > 6) {
+      toast.error("Passcode must be a 6 digits.");
+      return;
+    }
     await resetPasscode({ slug: recoveryUrl ?? "", newPasscode });
   };
 
@@ -54,13 +61,14 @@ const Recovery = () => {
             extraClasses="mt-4"
             onClick={handleVerify}
           >
-            Verify
+            {verifying ? "Verifying..." : "Verify"}
           </Button>
         </div>
       ) : (
         <div className={formDiv}>
           <label className={labelClasses}>New 6-digit Passcode</label>
           <input
+            type="password"
             className={input}
             value={newPasscode}
             onChange={(e) => setNewPasscode(e.target.value)}
@@ -72,7 +80,7 @@ const Recovery = () => {
             extraClasses="mt-4"
             onClick={handleReset}
           >
-            Reset Passcode
+            {resetting ? "Resetting..." : "Reset Passcode"}
           </Button>
         </div>
       )}
