@@ -11,12 +11,8 @@ const Navigation = () => {
 
   const location = useLocation();
 
-  const childrenLinks = links.filter(
-    (link) => link?.child === true && link?.admin === false
-  );
-  const parentLinks = links.filter(
-    (link) => link?.child === false && link?.admin === false
-  );
+  const childrenLinks = links.filter((link) => link?.child === true);
+  const parentLinks = links.filter((link) => link?.child === false);
 
   return (
     <nav className="w-full">
@@ -83,16 +79,6 @@ const Navigation = () => {
       </div>
       {location?.pathname !== "/" && (
         <div className="w-full overflow-x-auto lg:overflow-x-hidden flex items-center gap-4 justify-start lg:justify-center bg-gray-950 p-4 text-white font-[500] text-center">
-          {/* {location?.pathname !== "/" && (
-            <button
-              aria-label="Go to previous page"
-              onClick={() => navigate(-1)}
-              className="text-sm flex items-center gap-2 cursor-pointer"
-            >
-              <FaArrowLeft /> Back
-            </button>
-          )} */}
-
           {childrenLinks.map((link) => {
             return (
               <NavLink

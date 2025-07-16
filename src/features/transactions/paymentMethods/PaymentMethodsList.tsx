@@ -25,10 +25,10 @@ const PaymentMethodsList = () => {
             return (
               <div
                 key={id}
-                className="bg-white rounded-lg shadow-md p-4 flex flex-col gap-4"
+                className="bg-white border-2 rounded-lg shadow-md p-4 flex flex-col gap-4"
               >
-                <p className="text-sm text-cyan-950 font-black">
-                  #{type?.toUpperCase()}
+                <p className="text-sm text-gray-950 border-1 w-fit px-2 rounded-full">
+                  {type?.toUpperCase()}
                 </p>
                 <p className="text-2xl font-bold">{name}</p>
                 {budgets && (

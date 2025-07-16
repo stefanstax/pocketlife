@@ -8,7 +8,7 @@ import NoDataFallback from "../../components/forms/NoDataFallback";
 import type { EnrichedTransaction } from "./transactionTypes";
 import TransactionGrid from "./TransactionsGrid";
 import { useGetPaymentMethodsQuery } from "./paymentMethods/api/paymentMethodsApi";
-import type { PaymentMethod } from "./paymentMethods/paymentMethodsTypes";
+import type { PaymentMethod } from "./paymentMethods/types/paymentMethodsTypes";
 
 const TransactionList = () => {
   const { user } = useSelector((state: RootState) => state.auth);

@@ -10,7 +10,6 @@ import EditTransaction from "./features/transactions/TransactionEdit";
 import CurrenciesAdd from "./features/transactions/currency/CurrencyAdd";
 import CurrencyList from "./features/transactions/currency/CurrencyList";
 import CurrencyEdit from "./features/transactions/currency/CurrencyEdit";
-import CurrencySelection from "./features/transactions/currency/CurrencySelection";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
 import GuestRoute from "./components/GuestRoute";
@@ -44,7 +43,6 @@ const App = () => {
               <Route path="add" element={<AddTransaction />} />
               <Route path=":id" element={<EditTransaction />} />
             </Route>
-            <Route path="select-currencies" element={<CurrencySelection />} />
             <Route path="payment-methods">
               <Route index element={<PaymentMethodsList />} />
               <Route path="add" element={<PaymentMethodAdd />} />

@@ -3,8 +3,8 @@ import {
   paymentMethodOptions,
   type PaymentMethod,
   type PaymentMethodFormData,
-} from "./paymentMethodsTypes";
-import { paymentMethodsSchema } from "./paymentMethodsSchema";
+} from "./types/paymentMethodsTypes";
+import { paymentMethodsSchema } from "./schemas/paymentMethodsSchema";
 import { useAddPaymentMethodMutation } from "./api/paymentMethodsApi";
 import { toast } from "react-toastify";
 import {
@@ -24,6 +24,7 @@ import TransactionAmount from "../fields/TransactionAmount";
 import { nanoid } from "@reduxjs/toolkit";
 import { useDispatch } from "react-redux";
 import { updateUser } from "../../../app/authSlice";
+import { useGetCurrenciesQuery } from "../currency/api/currenciesApi";
 
 const PaymentMethodAdd = () => {
   const [formData, setFormData] = useState<PaymentMethodFormData>({
@@ -37,6 +38,8 @@ const PaymentMethodAdd = () => {
 
   const dispatch = useDispatch();
   const { user } = useSelector((state: RootState) => state.auth);
+
+  const { data: currencies } = useGetCurrenciesQuery();
 
   const [addPaymentMethod, { isLoading: creatingPaymentMethod }] =
     useAddPaymentMethodMutation();
@@ -162,7 +165,7 @@ const PaymentMethodAdd = () => {
                     formData?.type === paymentMethod?.type
                       ? "bg-gray-950 text-white border-black"
                       : ""
-                  } min-w-[100px] rounded-lg cursor-pointer p-2 border-black border-solid border-1`}
+                  } min-w-[100px] text-sm font-bold rounded-lg cursor-pointer p-2 border-solid border-1`}
                   onClick={() =>
                     setFormData({
                       ...formData,
@@ -187,7 +190,7 @@ const PaymentMethodAdd = () => {
             className="grid grid-cols-1 justify-start items-start gap-4"
           >
             <TransactionCurrency
-              currencies={user?.currencies || []}
+              currencies={currencies || []}
               currencyId={budget?.currencyId}
               setCurrencyId={(value) =>
                 updateBudget(budget?.id, "currencyId", value)
