@@ -5,7 +5,7 @@ import type { RootState } from "../../app/store";
 import Pagination from "../../components/Pagination";
 import { useEffect, useState } from "react";
 import NoDataFallback from "../../components/forms/NoDataFallback";
-import type { EnrichedTransaction } from "./transactionTypes";
+import type { EnrichedTransaction } from "./types/transactionTypes";
 import TransactionGrid from "./TransactionsGrid";
 import { useGetPaymentMethodsQuery } from "./paymentMethods/api/paymentMethodsApi";
 import type { PaymentMethod } from "./paymentMethods/types/paymentMethodsTypes";

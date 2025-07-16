@@ -1,4 +1,4 @@
-import type { EnrichedTransaction } from "./transactionTypes";
+import type { EnrichedTransaction } from "./types/transactionTypes";
 import { Link } from "react-router-dom";
 import { PRIMARY, SHARED } from "../../app/globalClasses";
 import Button from "../../components/Button";

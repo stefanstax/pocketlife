@@ -3,7 +3,7 @@ import FormError from "../../../components/FormError";
 import {
   transactionContexts,
   type TransactionContexts,
-} from "../transactionTypes";
+} from "../types/transactionTypes";
 
 const TransactionContext = ({
   context,

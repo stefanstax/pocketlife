@@ -7,6 +7,7 @@ const Login = () => {
     <section className="w-full flex justify-center items-center flex-col gap-4">
       <div className="min-w-full lg:min-w-[600px] flex flex-col items-center justify-center gap-4">
         <LoginForm />
+        <p className="text-sm">Forgot passcode: /recovery/YOUR-SECRET-URL</p>
         <p>OR</p>
         <Link
           className={`min-w-full ${SECONDARY} ${SHARED}`}

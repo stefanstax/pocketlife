@@ -1,7 +1,7 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { formDiv, input, labelClasses } from "../../../app/globalClasses";
-import { currenciesSchema } from "./currenciesSchema";
-import type { CurrencyState } from "./currencyTypes";
+import { currenciesSchema } from "./schemas/currenciesSchema";
+import type { CurrencyState } from "./types/currencyTypes";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../../app/store";
 import { useAddCurrencyMutation } from "./api/currenciesApi";

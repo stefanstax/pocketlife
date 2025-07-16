@@ -19,7 +19,7 @@ const Home = () => {
     <section className="w-full my-10 flex flex-col gap-4 justify-center items-center">
       <div className="flex flex-col gap-10 items-center">
         <h1 className="text-4xl font-black mb-10">
-          {user?.name}, what shall we do today?
+          {user?.name ?? "Guest"}, what shall we do today?
         </h1>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
           <Link

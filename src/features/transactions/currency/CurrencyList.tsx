@@ -3,7 +3,7 @@ import {
   useGetCurrenciesQuery,
   useRemoveCurrencyByIdMutation,
 } from "./api/currenciesApi";
-import type { CurrencyState } from "./currencyTypes";
+import type { CurrencyState } from "./types/currencyTypes";
 import { PRIMARY, SHARED } from "../../../app/globalClasses";
 import BlurredSpinner from "../../../components/BlurredSpinner";
 import { toast } from "react-toastify";

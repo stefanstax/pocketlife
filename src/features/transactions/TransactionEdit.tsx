@@ -1,12 +1,12 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { transactionSchema } from "./transactionSchemas";
+import { transactionSchema } from "./schemas/transactionSchemas";
 import { useNavigate, useParams } from "react-router";
 import {
   type TransactionContexts,
   type TransactionTypes,
   type Receipt,
   type Transaction,
-} from "./transactionTypes";
+} from "./types/transactionTypes";
 import SubmitButton from "../../components/SubmitButton";
 import VariantLink from "../../components/VariantLink";
 import { useSelector } from "react-redux";
