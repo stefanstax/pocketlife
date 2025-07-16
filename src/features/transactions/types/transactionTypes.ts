@@ -1,5 +1,5 @@
-import type { CurrencyState } from "./currency/currencyTypes";
-import type { PaymentMethod } from "./paymentMethods/types/paymentMethodsTypes";
+import type { CurrencyState } from "../currency/types/currencyTypes";
+import type { PaymentMethod } from "../paymentMethods/types/paymentMethodsTypes";
 
 export interface Transaction {
   id: string;

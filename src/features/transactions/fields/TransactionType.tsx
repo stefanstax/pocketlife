@@ -1,6 +1,9 @@
 import { formDiv, input, labelClasses } from "../../../app/globalClasses";
 import FormError from "../../../components/FormError";
-import { transactionTypes, type TransactionTypes } from "../transactionTypes";
+import {
+  transactionTypes,
+  type TransactionTypes,
+} from "../types/transactionTypes";
 
 const TransactionType = ({
   type,

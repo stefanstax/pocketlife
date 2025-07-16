@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import type { CurrencyState } from "../currencyTypes";
+import type { CurrencyState } from "../types/currencyTypes";
 import type { RootState } from "../../../../app/store";
 
 export const currenciesApi = createApi({

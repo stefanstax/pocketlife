@@ -1,6 +1,6 @@
 import { formDiv, input, labelClasses } from "../../../app/globalClasses";
 import FormError from "../../../components/FormError";
-import type { CurrencyState } from "../currency/currencyTypes";
+import type { CurrencyState } from "../currency/types/currencyTypes";
 import type { Budget } from "../paymentMethods/types/paymentMethodsTypes";
 
 const TransactionCurrency = ({

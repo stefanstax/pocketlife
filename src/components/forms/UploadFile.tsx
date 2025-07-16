@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import type { Receipt } from "../../features/transactions/transactionTypes";
+import type { Receipt } from "../../features/transactions/types/transactionTypes";
 import { uploadFileToBunny } from "../../features/transactions/api/uploadtoBunny";
 import { formDiv, input, labelClasses } from "../../app/globalClasses";
 import { toast } from "react-toastify";

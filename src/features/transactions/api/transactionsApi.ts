@@ -4,7 +4,7 @@ import type {
   PaginatatedTransactions,
   Transaction,
   TransactionClone,
-} from "../transactionTypes";
+} from "../types/transactionTypes";
 import type { RootState } from "../../../app/store";
 
 export const transactionsApi = createApi({
