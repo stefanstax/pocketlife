@@ -20,6 +20,9 @@ import PaymentMethodsList from "./features/transactions/paymentMethods/PaymentMe
 import PaymentMethodEdit from "./features/transactions/paymentMethods/PaymentMethodEdit";
 import Recovery from "./features/recovery/Recovery";
 import UserProfile from "./features/users/UserProfile";
+import CategoryList from "./features/transactions/category/CategoryList";
+import CategoryAdd from "./features/transactions/category/CategoryAdd";
+import CategoryEdit from "./features/transactions/category/CategoryEdit";
 
 const App = () => {
   return (
@@ -42,6 +45,11 @@ const App = () => {
               <Route index element={<TransactionList />} />
               <Route path="add" element={<AddTransaction />} />
               <Route path=":id" element={<EditTransaction />} />
+            </Route>
+            <Route path="transaction-categories">
+              <Route index element={<CategoryList />} />
+              <Route path="add" element={<CategoryAdd />} />
+              <Route path=":id" element={<CategoryEdit />} />
             </Route>
             <Route path="payment-methods">
               <Route index element={<PaymentMethodsList />} />

@@ -53,7 +53,7 @@ const TransactionList = () => {
           ) : null}
         </div>
       ) : (
-        <NoDataFallback dataType="transactions" />
+        <NoDataFallback dataType="transactions" goTo="/transactions/add" />
       )}
     </div>
   );

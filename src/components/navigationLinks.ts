@@ -40,6 +40,20 @@ export const links = [
   //   parent: "currencies",
   // },
   {
+    url: "/transaction-categories",
+    label: "Categories",
+    child: false,
+    admin: false,
+    parent: "transactions",
+  },
+  {
+    url: "/transaction-categories/add",
+    label: "Add transaction category",
+    child: true,
+    admin: false,
+    parent: "transaction-categories",
+  },
+  {
     url: "/payment-methods",
     label: "Payment Methods",
     icon: "FaGear",

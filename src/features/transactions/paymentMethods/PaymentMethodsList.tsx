@@ -64,7 +64,10 @@ const PaymentMethodsList = () => {
           })}
         </div>
       ) : (
-        <NoDataFallback dataType="payment methods" />
+        <NoDataFallback
+          dataType="payment methods"
+          goTo="/payment-methods/add"
+        />
       )}
     </>
   );
