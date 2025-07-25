@@ -764,4 +764,93 @@ app.post("/recovery/:slug/reset", async (req, res) => {
   }
 });
 
+// Transaction Categories
+app.get("/transaction-categories", authenticateToken, async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from("transaction-categories")
+      .select("*")
+      .eq("user_id", req?.user?.userId);
+
+    if (error) return res.status(400).json(error);
+    return res.status(200).json(data);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+});
+
+app.get("/transaction-categories/:id", authenticateToken, async (req, res) => {
+  const id = req.params.id;
+  try {
+    const { data, error } = await supabase
+      .from("transaction-categories")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+    if (error) return res.status(400).json({ message: error });
+    return res.status(200).json(data);
+  } catch (error) {
+    return res.status(500).json({ message: error });
+  }
+});
+
+app.post("/transaction-categories", authenticateToken, async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from("transaction-categories")
+      .insert(req.body)
+      .select("*")
+      .single();
+
+    if (error) {
+      return res.status(400).json({ message: error.message });
+    }
+
+    return res.status(201).json(data);
+  } catch (error) {
+    return res.status(500).json({ message: error });
+  }
+});
+
+app.put("/transaction-categories/:id", authenticateToken, async (req, res) => {
+  const updatedData = req.body;
+
+  try {
+    const { data, error } = await supabase
+      .from("transaction-categories")
+      .update(updatedData)
+      .eq("id", updatedData?.id)
+      .select()
+      .single();
+
+    if (error) return res.status(400).json({ message: error });
+    return res.status(200).json(data);
+  } catch (error) {
+    return res.status(500).json({ message: error });
+  }
+});
+
+app.delete(
+  "/transaction-categories/:id",
+  authenticateToken,
+  async (req, res) => {
+    const deleteThisId = req.params.id;
+
+    try {
+      const { error } = await supabase
+        .from("transaction-categories")
+        .delete()
+        .eq("id", deleteThisId);
+
+      if (error) return res.status(400).json({ message: error });
+      return res
+        .status(200)
+        .json({ message: "Transaction category has been deleted" });
+    } catch (error) {
+      return res.status(500).json({ message: error });
+    }
+  }
+);
+
 app.listen(process.env.PORT, () => console.log("Server running!"));
