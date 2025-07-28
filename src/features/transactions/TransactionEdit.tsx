@@ -32,10 +32,7 @@ import {
   substractAmount,
 } from "./paymentMethods/api/paymentMethodsSlice";
 import TransactionCategory from "./fields/TransactionCategory";
-import {
-  useGetCategoriesQuery,
-  useGetCategoryByIdQuery,
-} from "./category/api/transactionCategories";
+import { useGetCategoriesQuery } from "./category/api/transactionCategories";
 
 const EditTransaction = () => {
   const [title, setTitle] = useState<string>("");
