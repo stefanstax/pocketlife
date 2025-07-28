@@ -5,7 +5,10 @@
 - Create payment methods
 - Choose favorite currencies
 - Create transactions
-- NEW! Create budgets under payment methods
+- Create budgets under payment methods
+- New! Create transaction categories
+- New! Pincode registration
+- New! Secret profile update capabilities
 - Upload receipts from device or take with a device camera
 - All data has been protected by your own device keys upon registration and login which prevents any malicious use from third party
 - Coming soon:

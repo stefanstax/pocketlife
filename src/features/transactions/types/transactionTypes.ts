@@ -15,6 +15,7 @@ export interface Transaction {
   type: TransactionTypes;
   context: TransactionContexts;
   receipt?: Receipt;
+  categoryId: string;
 }
 
 export type TransactionClone = Omit<

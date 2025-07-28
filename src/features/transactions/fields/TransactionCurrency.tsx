@@ -28,7 +28,7 @@ const TransactionCurrency = ({
   return (
     <div className={formDiv}>
       <label className={labelClasses} htmlFor="currency">
-        Select Currency
+        Which wallet was used
       </label>
       <div className={`${input} flex flex-wrap gap-2`}>
         {isCurrencyArray(currencies) &&

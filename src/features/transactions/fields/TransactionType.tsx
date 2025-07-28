@@ -17,7 +17,7 @@ const TransactionType = ({
   return (
     <div className={formDiv}>
       <label className={labelClasses} htmlFor="type">
-        Transaction Type
+        Type
       </label>
       <div className={`${input} flex flex-wrap gap-2`}>
         {transactionTypes.map((option) => {
