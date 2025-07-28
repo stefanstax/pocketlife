@@ -165,7 +165,7 @@ const PaymentMethodAdd = () => {
                     formData?.type === paymentMethod?.type
                       ? "bg-gray-950 text-white border-black"
                       : ""
-                  } min-w-[100px] text-sm font-bold rounded-lg cursor-pointer p-2 border-solid border-1`}
+                  } min-w-[100px] font-[600] rounded-full text-sm cursor-pointer p-2 border-solid border-1`}
                   onClick={() =>
                     setFormData({
                       ...formData,
@@ -173,7 +173,7 @@ const PaymentMethodAdd = () => {
                     })
                   }
                 >
-                  {paymentMethod?.name}
+                  {paymentMethod?.name.toUpperCase()}
                 </button>
                 <input type="hidden" name="type" value={paymentMethod?.type} />
               </div>

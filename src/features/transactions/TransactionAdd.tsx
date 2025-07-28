@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import {  useState, type FormEvent } from "react";
 import { transactionSchema } from "./schemas/transactionSchemas";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../app/store";
@@ -16,21 +16,24 @@ import TransactionType from "./fields/TransactionType";
 import TransactionCurrency from "./fields/TransactionCurrency";
 import TransactionContext from "./fields/TransactionContext";
 import TransactionNote from "./fields/TransactionNote";
+import TransactionCategory from "./fields/TransactionCategory";
+import TransactionMethod from "./fields/TransactionMethod";
 import { useAddTransactionMutation } from "./api/transactionsApi";
 import UploadField from "../../components/forms/UploadFile";
 import { toast } from "react-toastify";
-import TransactionMethod from "./fields/TransactionMethod";
 import { useDispatch } from "react-redux";
 import {
   addAmount,
   substractAmount,
 } from "./paymentMethods/api/paymentMethodsSlice";
 import { useGetPaymentMethodByIdQuery } from "./paymentMethods/api/paymentMethodsApi";
+import { useGetCategoriesQuery } from "./category/api/transactionCategories";
 
 const TransactionAdd = () => {
   const [title, setTitle] = useState<string>("");
   const [amount, setAmount] = useState<number | "">("");
   const [context, setContext] = useState<TransactionContexts | "">("");
+  const [categoryId, setCategoryId] = useState<string>("");
   const [currencyId, setCurrencyId] = useState<string | "">("");
   const [note, setNote] = useState<string>("");
   const [type, setType] = useState<TransactionTypes | "">("");
@@ -50,6 +53,8 @@ const TransactionAdd = () => {
     paymentMethodId ?? ""
   );
 
+  const { data: transactionCategores } = useGetCategoriesQuery();
+
   const findBudget = paymentMethod?.budgets?.find(
     (budgetId) => budgetId?.currencyId === currencyId
   );
@@ -61,6 +66,7 @@ const TransactionAdd = () => {
     const verifiedData = transactionSchema.safeParse({
       title: formData.get("title"),
       amount: formData.get("amount"),
+      categoryId: formData.get("categoryId"),
       currencyId: formData.get("currencyId"),
       created_at: new Date().toISOString(),
       updated_at: null,
@@ -74,6 +80,8 @@ const TransactionAdd = () => {
     });
 
     if (!verifiedData.success) {
+      console.log(verifiedData?.error);
+
       const flattened = verifiedData.error.flatten();
       const fieldErrors = Object.fromEntries(
         Object.entries(flattened.fieldErrors).map(([key, val]) => [
@@ -116,6 +124,7 @@ const TransactionAdd = () => {
         setNote("");
         setType("");
         setContext("");
+        setCategoryId("");
         setCurrencyId("");
         setPaymentMethodId("");
         setReceipt(null);
@@ -138,6 +147,13 @@ const TransactionAdd = () => {
         amount={amount}
         setAmount={setAmount}
         validationError={formErrors?.amount}
+      />
+      {/* Category */}
+      <TransactionCategory
+        data={transactionCategores ?? []}
+        categoryId={categoryId}
+        setCategoryId={setCategoryId}
+        validationError={formErrors?.category}
       />
       {/* Type */}
       <TransactionType

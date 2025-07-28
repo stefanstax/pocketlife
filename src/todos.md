@@ -4,21 +4,22 @@
 
 / New Ideas / Improvements
 
-- [] Hide Transaction Currency and Transaction Methods if none have been added
 - [] Add date and time for transaction as an input
 - [] Redux to make state updates across the app more smooth and consistent
 - [] Add ability to delete transaction / for business with each delete also remove images which were previously uploaded to the cloud \*somewhere
 - [] Recognize if note contains a possible words which would make the transaction business context - and notify user to make sure it's not a business transaction
+- [] If there's a single wallet for a payment method auto select that per selection to minimize user steps
 - [] Open receipts route
-- [] Transaction categories
 - [] Delete old receipt when new one gets uploaded to the same transaction
 - [] Relocate receipt upload errors from the server onto frontend for info
 - [] Email authentication with magic link or codes
-- [] Add profile where user can update data
-- [] Add paymentMethodIDs to user's data
 
 / Done
 
+- [x] Add profile where user can update data
+- [x] Add paymentMethodIDs to user's data
+- [x] Transaction categories
+- [x] Hide Transaction Currency and Transaction Methods if none have been added
 - [x] Add option for automatic user generation upon registration -> Helps with locking popular username for users who do not use the system
 - [x] Fix date entries to be unanymous
 - [x] URL currently are missing / which breaks the API

@@ -59,7 +59,9 @@ const CurrencyList = () => {
           );
         })}
       </div>
-      {!data?.length && <NoDataFallback dataType="Currencies" />}
+      {!data?.length && (
+        <NoDataFallback dataType="Currencies" goTo="/currencies/add" />
+      )}
     </>
   );
 };

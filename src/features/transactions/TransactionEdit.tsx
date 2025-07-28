@@ -31,11 +31,14 @@ import {
   addAmount,
   substractAmount,
 } from "./paymentMethods/api/paymentMethodsSlice";
+import TransactionCategory from "./fields/TransactionCategory";
+import { useGetCategoriesQuery } from "./category/api/transactionCategories";
 
 const EditTransaction = () => {
   const [title, setTitle] = useState<string>("");
   const [amount, setAmount] = useState<number | "">("");
   const [currencyId, setCurrencyId] = useState<string | "">("");
+  const [categoryId, setCategoryId] = useState<string>("");
   const [note, setNote] = useState<string>("");
   const [type, setType] = useState<TransactionTypes | "">("");
   const [context, setContext] = useState<TransactionContexts | "">("");
@@ -58,6 +61,7 @@ const EditTransaction = () => {
   const { data: paymentMethod } = useGetPaymentMethodByIdQuery(
     paymentMethodId ?? ""
   );
+  const { data: transactionCategories } = useGetCategoriesQuery();
 
   const findBudget = paymentMethod?.budgets?.find(
     (budgetId) => budgetId?.currencyId === currencyId
@@ -87,6 +91,9 @@ const EditTransaction = () => {
       if (transactionData?.receipt) {
         setReceipt(transactionData?.receipt);
       }
+      if (transactionCategories) {
+        setCategoryId(transactionData?.categoryId);
+      }
       setType(transactionData?.type);
       setNote(transactionData?.note);
       setContext(transactionData?.context);
@@ -101,16 +108,17 @@ const EditTransaction = () => {
     const result = transactionSchema.safeParse({
       id: id,
       userId: transactionData?.userId,
-      title: formData.get("title"),
-      amount: formData.get("amount"),
-      currencyId: formData.get("currencyId"),
+      title,
+      amount,
+      categoryId,
+      currencyId,
       created_at: transactionData?.created_at,
       updated_at: new Date().toISOString(),
-      note: formData.get("note"),
-      paymentMethodId: formData.get("paymentMethodId"),
+      note,
+      paymentMethodId,
       budgetId: findBudget?.id,
       type: formData.get("type"),
-      context: formData.get("context"),
+      context,
       receipt: receipt,
     });
 
@@ -155,6 +163,7 @@ const EditTransaction = () => {
             success: "Transaction has been updated.",
           }
         );
+
         navigate("/transactions/");
       } catch (error: any) {
         toast.error(error?.data?.message ?? "Uncaught error.");
@@ -189,6 +198,12 @@ const EditTransaction = () => {
         amount={amount}
         setAmount={setAmount}
         validationError={formErrors?.amount}
+      />
+      <TransactionCategory
+        data={transactionCategories ?? []}
+        categoryId={categoryId}
+        setCategoryId={setCategoryId}
+        validationError={formErrors?.categoryId}
       />
       <TransactionType
         type={type}

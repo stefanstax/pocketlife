@@ -17,7 +17,7 @@ const TransactionMethod = ({
   return (
     <div className={formDiv}>
       <label className={labelClasses} htmlFor="method">
-        Transaction Method
+        Method
       </label>
       <div className={`${input} flex flex-wrap gap-2`}>
         {data?.map((option) => {

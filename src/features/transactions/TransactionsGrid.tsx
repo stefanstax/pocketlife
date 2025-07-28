@@ -19,6 +19,8 @@ import {
 } from "./api/transactionsApi";
 import { toast } from "react-toastify";
 import type { PaymentMethod } from "./paymentMethods/types/paymentMethodsTypes";
+import { useGetCategoriesQuery } from "./category/api/transactionCategories";
+import { IconShowcase } from "../../components/IconPicker";
 
 type Props = {
   data: EnrichedTransaction[];
@@ -29,6 +31,8 @@ const TransactionGrid = ({ data, paymentMethods }: Props) => {
   const [deleteTransaction] = useDeleteTransactionMutation();
 
   const [addTransaction] = useAddTransactionMutation();
+
+  const { data: transactionCategories } = useGetCategoriesQuery();
 
   const handleDelete = async (id: string) => {
     try {
@@ -90,6 +94,7 @@ const TransactionGrid = ({ data, paymentMethods }: Props) => {
             type,
             currency,
             receipt,
+            categoryId,
             paymentMethod,
             created_at,
             context,
@@ -97,6 +102,9 @@ const TransactionGrid = ({ data, paymentMethods }: Props) => {
 
           const createdDate = new Date(created_at).toLocaleDateString();
           const createdTime = new Date(created_at).toLocaleTimeString();
+          const findIcon = transactionCategories?.find(
+            (category) => category?.id === categoryId
+          );
           return (
             <div
               key={transaction?.id}
@@ -108,7 +116,20 @@ const TransactionGrid = ({ data, paymentMethods }: Props) => {
                   {createdDate} - {createdTime}
                 </span>
               </div>
-              <p className="font-bold">{title}</p>
+              <p className="font-bold flex gap-2 items-center flex-wrap">
+                {title}
+                {findIcon && (
+                  <span
+                    className="flex gap-2 items-center text-xs border-1
+                  rounded-full 
+                  px-2
+                  py-1"
+                  >
+                    <IconShowcase pickedIcon={findIcon?.icon ?? ""} />
+                    <span>{findIcon?.name}</span>
+                  </span>
+                )}
+              </p>
               <p
                 className={`inline-block ${
                   type === "EXPENSE" ? "text-red-600" : "text-green-600"
