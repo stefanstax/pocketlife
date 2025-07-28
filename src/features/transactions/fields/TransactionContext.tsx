@@ -17,7 +17,7 @@ const TransactionContext = ({
   return (
     <div className={formDiv}>
       <label className={labelClasses} htmlFor="variant">
-        Transaction Context
+        Context
       </label>
       <div className={`${input} flex flex-wrap gap-2`}>
         {transactionContexts.map((option) => {

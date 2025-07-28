@@ -14,7 +14,7 @@ const TransactionList = () => {
   const { user } = useSelector((state: RootState) => state.auth);
   const { data: paymentMethods } = useGetPaymentMethodsQuery();
   const [page, setPage] = useState(1);
-  const limit = 10;
+  const limit = 30;
 
   const {
     data,
