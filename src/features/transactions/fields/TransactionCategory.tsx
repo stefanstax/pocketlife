@@ -1,6 +1,7 @@
 import { formDiv, input, labelClasses } from "../../../app/globalClasses";
-import { IconShowcase } from "../../../components/IconPicker";
+
 import FormError from "../../../components/FormError";
+import { IconShowcase } from "../../../components/IconPicker";
 import type { CategoryType } from "../category/types/categoryType";
 
 const TransactionCategory = ({
@@ -25,6 +26,7 @@ const TransactionCategory = ({
 
           return (
             <button
+              key={id}
               type="button"
               className={`${
                 categoryId === id ? "bg-black text-white" : ""

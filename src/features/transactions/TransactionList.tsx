@@ -1,27 +1,24 @@
 import BlurredSpinner from "../../components/BlurredSpinner";
+import Pagination from "../../components/Pagination";
+import NoDataFallback from "../../components/forms/NoDataFallback";
+import TransactionGrid from "./TransactionsGrid";
 import { useGetTransactionsQuery } from "./api/transactionsApi";
 import { useSelector } from "react-redux";
+import { useState } from "react";
+import { useGetCategoriesQuery } from "./category/api/transactionCategories";
 import type { RootState } from "../../app/store";
-import Pagination from "../../components/Pagination";
-import { useEffect, useState } from "react";
-import NoDataFallback from "../../components/forms/NoDataFallback";
-import type { EnrichedTransaction } from "./types/transactionTypes";
-import TransactionGrid from "./TransactionsGrid";
-import { useGetPaymentMethodsQuery } from "./paymentMethods/api/paymentMethodsApi";
-import type { PaymentMethod } from "./paymentMethods/types/paymentMethodsTypes";
 
 const TransactionList = () => {
   const { user } = useSelector((state: RootState) => state.auth);
-  const { data: paymentMethods } = useGetPaymentMethodsQuery();
+
+  const {
+    data: transactionCategories,
+    isLoading: transactionCategoriesLoading,
+  } = useGetCategoriesQuery();
   const [page, setPage] = useState(1);
   const limit = 30;
 
-  const {
-    data,
-    refetch,
-    isSuccess,
-    isLoading: transactionsLoading,
-  } = useGetTransactionsQuery({
+  const { data, isLoading: transactionsLoading } = useGetTransactionsQuery({
     userId: user?.id ?? "",
     page,
     limit,
@@ -29,19 +26,17 @@ const TransactionList = () => {
     order: "desc",
   });
 
-  useEffect(() => {
-    if (isSuccess) refetch();
-  }, [isSuccess]);
-
-  if (transactionsLoading) return <BlurredSpinner />;
+  if (transactionsLoading || transactionCategoriesLoading)
+    return <BlurredSpinner />;
 
   return (
     <div className="w-full">
       {data && data?.total >= 1 ? (
         <div className="flex flex-col justify-start items-start gap-2">
           <TransactionGrid
-            data={data?.data as EnrichedTransaction[]}
-            paymentMethods={paymentMethods as PaymentMethod[]}
+            data={data?.data}
+            paymentMethods={user?.paymentMethods}
+            categories={transactionCategories}
           />
           {data!.total >= 11 ? (
             <Pagination

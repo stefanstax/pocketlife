@@ -1,10 +1,9 @@
-import {  useState, type FormEvent } from "react";
-import { transactionSchema } from "./schemas/transactionSchemas";
+import { lazy, Suspense, useState, type FormEvent } from "react";
+import { newTransactionSchema } from "./schemas/transactionSchemas";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../app/store";
 import {
   type Receipt,
-  type Transaction,
   type TransactionContexts,
   type TransactionTypes,
 } from "./types/transactionTypes";
@@ -13,21 +12,21 @@ import SubmitButton from "../../components/SubmitButton";
 import TransactionTitle from "./fields/TransactionTitle";
 import TransactionAmount from "./fields/TransactionAmount";
 import TransactionType from "./fields/TransactionType";
-import TransactionCurrency from "./fields/TransactionCurrency";
 import TransactionContext from "./fields/TransactionContext";
 import TransactionNote from "./fields/TransactionNote";
-import TransactionCategory from "./fields/TransactionCategory";
 import TransactionMethod from "./fields/TransactionMethod";
+import DataSpinner from "../../components/DataSpinner";
+
+const TransactionCurrency = lazy(() => import("./fields/TransactionCurrency"));
+const TransactionCategory = lazy(() => import("./fields/TransactionCategory"));
 import { useAddTransactionMutation } from "./api/transactionsApi";
 import UploadField from "../../components/forms/UploadFile";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
-import {
-  addAmount,
-  substractAmount,
-} from "./paymentMethods/api/paymentMethodsSlice";
+
 import { useGetPaymentMethodByIdQuery } from "./paymentMethods/api/paymentMethodsApi";
 import { useGetCategoriesQuery } from "./category/api/transactionCategories";
+import { updateUserBudget } from "../../app/authSlice";
 
 const TransactionAdd = () => {
   const [title, setTitle] = useState<string>("");
@@ -49,11 +48,11 @@ const TransactionAdd = () => {
   const [addTransaction, { isLoading: creatingTransaction }] =
     useAddTransactionMutation();
 
-  const { data: paymentMethod } = useGetPaymentMethodByIdQuery(
-    paymentMethodId ?? ""
-  );
+  const { data: paymentMethod, isLoading: paymentMethodLoading } =
+    useGetPaymentMethodByIdQuery(paymentMethodId ?? "");
 
-  const { data: transactionCategores } = useGetCategoriesQuery();
+  const { data: transactionCategores, isLoading: transactionCategoresLoading } =
+    useGetCategoriesQuery();
 
   const findBudget = paymentMethod?.budgets?.find(
     (budgetId) => budgetId?.currencyId === currencyId
@@ -61,27 +60,23 @@ const TransactionAdd = () => {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const formData = new FormData(event.currentTarget);
 
-    const verifiedData = transactionSchema.safeParse({
-      title: formData.get("title"),
-      amount: formData.get("amount"),
-      categoryId: formData.get("categoryId"),
-      currencyId: formData.get("currencyId"),
+    const verifiedData = newTransactionSchema.safeParse({
+      title,
+      amount,
+      categoryId,
+      currencyId,
       created_at: new Date().toISOString(),
-      updated_at: null,
-      note: formData.get("note"),
-      type: formData.get("type"),
-      paymentMethodId: formData.get("paymentMethodId"),
+      note,
+      type,
+      paymentMethodId,
       budgetId: findBudget?.id,
-      context: formData.get("context"),
+      context,
       receipt: receipt,
       userId: user?.id,
     });
 
     if (!verifiedData.success) {
-      console.log(verifiedData?.error);
-
       const flattened = verifiedData.error.flatten();
       const fieldErrors = Object.fromEntries(
         Object.entries(flattened.fieldErrors).map(([key, val]) => [
@@ -95,29 +90,27 @@ const TransactionAdd = () => {
     }
 
     if (verifiedData.success) {
+      const toastId = toast.info("Transaction is being created...");
       try {
-        if (type === "EXPENSE") {
-          dispatch(
-            substractAmount({
-              budgetId: findBudget?.id as string,
-              currencyId,
-              amount: +amount,
-            })
-          );
-        } else {
-          dispatch(
-            addAmount({
-              budgetId: findBudget?.id as string,
-              currencyId,
-              amount: +amount,
-            })
-          );
-        }
+        dispatch(
+          updateUserBudget({
+            budgetId: findBudget?.id,
+            currencyId: findBudget?.currencyId,
+            amount: +amount,
+            type: type === "INCOME" ? "ADD" : "SUBTRACT",
+          })
+        );
 
-        await addTransaction(verifiedData.data as Transaction).unwrap();
+        await addTransaction(verifiedData.data).unwrap();
 
-        toast.success("Transaction has been created.");
+        toast.update(toastId, {
+          render: "Transaction has been created.",
+          type: "success",
+          autoClose: 5000,
+          isLoading: false,
+        });
 
+        //* Clear state as user is being kept on the same page
         setTitle("");
         setAmount("");
         setCurrencyId("");
@@ -125,11 +118,15 @@ const TransactionAdd = () => {
         setType("");
         setContext("");
         setCategoryId("");
-        setCurrencyId("");
         setPaymentMethodId("");
         setReceipt(null);
       } catch (error: any) {
-        toast.error(error?.data?.message ?? "Uncaught error.");
+        toast.update(toastId, {
+          render: error?.data?.message,
+          type: "error",
+          autoClose: 5000,
+          isLoading: false,
+        });
       }
     }
   };
@@ -149,12 +146,18 @@ const TransactionAdd = () => {
         validationError={formErrors?.amount}
       />
       {/* Category */}
-      <TransactionCategory
-        data={transactionCategores ?? []}
-        categoryId={categoryId}
-        setCategoryId={setCategoryId}
-        validationError={formErrors?.category}
-      />
+      {transactionCategoresLoading ? (
+        <DataSpinner />
+      ) : (
+        <Suspense fallback={<DataSpinner />}>
+          <TransactionCategory
+            data={transactionCategores ?? []}
+            categoryId={categoryId}
+            setCategoryId={setCategoryId}
+            validationError={formErrors?.category}
+          />
+        </Suspense>
+      )}
       {/* Type */}
       <TransactionType
         type={type}
@@ -162,7 +165,9 @@ const TransactionAdd = () => {
         validationError={formErrors?.type}
       />
       {/* Method */}
-      {paymentMethod && (
+      {paymentMethodLoading ? (
+        <DataSpinner />
+      ) : (
         <TransactionMethod
           userId={user?.id ?? ""}
           paymentMethodId={paymentMethodId ?? ""}
@@ -171,13 +176,15 @@ const TransactionAdd = () => {
         />
       )}
       {/* Currency */}
-      {paymentMethod?.budgets && (
-        <TransactionCurrency
-          currencies={paymentMethod?.budgets ?? []}
-          currencyId={currencyId}
-          setCurrencyId={setCurrencyId}
-          validationError={formErrors?.currencyId}
-        />
+      {paymentMethod?.budgets?.length > 0 && (
+        <Suspense fallback={<DataSpinner />}>
+          <TransactionCurrency
+            currencies={paymentMethod?.budgets ?? []}
+            currencyId={currencyId}
+            setCurrencyId={setCurrencyId}
+            validationError={formErrors?.currencyId}
+          />
+        </Suspense>
       )}
       {/* Business or Personal Toggle */}
       <TransactionContext
@@ -185,13 +192,11 @@ const TransactionAdd = () => {
         setContext={setContext}
         validationError={formErrors?.context}
       />
-      <>
-        <UploadField
-          receipt={receipt}
-          setReceipt={setReceipt}
-          username={user?.username as string}
-        />
-      </>
+      <UploadField
+        receipt={receipt}
+        setReceipt={setReceipt}
+        username={user?.username as string}
+      />
       {/* Note */}
       <TransactionNote note={note} setNote={setNote} />
 

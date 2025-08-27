@@ -270,6 +270,7 @@ app.get("/transactions", authenticateToken, async (req, res) => {
       .from("transactions")
       .select("*", { count: "exact" })
       .eq("userId", userId)
+      .eq("context", "BUSINESS")
       .order("created_at", { ascending: false })
       .range(startIndex, endIndex);
 
@@ -336,14 +337,14 @@ app.post("/transactions", authenticateToken, async (req, res) => {
 
     if (findBudget) {
       if (type === "EXPENSE") {
-        findBudget.amount -= Number(amount);
+        findBudget.amount -= amount;
         if (findBudget.amount < 0) {
           return res.status(400).json({
             message: "Insufficient budget amount. Feel free to top up.",
           });
         }
       } else if (type === "INCOME") {
-        findBudget.amount += Number(amount);
+        findBudget.amount += amount;
       } else {
         return res.status(400).json({ message: "Invalid transaction type." });
       }
@@ -379,6 +380,33 @@ app.put("/transactions/:id", authenticateToken, async (req, res) => {
   const { budgetId, paymentMethodId, type, amount } = updatedBody;
 
   try {
+    const { data: paymentMethod } = await supabase
+      .from("payment-methods")
+      .select("budgets")
+      .eq("id", paymentMethodId)
+      .single();
+
+    const budgets = paymentMethod?.budgets || [];
+    const findBudget = budgets.find((budget) => budget?.id === budgetId);
+
+    if (findBudget) {
+      if (type === "EXPENSE") {
+        findBudget.amount -= amount;
+        if (findBudget.amount < 0) {
+          return res.status(400).json({
+            message: "Insufficient budget amount. Feel free to top up.",
+          });
+        }
+      } else if (type === "INCOME") {
+        findBudget.amount += amount;
+      } else {
+        return res.status(400).json({ message: "Invalid transaction type." });
+      }
+    } else
+      return res
+        .status(400)
+        .json({ message: "We couldn't locate payment method's budget." });
+
     const { data: currentTransaction, error: txError } = await supabase
       .from("transactions")
       .select("*")
@@ -456,14 +484,14 @@ app.put("/transactions/:id", authenticateToken, async (req, res) => {
       }
 
       if (type === "EXPENSE") {
-        targetBudget.amount -= Number(amount);
+        targetBudget.amount -= amount;
         if (targetBudget.amount < 0) {
           return res
             .status(400)
             .json({ message: "Insufficient budget. Top up required." });
         }
       } else if (type === "INCOME") {
-        targetBudget.amount += Number(amount);
+        targetBudget.amount += amount;
       } else {
         return res.status(400).json({ message: "Invalid transaction type." });
       }

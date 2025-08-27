@@ -1,23 +1,23 @@
 import { useState, type FormEvent } from "react";
 import { formDiv, input, labelClasses } from "../../../app/globalClasses";
 import { useDispatch } from "react-redux";
-import { loginSuccess } from "../../../app/authSlice";
+import { loginSuccess, updateUser } from "../../../app/authSlice";
 import Button from "../../../components/Button";
-import type { LoginState } from "./loginTypes";
 import { loginSchemas } from "./loginSchemas";
 import { useLoginUserMutation } from "../api/authApi";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router";
 import FormError from "../../../components/FormError";
+import { useLazyGetPaymentMethodsQuery } from "../../transactions/paymentMethods/api/paymentMethodsApi";
 
 const LoginForm = () => {
-  const [formData, setFormData] = useState<LoginState>({
-    email: "",
-    passcode: "",
-  });
+  const [email, setEmail] = useState<string | "">("");
+  const [passcode, setPasscode] = useState<string | "">("");
   const [formErrors, setFormErrors] = useState<Partial<Record<string, string>>>(
     {}
   );
+
+  const [getPaymentMethods] = useLazyGetPaymentMethodsQuery();
 
   const [loginUser] = useLoginUserMutation();
   const dispatch = useDispatch();
@@ -25,11 +25,10 @@ const LoginForm = () => {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const formData = new FormData(event?.currentTarget);
 
     const verifyData = loginSchemas.safeParse({
-      email: formData.get("email"),
-      passcode: formData.get("passcode"),
+      email,
+      passcode,
     });
 
     if (!verifyData.success) {
@@ -45,25 +44,43 @@ const LoginForm = () => {
     }
 
     if (verifyData.success) {
+      const toastId = toast.info("We're checking your creds...");
       try {
-        const loginPromise = loginUser(verifyData.data).unwrap();
-        const { token, user } = await toast.promise(loginPromise, {
-          pending: "Checking your credentials.",
-          success: "You have been logged in.",
+        const { token, user } = await loginUser(verifyData.data).unwrap();
+
+        toast.update(toastId, {
+          render: `${user?.name}, welcome!`,
+          type: "success",
+          autoClose: 5000,
+          isLoading: false,
         });
+
         dispatch(loginSuccess({ token, user }));
+        const paymentMethods = await getPaymentMethods().unwrap();
+        console.log(paymentMethods);
+
+        const enrichedUser = { ...user, paymentMethods: paymentMethods };
+        // Send another update to fill user's data
+        dispatch(
+          updateUser({
+            ...user,
+            paymentMethods,
+          })
+        );
 
         setFormErrors({});
-        if (user?.currencies) {
-          navigate("/select-currencies");
-          // Not ideal when cache is wiped
-        } else if (user?.paymentMethods) {
+        if (enrichedUser?.paymentMethods?.length !== 0) {
           navigate("/payment-methods");
         } else {
           navigate("/transactions");
         }
       } catch (error: any) {
-        toast.error(error?.data?.message ?? "Uncaught error. Check console.");
+        toast.update(toastId, {
+          render: error?.data?.message ?? "Uncaught error.",
+          type: "error",
+          autoClose: 5000,
+          isLoading: false,
+        });
       }
     }
   };
@@ -78,8 +95,8 @@ const LoginForm = () => {
           className={input}
           type="email"
           name="email"
-          value={formData.email}
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           placeholder="Your email"
         />
         <FormError fieldError={formErrors?.email} />
@@ -90,10 +107,8 @@ const LoginForm = () => {
           className={input}
           type="text"
           name="passcode"
-          value={formData.passcode}
-          onChange={(e) =>
-            setFormData({ ...formData, passcode: e.target.value })
-          }
+          value={passcode}
+          onChange={(e) => setPasscode(e.target.value)}
           placeholder="Your passcode"
         />
         <FormError fieldError={formErrors?.passcode} />

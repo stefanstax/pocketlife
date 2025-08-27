@@ -11,6 +11,7 @@
     "start:server": "node server.js"
   },
   "dependencies": {
+    "@react-icons/all-files": "^4.1.0",
     "@reduxjs/toolkit": "^2.8.2",
     "@supabase/supabase-js": "^2.50.2",
     "axios": "^1.10.0",

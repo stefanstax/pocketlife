@@ -1,8 +1,8 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type { RootState } from "../../../../app/store";
 import type {
+  AddPaymentMethod,
   PaymentMethod,
-  PaymentMethodFormData,
 } from "../types/paymentMethodsTypes";
 
 export const paymentMethodsApi = createApi({
@@ -27,7 +27,7 @@ export const paymentMethodsApi = createApi({
       query: (id) => `/payment-methods/${id}`,
       providesTags: ["PaymentMethods"],
     }),
-    addPaymentMethod: builder.mutation<PaymentMethod, PaymentMethodFormData>({
+    addPaymentMethod: builder.mutation<PaymentMethod, AddPaymentMethod>({
       query: (paymentMethod) => ({
         url: "/payment-methods",
         method: "POST",
@@ -35,10 +35,7 @@ export const paymentMethodsApi = createApi({
       }),
       invalidatesTags: ["PaymentMethods"],
     }),
-    editPaymentMethod: builder.mutation<
-      PaymentMethod,
-      Partial<PaymentMethod> & Pick<PaymentMethod, "id">
-    >({
+    editPaymentMethod: builder.mutation<PaymentMethod, PaymentMethod>({
       query: ({ id, ...patch }) => ({
         url: `/payment-methods/${id}`,
         method: "PUT",
@@ -57,6 +54,7 @@ export const paymentMethodsApi = createApi({
 });
 
 export const {
+  useLazyGetPaymentMethodsQuery,
   useGetPaymentMethodsQuery,
   useGetPaymentMethodByIdQuery,
   useAddPaymentMethodMutation,

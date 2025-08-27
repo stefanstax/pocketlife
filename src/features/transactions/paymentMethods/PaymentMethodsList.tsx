@@ -1,26 +1,24 @@
-import {
-  useDeletePaymentMethodMutation,
-  useGetPaymentMethodsQuery,
-} from "./api/paymentMethodsApi";
+import { useDeletePaymentMethodMutation } from "./api/paymentMethodsApi";
 import { Link } from "react-router";
 import Button from "../../../components/Button";
 import { PRIMARY, SHARED } from "../../../app/globalClasses";
-import BlurredSpinner from "../../../components/BlurredSpinner";
 import NoDataFallback from "../../../components/forms/NoDataFallback";
 import { FiEdit2 } from "react-icons/fi";
 import { AiOutlineDelete } from "react-icons/ai";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../../app/store";
 
 const PaymentMethodsList = () => {
   const [deletePaymentMethod] = useDeletePaymentMethodMutation();
-  const { data, isLoading } = useGetPaymentMethodsQuery();
+  const { user } = useSelector((state: RootState) => state.auth);
 
-  if (isLoading) return <BlurredSpinner />;
+  const paymentMethods = user?.paymentMethods;
 
   return (
     <>
-      {data && data?.length > 0 ? (
+      {paymentMethods && paymentMethods?.length > 0 ? (
         <div className="w-full grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {data?.map((paymentMethod) => {
+          {paymentMethods?.map((paymentMethod) => {
             const { id, name, type, budgets } = paymentMethod;
             return (
               <div
