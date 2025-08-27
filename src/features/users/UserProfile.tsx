@@ -6,14 +6,19 @@ import { useEffect, useState, type FormEvent } from "react";
 import SubmitButton from "../../components/SubmitButton";
 import { toast } from "react-toastify";
 import { useUpdateUserByIdMutation } from "./api/usersApi";
-import { userSchemas } from "./schemas/userSchemas";
+import { userSchema } from "./schemas/userSchemas";
 import { useDispatch } from "react-redux";
-import { updateUser } from "../../app/authSlice";
+import { updateUser, type User } from "../../app/authSlice";
 
 const UserProfile = () => {
   const { user } = useSelector((state: RootState) => state.auth);
-  const [formData, setFormData] = useState({
-    id: user?.id,
+  const [formData, setFormData] = useState<
+    Pick<
+      User,
+      "id" | "username" | "name" | "email" | "recoveryUrl" | "securityName"
+    >
+  >({
+    id: "",
     name: "",
     username: "",
     email: "",
@@ -29,15 +34,18 @@ const UserProfile = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    setFormData((prev) => ({
-      ...prev,
-      id: user?.id,
-      name: user?.name ?? "",
-      username: user?.username ?? "",
-      email: user?.email ?? "",
-      recoveryUrl: user?.recoveryUrl ?? "",
-      securityName: user?.securityName ?? "",
-    }));
+    const newData: Pick<
+      User,
+      "id" | "username" | "name" | "email" | "recoveryUrl" | "securityName"
+    > = {
+      id: user.id,
+      name: user.name,
+      username: user.username,
+      email: user.email,
+      recoveryUrl: user.recoveryUrl,
+      securityName: user.securityName,
+    };
+    setFormData(newData);
   }, [user]);
 
   const [updateUserById] = useUpdateUserByIdMutation();
@@ -45,7 +53,7 @@ const UserProfile = () => {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const verifiedData = userSchemas.safeParse(formData);
+    const verifiedData = userSchema.safeParse(formData);
 
     if (!verifiedData.success) {
       toast.error("Invalid input data.");

@@ -1,60 +1,101 @@
+import { lazy, Suspense } from "react";
 import type { EnrichedTransaction } from "./types/transactionTypes";
 import { Link } from "react-router-dom";
 import { PRIMARY, SHARED } from "../../app/globalClasses";
 import Button from "../../components/Button";
-import { FiEdit2 } from "react-icons/fi";
-import { AiOutlineDelete } from "react-icons/ai";
-import {
-  FaCalendar,
-  FaCreditCard,
-  FaNoteSticky,
-  FaReceipt,
-  FaRegClone,
-  FaUserTie,
-} from "react-icons/fa6";
 
+// Icons
+import { FaCalendar } from "@react-icons/all-files/fa/FaCalendar";
+import { FaCreditCard } from "@react-icons/all-files/fa/FaCreditCard";
+import { FaStickyNote } from "@react-icons/all-files/fa/FaStickyNote";
+import { FaReceipt } from "@react-icons/all-files/fa/FaReceipt";
+import { FaRegClone } from "@react-icons/all-files/fa/FaRegClone";
+import { FaUserTie } from "@react-icons/all-files/fa/FaUserTie";
+import { FaEdit } from "@react-icons/all-files/fa/FaEdit";
+import { FaTrash } from "@react-icons/all-files/fa/FaTrash";
+
+// Redux
 import {
   useAddTransactionMutation,
   useDeleteTransactionMutation,
 } from "./api/transactionsApi";
-import { toast } from "react-toastify";
-import type { PaymentMethod } from "./paymentMethods/types/paymentMethodsTypes";
-import { useGetCategoriesQuery } from "./category/api/transactionCategories";
-import { IconShowcase } from "../../components/IconPicker";
 
+import { toast } from "react-toastify";
+
+import type { PaymentMethod } from "./paymentMethods/types/paymentMethodsTypes";
+import DataSpinner from "../../components/DataSpinner";
+import type { CategoryType } from "./category/types/categoryType";
+const IconShowcase = lazy(() =>
+  import("../../components/IconPicker").then((module) => ({
+    default: module.IconShowcase,
+  }))
+);
 type Props = {
   data: EnrichedTransaction[];
   paymentMethods: PaymentMethod[];
+  categories: CategoryType[];
 };
 
-const TransactionGrid = ({ data, paymentMethods }: Props) => {
+const TransactionGrid = ({ data, paymentMethods, categories }: Props) => {
   const [deleteTransaction] = useDeleteTransactionMutation();
 
   const [addTransaction] = useAddTransactionMutation();
 
-  const { data: transactionCategories } = useGetCategoriesQuery();
-
   const handleDelete = async (id: string) => {
+    const toastId = toast.info("Transaction is being deleted...");
     try {
       await deleteTransaction(id);
-      toast.success("Transaction was deleted.");
+      toast.update(toastId, {
+        render: "Transaction has been deleted",
+        type: "success",
+        autoClose: 5000,
+        isLoading: false,
+      });
     } catch (error: any) {
-      toast.error(error?.data?.message ?? "Uncaught error. Check console.");
+      toast.update(toastId, {
+        render: error?.data?.message ?? "Uncaught error.",
+        type: "error",
+        autoClose: 5000,
+        isLoading: false,
+      });
     }
   };
 
   const handleClone = async (transaction: EnrichedTransaction) => {
-    const { currency, paymentMethod, id, ...rest } = transaction;
-    const clonedTransaction = {
-      ...rest,
-      receipt: undefined,
-    };
+    const {
+      id,
+      receipt,
+      currency,
+      paymentMethod,
+      created_at,
+      updated_at,
+      ...rest
+    } = transaction;
 
-    await toast.promise(addTransaction(clonedTransaction), {
-      pending: "Transaction is being cloned.",
-      success: "Transaction has been cloned.",
-      error: "Transaction could not be cloned.",
-    });
+    const revisedData = {
+      ...rest,
+      id: undefined,
+      receipt: undefined,
+      updated_at: undefined,
+      created_at: new Date().toISOString(),
+    };
+    const toastId = toast.info("Transaction is being cloned...");
+    try {
+      await addTransaction(revisedData).unwrap();
+      toast.update(toastId, {
+        render: "Transaction has been cloned.",
+        type: "success",
+        autoClose: 5000,
+        isLoading: false,
+      });
+    } catch (error: any) {
+      return toast.update(toastId, {
+        render: error?.data?.message ?? "Uncaught error.",
+        type: "error",
+        autoClose: 5000,
+        isLoading: false,
+      });
+    }
   };
 
   return (
@@ -102,7 +143,7 @@ const TransactionGrid = ({ data, paymentMethods }: Props) => {
 
           const createdDate = new Date(created_at).toLocaleDateString();
           const createdTime = new Date(created_at).toLocaleTimeString();
-          const findIcon = transactionCategories?.find(
+          const findIcon = categories?.find(
             (category) => category?.id === categoryId
           );
           return (
@@ -116,20 +157,22 @@ const TransactionGrid = ({ data, paymentMethods }: Props) => {
                   {createdDate} - {createdTime}
                 </span>
               </div>
-              <p className="font-bold flex gap-2 items-center flex-wrap">
-                {title}
-                {findIcon && (
-                  <span
-                    className="flex gap-2 items-center text-xs border-1
+              <div className="flex flex-wrap font-[600] gap-2 items-center">
+                <p>{title}</p>
+                <Suspense fallback={<DataSpinner />}>
+                  {findIcon && (
+                    <span
+                      className="flex gap-2 items-center text-xs border-1
                   rounded-full 
                   px-2
                   py-1"
-                  >
-                    <IconShowcase pickedIcon={findIcon?.icon ?? ""} />
-                    <span>{findIcon?.name}</span>
-                  </span>
-                )}
-              </p>
+                    >
+                      <IconShowcase pickedIcon={findIcon?.icon ?? ""} />
+                      <span>{findIcon?.name}</span>
+                    </span>
+                  )}
+                </Suspense>
+              </div>
               <p
                 className={`inline-block ${
                   type === "EXPENSE" ? "text-red-600" : "text-green-600"
@@ -147,7 +190,7 @@ const TransactionGrid = ({ data, paymentMethods }: Props) => {
                 {paymentMethod?.name}
               </p>
               <p className="text-sm flex items-center gap-2">
-                <FaNoteSticky className="min-w-[16px]" />
+                <FaStickyNote className="min-w-[16px]" />
                 {note?.length ? note : "Note not provided."}
               </p>
               <div className="grid gap-4 grid-cols-4 border-t-1 border-gray-900 pt-4">
@@ -155,7 +198,7 @@ const TransactionGrid = ({ data, paymentMethods }: Props) => {
                   className={`${PRIMARY} ${SHARED}`}
                   to={`/transactions/${transaction?.id}`}
                 >
-                  <FiEdit2 className="min-w-[16px]" />
+                  <FaEdit className="min-w-[16px]" />
                 </Link>
                 <Button
                   type="button"
@@ -171,7 +214,7 @@ const TransactionGrid = ({ data, paymentMethods }: Props) => {
                   variant="PRIMARY"
                   onClick={() => handleDelete(transaction?.id)}
                 >
-                  <AiOutlineDelete className="min-w-[16px]" />
+                  <FaTrash className="min-w-[16px]" />
                 </Button>
                 {receipt?.url ? (
                   <Link

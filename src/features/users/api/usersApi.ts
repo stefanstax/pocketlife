@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type { User } from "../../../app/authSlice";
 import type { RootState } from "../../../app/store";
+import type { UserProfileUpdate } from "../schemas/userSchemas";
 
 export const usersApi = createApi({
   baseQuery: fetchBaseQuery({
@@ -22,21 +23,11 @@ export const usersApi = createApi({
     getUserById: builder.query<User, string>({
       query: (username) => `users/${username}`,
     }),
-    updateUserById: builder.mutation<
-      User,
-      {
-        id: string;
-        username: string | undefined;
-        name: string;
-        email: string;
-        recoveryUrl: string;
-        securityName: string;
-      }
-    >({
+    updateUserById: builder.mutation<User, UserProfileUpdate>({
       query: (user) => ({
         url: `users/${user?.id}`,
         method: "PUT",
-        body: user,
+        body: user
       }),
     }),
   }),

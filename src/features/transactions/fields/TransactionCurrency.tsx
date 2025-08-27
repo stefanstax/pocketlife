@@ -14,7 +14,6 @@ const TransactionCurrency = ({
   setCurrencyId: (value: string) => void;
   validationError?: string;
 }) => {
-  // Check what type of array is incoming prop of currencies
   function isCurrencyArray(
     data: CurrencyState[] | Budget[]
   ): data is CurrencyState[] {
