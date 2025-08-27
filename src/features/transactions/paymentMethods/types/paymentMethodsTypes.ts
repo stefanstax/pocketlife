@@ -1,10 +1,9 @@
-export type PaymentMethodTypes =
-  | "cash"
-  | "card"
-  | "bank"
-  | "online"
-  | "crypto"
-  | "other";
+import { z } from "zod";
+import {
+  budgetSchema,
+  paymentMethodCreationSchema,
+  paymentMethodsSchema,
+} from "../schemas/paymentMethodsSchema";
 
 export const paymentMethodOptions = [
   {
@@ -33,19 +32,6 @@ export const paymentMethodOptions = [
   },
 ];
 
-export interface PaymentMethod extends PaymentMethodFormData {
-  id: string;
-  userId: string;
-}
-
-export interface PaymentMethodFormData {
-  name: string;
-  type: PaymentMethodTypes | null;
-  budgets: Budget[];
-}
-
-export interface Budget {
-  id: string;
-  currencyId: string;
-  amount: number | 0;
-}
+export type PaymentMethod = z.infer<typeof paymentMethodsSchema>;
+export type AddPaymentMethod = z.infer<typeof paymentMethodCreationSchema>;
+export type Budget = z.infer<typeof budgetSchema>;

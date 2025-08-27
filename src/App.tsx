@@ -1,30 +1,63 @@
-import { BrowserRouter, Route, Routes } from "react-router";
-import Authentication from "./pages/Authentication";
-import Login from "./pages/Login";
-import Registration from "./pages/Registration";
-import Home from "./pages/Home";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { Suspense, lazy, type JSX } from "react";
+import { ToastContainer } from "react-toastify";
+
 import Layout from "./components/Layout";
-import TransactionList from "./features/transactions/TransactionList";
-import AddTransaction from "./features/transactions/TransactionAdd";
-import EditTransaction from "./features/transactions/TransactionEdit";
-import CurrenciesAdd from "./features/transactions/currency/CurrencyAdd";
-import CurrencyList from "./features/transactions/currency/CurrencyList";
-import CurrencyEdit from "./features/transactions/currency/CurrencyEdit";
+import BlurredSpinner from "./components/BlurredSpinner";
+
+const Authentication = lazy(() => import("./pages/Authentication"));
+const Login = lazy(() => import("./pages/Login"));
+const Registration = lazy(() => import("./pages/Registration"));
+const Home = lazy(() => import("./pages/Home"));
+const TransactionList = lazy(
+  () => import("./features/transactions/TransactionList")
+);
+const AddTransaction = lazy(
+  () => import("./features/transactions/TransactionAdd")
+);
+const EditTransaction = lazy(
+  () => import("./features/transactions/TransactionEdit")
+);
+const CurrenciesAdd = lazy(
+  () => import("./features/transactions/currency/CurrencyAdd")
+);
+const CurrencyList = lazy(
+  () => import("./features/transactions/currency/CurrencyList")
+);
+const CurrencyEdit = lazy(
+  () => import("./features/transactions/currency/CurrencyEdit")
+);
+const PaymentMethodAdd = lazy(
+  () => import("./features/transactions/paymentMethods/PaymentMethodAdd")
+);
+const PaymentMethodsList = lazy(
+  () => import("./features/transactions/paymentMethods/PaymentMethodsList")
+);
+const PaymentMethodEdit = lazy(
+  () => import("./features/transactions/paymentMethods/PaymentMethodEdit")
+);
+const Recovery = lazy(() => import("./features/recovery/Recovery"));
+const UserProfile = lazy(() => import("./features/users/UserProfile"));
+const CategoryList = lazy(
+  () => import("./features/transactions/category/CategoryList")
+);
+const CategoryAdd = lazy(
+  () => import("./features/transactions/category/CategoryAdd")
+);
+const CategoryEdit = lazy(
+  () => import("./features/transactions/category/CategoryEdit")
+);
+const ComingSoon = lazy(() => import("./pages/ComingSoon"));
+
+// Route guards (keep eager)
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
 import GuestRoute from "./components/GuestRoute";
-import { ToastContainer } from "react-toastify";
-import ComingSoon from "./pages/ComingSoon";
-import PaymentMethodAdd from "./features/transactions/paymentMethods/PaymentMethodAdd";
-import PaymentMethodsList from "./features/transactions/paymentMethods/PaymentMethodsList";
-import PaymentMethodEdit from "./features/transactions/paymentMethods/PaymentMethodEdit";
-import Recovery from "./features/recovery/Recovery";
-import UserProfile from "./features/users/UserProfile";
-import CategoryList from "./features/transactions/category/CategoryList";
-import CategoryAdd from "./features/transactions/category/CategoryAdd";
-import CategoryEdit from "./features/transactions/category/CategoryEdit";
 
 const App = () => {
+  const withSuspense = (Component: JSX.Element) => (
+    <Suspense fallback={<BlurredSpinner />}>{Component}</Suspense>
+  );
   return (
     <BrowserRouter>
       <Routes>
@@ -33,33 +66,33 @@ const App = () => {
           {/* Admin Routes */}
           <Route element={<AdminRoute />}>
             <Route path="currencies">
-              <Route index element={<CurrencyList />} />
-              <Route path="add" element={<CurrenciesAdd />} />
-              <Route path=":id" element={<CurrencyEdit />} />
+              <Route index element={withSuspense(<CurrencyList />)} />
+              <Route path="add" element={withSuspense(<CurrenciesAdd />)} />
+              <Route path=":id" element={withSuspense(<CurrencyEdit />)} />
             </Route>
           </Route>
           <Route element={<ProtectedRoute />}>
-            <Route path="users/:id" element={<UserProfile />} />
+            <Route path="users/:id" element={withSuspense(<UserProfile />)} />
             {/* Protected Routes */}
             <Route path="transactions">
-              <Route index element={<TransactionList />} />
-              <Route path="add" element={<AddTransaction />} />
-              <Route path=":id" element={<EditTransaction />} />
+              <Route index element={withSuspense(<TransactionList />)} />
+              <Route path="add" element={withSuspense(<AddTransaction />)} />
+              <Route path=":id" element={withSuspense(<EditTransaction />)} />
             </Route>
             <Route path="transaction-categories">
-              <Route index element={<CategoryList />} />
-              <Route path="add" element={<CategoryAdd />} />
-              <Route path=":id" element={<CategoryEdit />} />
+              <Route index element={withSuspense(<CategoryList />)} />
+              <Route path="add" element={withSuspense(<CategoryAdd />)} />
+              <Route path=":id" element={withSuspense(<CategoryEdit />)} />
             </Route>
             <Route path="payment-methods">
-              <Route index element={<PaymentMethodsList />} />
-              <Route path="add" element={<PaymentMethodAdd />} />
-              <Route path=":id" element={<PaymentMethodEdit />} />
+              <Route index element={withSuspense(<PaymentMethodsList />)} />
+              <Route path="add" element={withSuspense(<PaymentMethodAdd />)} />
+              <Route path=":id" element={withSuspense(<PaymentMethodEdit />)} />
             </Route>
           </Route>
           {/* Guest Routes */}
-          <Route path="links" element={<ComingSoon />} />
-          <Route path="storage" element={<ComingSoon />} />
+          <Route path="links" element={withSuspense(<ComingSoon />)} />
+          <Route path="storage" element={withSuspense(<ComingSoon />)} />
           <Route element={<GuestRoute />}>
             <Route path="authentication">
               <Route index element={<Authentication />} />

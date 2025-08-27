@@ -3,13 +3,13 @@ import type { PaymentMethod } from "../features/transactions/paymentMethods/type
 
 export interface User {
   id: string;
+  name: string;
   username: string;
   email: string;
-  name: string;
+  recoveryUrl: string;
+  securityName: string;
   currencies: string[];
   passcode: string;
-  securityName: string;
-  recoveryUrl: string;
   paymentMethods: PaymentMethod[];
 }
 
@@ -46,8 +46,45 @@ const authSlice = createSlice({
         state.user = { ...state.user, ...action.payload };
       }
     },
+    updateUserBudget: (
+      state,
+      action: PayloadAction<{
+        budgetId: string;
+        currencyId: string;
+        amount: number;
+        type: "ADD" | "SUBTRACT" | "SET";
+      }>
+    ) => {
+      if (!state.user?.paymentMethods) return;
+
+      for (const method of state.user.paymentMethods) {
+        const budget = method.budgets.find(
+          (b) =>
+            b.id === action.payload.budgetId &&
+            b.currencyId === action.payload.currencyId
+        );
+
+        if (!budget) continue;
+
+        switch (action.payload.type) {
+          case "ADD":
+            budget.amount += action.payload.amount;
+            break;
+          case "SUBTRACT":
+            budget.amount -= action.payload.amount;
+            break;
+          case "SET":
+            budget.amount = action.payload.amount;
+            break;
+          default:
+            console.warn("Unknown budget update type");
+        }
+        break;
+      }
+    },
   },
 });
 
-export const { loginSuccess, logout, updateUser } = authSlice.actions;
+export const { loginSuccess, logout, updateUser, updateUserBudget } =
+  authSlice.actions;
 export default authSlice.reducer;

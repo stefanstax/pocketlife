@@ -1,10 +1,10 @@
 import { useState, type FormEvent } from "react";
 import {
   paymentMethodOptions,
+  type Budget,
   type PaymentMethod,
-  type PaymentMethodFormData,
 } from "./types/paymentMethodsTypes";
-import { paymentMethodsSchema } from "./schemas/paymentMethodsSchema";
+import { paymentMethodCreationSchema } from "./schemas/paymentMethodsSchema";
 import { useAddPaymentMethodMutation } from "./api/paymentMethodsApi";
 import { toast } from "react-toastify";
 import {
@@ -27,11 +27,9 @@ import { updateUser } from "../../../app/authSlice";
 import { useGetCurrenciesQuery } from "../currency/api/currenciesApi";
 
 const PaymentMethodAdd = () => {
-  const [formData, setFormData] = useState<PaymentMethodFormData>({
-    name: "",
-    type: null,
-    budgets: [{ id: nanoid(), currencyId: "", amount: 0 }],
-  });
+  const [name, setName] = useState<string>("");
+  const [type, setType] = useState<string>("");
+  const [budgets, setBudgets] = useState<Budget[]>([]);
   const [formErrors, setFormErrors] = useState<Partial<Record<string, string>>>(
     {}
   );
@@ -47,7 +45,11 @@ const PaymentMethodAdd = () => {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event?.preventDefault();
 
-    const verifyData = paymentMethodsSchema.safeParse(formData);
+    const verifyData = paymentMethodCreationSchema.safeParse({
+      name,
+      type,
+      budgets,
+    });
 
     if (verifyData?.error) {
       const flattenErrors = verifyData?.error.flatten();
@@ -57,6 +59,8 @@ const PaymentMethodAdd = () => {
           val[0],
         ])
       );
+
+      console.log(verifyData?.error);
 
       setFormErrors(fieldErrors);
     }
@@ -85,54 +89,31 @@ const PaymentMethodAdd = () => {
     field: "currencyId" | "amount",
     value: string | number
   ) => {
-    setFormData((prev) => {
-      const currentIndex = prev.budgets.findIndex((b) => b.id === id);
-      if (currentIndex === -1) return prev; // Budget not found, no update
-
-      const newCurrency = field === "currencyId" ? String(value) : null;
-      const newAmount = field === "amount" ? Number(value) : null;
-
-      if (field === "currencyId") {
-        const duplicateIndex = prev.budgets.findIndex(
-          (budget) => budget.currencyId === newCurrency && budget.id !== id
-        );
-        if (duplicateIndex !== -1) {
-          toast.warning(`Currency ${newCurrency} is already added.`);
-          return prev;
-        }
-      }
-
-      const newBudgets = prev.budgets.map((budget) => {
-        if (budget.id !== id) return budget;
-        return {
-          ...budget,
-          currencyId: newCurrency ?? budget.currencyId,
-          amount: newAmount ?? budget.amount,
-        };
-      });
-
-      return {
-        ...prev,
-        budgets: newBudgets,
-      };
-    });
+    setBudgets((prev) =>
+      prev.map((b) =>
+        b?.id === id
+          ? {
+              ...b,
+              [field]: field === "amount" ? Number(value) : String(value),
+            }
+          : b
+      )
+    );
   };
 
   const addBudget = () => {
-    setFormData({
-      ...formData,
-      budgets: [
-        ...formData.budgets,
-        { id: nanoid(), currencyId: "", amount: 0 },
-      ],
-    });
+    setBudgets((prev) => [
+      ...prev,
+      {
+        id: nanoid(),
+        currencyId: "",
+        amount: 0,
+      },
+    ]);
   };
 
   const removeBudget = (id: string) => {
-    setFormData({
-      ...formData,
-      budgets: formData?.budgets.filter((i) => i?.id !== id),
-    });
+    setBudgets((prev) => prev.filter((b) => b.id !== id));
   };
 
   return (
@@ -146,7 +127,7 @@ const PaymentMethodAdd = () => {
           type="text"
           placeholder="Revolut, Paypal, Cash, Bank, Wise, etc..."
           name="name"
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          onChange={(e) => setName(e.target.value)}
         />
         {formErrors?.name && <FormError fieldError={formErrors?.name} />}
       </div>
@@ -162,16 +143,11 @@ const PaymentMethodAdd = () => {
                   key={paymentMethod?.type}
                   type="button"
                   className={`${
-                    formData?.type === paymentMethod?.type
+                    type === paymentMethod?.type
                       ? "bg-gray-950 text-white border-black"
                       : ""
                   } min-w-[100px] font-[600] rounded-full text-sm cursor-pointer p-2 border-solid border-1`}
-                  onClick={() =>
-                    setFormData({
-                      ...formData,
-                      type: paymentMethod?.type as PaymentMethod["type"],
-                    })
-                  }
+                  onClick={() => setType(paymentMethod?.type)}
                 >
                   {paymentMethod?.name.toUpperCase()}
                 </button>
@@ -183,7 +159,7 @@ const PaymentMethodAdd = () => {
 
         {formErrors?.type && <FormError fieldError={formErrors?.type} />}
       </div>
-      {formData?.budgets?.map((budget) => {
+      {budgets?.map((budget) => {
         return (
           <div
             key={budget?.id}

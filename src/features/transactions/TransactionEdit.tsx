@@ -5,7 +5,6 @@ import {
   type TransactionContexts,
   type TransactionTypes,
   type Receipt,
-  type Transaction,
 } from "./types/transactionTypes";
 import SubmitButton from "../../components/SubmitButton";
 import VariantLink from "../../components/VariantLink";
@@ -25,14 +24,11 @@ import BlurredSpinner from "../../components/BlurredSpinner";
 import UploadField from "../../components/forms/UploadFile";
 import { toast } from "react-toastify";
 import TransactionMethod from "./fields/TransactionMethod";
-import { useGetPaymentMethodByIdQuery } from "./paymentMethods/api/paymentMethodsApi";
 import { useDispatch } from "react-redux";
-import {
-  addAmount,
-  substractAmount,
-} from "./paymentMethods/api/paymentMethodsSlice";
+
 import TransactionCategory from "./fields/TransactionCategory";
 import { useGetCategoriesQuery } from "./category/api/transactionCategories";
+import { updateUserBudget } from "../../app/authSlice";
 
 const EditTransaction = () => {
   const [title, setTitle] = useState<string>("");
@@ -55,15 +51,16 @@ const EditTransaction = () => {
 
   const navigate = useNavigate();
 
-  // User Data
+  // Grab redux user data to locate paymentMethods
   const { user } = useSelector((state: RootState) => state.auth);
 
-  const { data: paymentMethod } = useGetPaymentMethodByIdQuery(
-    paymentMethodId ?? ""
-  );
   const { data: transactionCategories } = useGetCategoriesQuery();
 
-  const findBudget = paymentMethod?.budgets?.find(
+  const findPaymentMethod = user?.paymentMethods?.find(
+    (paymentMethod) => paymentMethod?.id === paymentMethodId
+  );
+
+  const findBudget = findPaymentMethod?.budgets?.find(
     (budgetId) => budgetId?.currencyId === currencyId
   );
 
@@ -72,7 +69,6 @@ const EditTransaction = () => {
     id || ""
   );
 
-  // Update transaction mutation
   const [updateTransaction] = useUpdateTransactionMutation();
 
   const currenciesMatch = user?.currencies?.includes(
@@ -89,7 +85,11 @@ const EditTransaction = () => {
         setCurrencyId("");
       }
       if (transactionData?.receipt) {
-        setReceipt(transactionData?.receipt);
+        setReceipt({
+          id: transactionData.receipt.id,
+          name: transactionData.receipt.name,
+          url: transactionData.receipt.url,
+        });
       }
       if (transactionCategories) {
         setCategoryId(transactionData?.categoryId);
@@ -103,9 +103,8 @@ const EditTransaction = () => {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const formData = new FormData(event.currentTarget);
 
-    const result = transactionSchema.safeParse({
+    const verifyData = transactionSchema.safeParse({
       id: id,
       userId: transactionData?.userId,
       title,
@@ -117,13 +116,13 @@ const EditTransaction = () => {
       note,
       paymentMethodId,
       budgetId: findBudget?.id,
-      type: formData.get("type"),
+      type,
       context,
       receipt: receipt,
     });
 
-    if (!result.success) {
-      const flattened = result.error.flatten();
+    if (!verifyData.success) {
+      const flattened = verifyData.error.flatten();
       const fieldErrors = Object.fromEntries(
         Object.entries(flattened.fieldErrors)?.map(([key, val]) => [
           key,
@@ -135,38 +134,45 @@ const EditTransaction = () => {
       return;
     }
 
-    if (result.success) {
+    if (verifyData.success) {
+      const toastId = toast.info("Transaction is being updated...");
+
       try {
-        if (transactionData?.amount !== amount) {
-          if (type === "EXPENSE") {
-            dispatch(
-              substractAmount({
-                budgetId: String(findBudget?.id),
-                currencyId,
-                amount: Number(amount),
-              })
-            );
-          } else {
-            dispatch(
-              addAmount({
-                budgetId: String(findBudget?.id),
-                currencyId,
-                amount: Number(amount),
-              })
-            );
-          }
+        if (transactionData?.amount !== +amount) {
+          const recalculatedBudgetAmount =
+            transactionData.type === "INCOME"
+              ? findBudget.amount - transactionData.amount + +amount
+              : findBudget.amount + transactionData.amount - +amount;
+
+          dispatch(
+            updateUserBudget({
+              budgetId: findBudget?.id,
+              currencyId: findBudget?.currencyId,
+              amount: +recalculatedBudgetAmount,
+              type: "SET",
+            })
+          );
         }
-        await toast.promise(
-          updateTransaction(result?.data as Transaction).unwrap(),
-          {
-            pending: "Transaction is being updated.",
-            success: "Transaction has been updated.",
-          }
-        );
+
+        await updateTransaction(verifyData?.data).unwrap();
+
+        toast.update(toastId, {
+          render: "Transaction has been updated",
+          type: "success",
+          autoClose: 5000,
+          isLoading: false,
+        });
 
         navigate("/transactions/");
       } catch (error: any) {
-        toast.error(error?.data?.message ?? "Uncaught error.");
+        console.log(error);
+
+        toast.update(toastId, {
+          render: error?.data?.message ?? "Uncaught error.",
+          type: "error",
+          autoClose: 5000,
+          isLoading: false,
+        });
       }
     }
   };
@@ -175,20 +181,6 @@ const EditTransaction = () => {
 
   return (
     <form onSubmit={handleSubmit} className="w-full flex flex-col gap-4">
-      {!currenciesMatch && (
-        <div className="flex items-center gap-2 bg-black p-4 ">
-          <p className="text-red-400">
-            *Your transaction currency ({transactionData?.currencyId}) has been
-            disabled. Enable it?
-          </p>
-          <VariantLink
-            aria="Go to Currency modification page"
-            variant="PRIMARY"
-            link="/select-currencies/"
-            label="Modify available currencies"
-          />
-        </div>
-      )}
       <TransactionTitle
         title={title}
         setTitle={setTitle}
@@ -217,7 +209,7 @@ const EditTransaction = () => {
         validationError={formErrors?.method}
       />
       <TransactionCurrency
-        currencies={paymentMethod?.budgets ?? []}
+        currencies={findPaymentMethod?.budgets ?? []}
         currencyId={currencyId as string}
         setCurrencyId={setCurrencyId}
         validationError={formErrors?.currencyId}

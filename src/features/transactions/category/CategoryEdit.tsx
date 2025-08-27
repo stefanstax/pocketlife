@@ -1,6 +1,6 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { lazy, Suspense, useEffect, useState, type FormEvent } from "react";
 import { formDiv, input, labelClasses } from "../../../app/globalClasses";
-import IconPicker from "../../../components/IconPicker";
+const IconPicker = lazy(() => import("../../../components/IconPicker"));
 import type { EditCategoryType } from "./types/categoryType";
 import SubmitButton from "../../../components/SubmitButton";
 import { editCategorySchemas } from "./schemas/categorySchemas";
@@ -12,6 +12,7 @@ import {
 } from "./api/transactionCategories";
 import { useParams } from "react-router";
 import BlurredSpinner from "../../../components/BlurredSpinner";
+import DataSpinner from "../../../components/DataSpinner";
 
 const CategoryEdit = () => {
   const { id } = useParams();
@@ -101,12 +102,14 @@ const CategoryEdit = () => {
         <label htmlFor="icon" className={labelClasses}>
           Icon
         </label>
-        <IconPicker
-          value={formData?.icon}
-          setIcon={(value: string) =>
-            setFormData((prev) => ({ ...prev, icon: value }))
-          }
-        />
+        <Suspense fallback={<DataSpinner />}>
+          <IconPicker
+            value={formData?.icon}
+            setIcon={(value: string) =>
+              setFormData((prev) => ({ ...prev, icon: value }))
+            }
+          />
+        </Suspense>
       </div>
       <SubmitButton aria="Update" label={`Update ${formData?.name}`} />
     </form>

@@ -1,6 +1,6 @@
-import { useState, type FormEvent } from "react";
+import { lazy, Suspense, useState, type FormEvent } from "react";
 import { formDiv, input, labelClasses } from "../../../app/globalClasses";
-import IconPicker from "../../../components/IconPicker";
+const IconPicker = lazy(() => import("../../../components/IconPicker"));
 import type { AddCategoryType } from "./types/categoryType";
 import SubmitButton from "../../../components/SubmitButton";
 import { categorySchemas } from "./schemas/categorySchemas";
@@ -9,6 +9,7 @@ import FormError from "../../../components/FormError";
 import { useAddCategoryMutation } from "./api/transactionCategories";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../../app/store";
+import DataSpinner from "../../../components/DataSpinner";
 
 const CategoryAdd = () => {
   const { user } = useSelector((state: RootState) => state.auth);
@@ -78,12 +79,14 @@ const CategoryAdd = () => {
         <label htmlFor="icon" className={labelClasses}>
           Icon
         </label>
-        <IconPicker
-          value={formData?.icon}
-          setIcon={(value: string) =>
-            setFormData((prev) => ({ ...prev, icon: value }))
-          }
-        />
+        <Suspense fallback={<DataSpinner />}>
+          <IconPicker
+            value={formData?.icon}
+            setIcon={(value: string) =>
+              setFormData((prev) => ({ ...prev, icon: value }))
+            }
+          />
+        </Suspense>
       </div>
       <SubmitButton aria="Create" label={`Create ${formData?.name}`} />
     </form>
