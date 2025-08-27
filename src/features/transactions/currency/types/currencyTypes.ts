@@ -1,10 +1,4 @@
-export interface CurrencyState {
-  code: string;
-  name: string;
-  symbol: string;
-}
+import type { z } from "zod";
+import type { currenciesSchema } from "../schemas/currenciesSchema";
 
-export interface FavoriteCurrenciesState {
-  currencies: string[];
-  userId: string;
-}
+export type CurrencyState = z.infer<typeof currenciesSchema>;
