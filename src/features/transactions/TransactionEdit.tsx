@@ -7,7 +7,6 @@ import {
   type Receipt,
 } from "./types/transactionTypes";
 import SubmitButton from "../../components/SubmitButton";
-import VariantLink from "../../components/VariantLink";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../app/store";
 import TransactionTitle from "./fields/TransactionTitle";

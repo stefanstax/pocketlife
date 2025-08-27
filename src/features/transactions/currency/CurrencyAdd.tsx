@@ -14,6 +14,7 @@ const CurrenciesAdd = () => {
     code: "",
     name: "",
     symbol: "",
+    userId: user?.id,
   });
 
   const [addCurrency, { isLoading }] = useAddCurrencyMutation();
@@ -25,15 +26,7 @@ const CurrenciesAdd = () => {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
-    const formData = new FormData(event.currentTarget);
-
-    const verifyData = currenciesSchema.safeParse({
-      code: formData.get("code"),
-      name: formData.get("name"),
-      symbol: formData.get("symbol"),
-      userId: user?.id,
-    });
+    const verifyData = currenciesSchema.safeParse(formData);
 
     if (!verifyData.success) {
       console.error(
