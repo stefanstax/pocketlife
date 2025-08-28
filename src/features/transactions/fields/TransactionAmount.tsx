@@ -15,6 +15,7 @@ const TransactionAmount = ({
       <label htmlFor="amount" className={labelClasses}>
         Amount
       </label>
+      <span className="text-xs pb-2">You will select the currency later.</span>
       <input
         className={input}
         type="number"
