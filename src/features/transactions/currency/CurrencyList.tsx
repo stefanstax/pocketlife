@@ -8,8 +8,8 @@ import { PRIMARY, SHARED } from "../../../app/globalClasses";
 import BlurredSpinner from "../../../components/BlurredSpinner";
 import { toast } from "react-toastify";
 import NoDataFallback from "../../../components/forms/NoDataFallback";
-import { AiOutlineDelete } from "react-icons/ai";
 import { FiEdit2 } from "react-icons/fi";
+import { FaTrash } from "@react-icons/all-files/fa/FaTrash";
 
 const CurrencyList = () => {
   const { data } = useGetCurrenciesQuery();
@@ -52,7 +52,7 @@ const CurrencyList = () => {
                   className={`${PRIMARY} ${SHARED}`}
                   onClick={() => handleDelete(code)}
                 >
-                  <AiOutlineDelete />
+                  <FaTrash className="min-w-[16px]" />
                 </button>
               </div>
             </div>
