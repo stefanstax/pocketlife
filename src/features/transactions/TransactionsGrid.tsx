@@ -1,7 +1,7 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useState } from "react";
 import type { EnrichedTransaction } from "./types/transactionTypes";
 import { Link } from "react-router-dom";
-import { PRIMARY, SHARED } from "../../app/globalClasses";
+import { PRIMARY, SECONDARY, SHARED, TERTIARY } from "../../app/globalClasses";
 import Button from "../../components/Button";
 
 // Icons
@@ -25,6 +25,7 @@ import { toast } from "react-toastify";
 import type { PaymentMethod } from "./paymentMethods/types/paymentMethodsTypes";
 import DataSpinner from "../../components/DataSpinner";
 import type { CategoryType } from "./category/types/categoryType";
+import DeleteRecordModal from "../../components/DeleteRecordModal";
 const IconShowcase = lazy(() =>
   import("../../components/IconPicker").then((module) => ({
     default: module.IconShowcase,
@@ -38,6 +39,16 @@ type Props = {
 
 const TransactionGrid = ({ data, paymentMethods, categories }: Props) => {
   const [deleteTransaction] = useDeleteTransactionMutation();
+
+  const [showDeleteModal, setShowDeleteModal] = useState<{
+    show: boolean;
+    itemId: string | null;
+    itemTitle: string | null;
+  }>({
+    show: false,
+    itemId: null,
+    itemTitle: "",
+  });
 
   const [addTransaction] = useAddTransactionMutation();
 
@@ -202,25 +213,32 @@ const TransactionGrid = ({ data, paymentMethods, categories }: Props) => {
                 </Link>
                 <Button
                   type="button"
-                  ariaLabel="Edit transaction"
-                  variant="PRIMARY"
+                  ariaLabel="Delete transaction"
+                  variant="DANGER"
+                  onClick={() =>
+                    setShowDeleteModal({
+                      show: true,
+                      itemId: transaction?.id,
+                      itemTitle: transaction?.title,
+                    })
+                  }
+                >
+                  <FaTrash className="min-w-[16px]" />
+                </Button>
+                <Button
+                  type="button"
+                  ariaLabel="Clone transaction"
+                  variant="SECONDARY"
                   onClick={() => handleClone(transaction)}
                 >
                   <FaRegClone className="min-w-[16px]" />
                 </Button>
-                <Button
-                  type="button"
-                  ariaLabel="Edit transaction"
-                  variant="PRIMARY"
-                  onClick={() => handleDelete(transaction?.id)}
-                >
-                  <FaTrash className="min-w-[16px]" />
-                </Button>
+
                 {receipt?.url ? (
                   <Link
                     to={`${receipt?.url}`}
                     target="_blank"
-                    className={`${PRIMARY} ${SHARED}`}
+                    className={`${SECONDARY} ${SHARED}`}
                   >
                     <FaReceipt />
                   </Link>
@@ -236,6 +254,15 @@ const TransactionGrid = ({ data, paymentMethods, categories }: Props) => {
           );
         })}
       </div>
+      <DeleteRecordModal
+        itemId={showDeleteModal?.itemId}
+        itemTitle={showDeleteModal?.itemTitle}
+        showModal={showDeleteModal?.show}
+        onCancel={() =>
+          setShowDeleteModal({ show: false, itemId: null, itemTitle: null })
+        }
+        deleteFn={() => handleDelete(showDeleteModal?.itemId)}
+      />
     </>
   );
 };

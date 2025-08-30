@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState, type FormEvent } from "react";
+import { lazy, useState, type FormEvent } from "react";
 import { newTransactionSchema } from "./schemas/transactionSchemas";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../app/store";
@@ -15,10 +15,13 @@ import TransactionType from "./fields/TransactionType";
 import TransactionContext from "./fields/TransactionContext";
 import TransactionNote from "./fields/TransactionNote";
 import TransactionMethod from "./fields/TransactionMethod";
+import TransactionCurrency from "./fields/TransactionCurrency";
+import TransaactionDateTime from "./fields/TransaactionDateTime";
+import TransactionCategory from "./fields/TransactionCategory";
+
+// Spinners
 import DataSpinner from "../../components/DataSpinner";
 
-const TransactionCurrency = lazy(() => import("./fields/TransactionCurrency"));
-const TransactionCategory = lazy(() => import("./fields/TransactionCategory"));
 import { useAddTransactionMutation } from "./api/transactionsApi";
 import UploadField from "../../components/forms/UploadFile";
 import { toast } from "react-toastify";
@@ -27,10 +30,13 @@ import { useDispatch } from "react-redux";
 import { useGetPaymentMethodByIdQuery } from "./paymentMethods/api/paymentMethodsApi";
 import { useGetCategoriesQuery } from "./category/api/transactionCategories";
 import { updateUserBudget } from "../../app/authSlice";
+import TransactionFee from "./fields/TransactionFee";
 
 const TransactionAdd = () => {
   const [title, setTitle] = useState<string>("");
   const [amount, setAmount] = useState<number | "">("");
+  const [fee, setFee] = useState<number>(0);
+  const [created_at, setCreatedAt] = useState<string | "">("");
   const [context, setContext] = useState<TransactionContexts | "">("");
   const [categoryId, setCategoryId] = useState<string>("");
   const [currencyId, setCurrencyId] = useState<string | "">("");
@@ -51,8 +57,10 @@ const TransactionAdd = () => {
   const { data: paymentMethod, isLoading: paymentMethodLoading } =
     useGetPaymentMethodByIdQuery(paymentMethodId ?? "");
 
-  const { data: transactionCategores, isLoading: transactionCategoresLoading } =
-    useGetCategoriesQuery();
+  const {
+    data: transactionCategories,
+    isLoading: transactionCategoriesLoading,
+  } = useGetCategoriesQuery();
 
   const findBudget = paymentMethod?.budgets?.find(
     (budgetId) => budgetId?.currencyId === currencyId
@@ -64,15 +72,16 @@ const TransactionAdd = () => {
     const verifiedData = newTransactionSchema.safeParse({
       title,
       amount,
+      fee,
       categoryId,
       currencyId,
-      created_at: new Date().toISOString(),
+      created_at: created_at || new Date().toISOString(), // If empty use current date and time
       note,
       type,
       paymentMethodId,
       budgetId: findBudget?.id,
       context,
-      receipt: receipt,
+      receipt,
       userId: user?.id,
     });
 
@@ -113,7 +122,9 @@ const TransactionAdd = () => {
         //* Clear state as user is being kept on the same page
         setTitle("");
         setAmount("");
+        setFee(0);
         setCurrencyId("");
+        setCreatedAt("");
         setNote("");
         setType("");
         setContext("");
@@ -145,19 +156,23 @@ const TransactionAdd = () => {
         setAmount={setAmount}
         validationError={formErrors?.amount}
       />
+      {/* Fees */}
+      <TransactionFee fee={fee} setFee={setFee} />
       {/* Category */}
-      {transactionCategoresLoading ? (
+      {transactionCategoriesLoading ? (
         <DataSpinner />
       ) : (
-        <Suspense fallback={<DataSpinner />}>
-          <TransactionCategory
-            data={transactionCategores ?? []}
-            categoryId={categoryId}
-            setCategoryId={setCategoryId}
-            validationError={formErrors?.category}
-          />
-        </Suspense>
+        <TransactionCategory
+          data={transactionCategories ?? []}
+          categoryId={categoryId}
+          setCategoryId={setCategoryId}
+          validationError={formErrors?.category}
+        />
       )}
+      <TransaactionDateTime
+        created_at={created_at}
+        setCreatedAt={setCreatedAt}
+      />
       {/* Type */}
       <TransactionType
         type={type}
@@ -172,19 +187,17 @@ const TransactionAdd = () => {
           userId={user?.id ?? ""}
           paymentMethodId={paymentMethodId ?? ""}
           setPaymentMethodId={setPaymentMethodId}
-          validationError={formErrors?.method}
+          validationError={formErrors?.paymentMethodId}
         />
       )}
       {/* Currency */}
       {paymentMethod?.budgets?.length > 0 && (
-        <Suspense fallback={<DataSpinner />}>
-          <TransactionCurrency
-            currencies={paymentMethod?.budgets ?? []}
-            currencyId={currencyId}
-            setCurrencyId={setCurrencyId}
-            validationError={formErrors?.currencyId}
-          />
-        </Suspense>
+        <TransactionCurrency
+          currencies={paymentMethod?.budgets ?? []}
+          currencyId={currencyId}
+          setCurrencyId={setCurrencyId}
+          validationError={formErrors?.currencyId}
+        />
       )}
       {/* Business or Personal Toggle */}
       <TransactionContext

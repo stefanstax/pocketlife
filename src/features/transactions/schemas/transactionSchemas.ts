@@ -11,6 +11,7 @@ export const transactionSchema = z.object({
       .number({ message: "Please enter transaction amount" })
       .positive("Transaction amount must be higher than 0")
   ),
+  fee: z.number().min(0),
   categoryId: z.string().optional(),
   userId: z.string(),
   currencyId: z
@@ -38,19 +39,20 @@ export const transactionSchema = z.object({
 });
 
 export const newTransactionSchema = z.object({
-  created_at: z.string(),
-  title: z.string().nonempty({ message: "Please enter transaction title" }),
+  created_at: z
+    .string()
+    .min(5, { message: "Business transactions must include date and time." }),
+  title: z.string().nonempty({ message: "Please enter transaction title." }),
   amount: z.preprocess(
     (val) => parseFloat(String(val)),
     z
-      .number({ message: "Please enter transaction amount" })
+      .number({ message: "Please enter transaction amount." })
       .positive("Transaction amount must be higher than 0")
   ),
+  fee: z.number().min(0),
   categoryId: z.string().optional(),
   userId: z.string(),
-  currencyId: z
-    .string()
-    .nonempty({ message: "Transaction currency must be selected" }),
+  currencyId: z.string(),
   note: z.string(),
   type: z.enum(["INCOME", "EXPENSE"], {
     message: "Please select transaction type",

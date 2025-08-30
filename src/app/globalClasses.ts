@@ -4,19 +4,19 @@ export const buttonClasses = `
 `;
 
 export const PRIMARY = `
-  bg-[#4460F1] text-white
+  bg-[#4460F1] text-white border border-[#5152fb]
   hover:bg-[#2C45CB]
   rounded-md font-medium py-2 px-4
 `;
 
 export const SECONDARY = `
-  bg-[#EDF0FB] text-[#4460F1]
+  bg-[#EDF0FB] text-[#4460F1] border border-[#4460F1]
   hover:bg-[#D9E0FA]
   rounded-md font-medium py-2 px-4
 `;
 
 export const DANGER = `
-  bg-[#FEE3E3] text-[#CC3F3F]
+  bg-[#FEE3E3] text-[#CC3F3F] border border-[#CC3F3F]
   hover:bg-[#F9D2D2]
   rounded-md font-medium py-2 px-4
 `;

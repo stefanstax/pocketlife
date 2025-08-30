@@ -28,12 +28,16 @@ import { useDispatch } from "react-redux";
 import TransactionCategory from "./fields/TransactionCategory";
 import { useGetCategoriesQuery } from "./category/api/transactionCategories";
 import { updateUserBudget } from "../../app/authSlice";
+import TransaactionDateTime from "./fields/TransaactionDateTime";
+import TransactionFee from "./fields/TransactionFee";
 
 const EditTransaction = () => {
   const [title, setTitle] = useState<string>("");
   const [amount, setAmount] = useState<number | "">("");
+  const [fee, setFee] = useState<number>(0);
   const [currencyId, setCurrencyId] = useState<string | "">("");
   const [categoryId, setCategoryId] = useState<string>("");
+  const [created_at, setCreatedAt] = useState<string | "">("");
   const [note, setNote] = useState<string>("");
   const [type, setType] = useState<TransactionTypes | "">("");
   const [context, setContext] = useState<TransactionContexts | "">("");
@@ -78,6 +82,7 @@ const EditTransaction = () => {
     if (transactionData) {
       setTitle(transactionData?.title);
       setAmount(transactionData?.amount);
+      setFee(transactionData?.fee);
       if (currenciesMatch) {
         setCurrencyId(transactionData?.currencyId);
       } else {
@@ -96,6 +101,7 @@ const EditTransaction = () => {
       setType(transactionData?.type);
       setNote(transactionData?.note);
       setContext(transactionData?.context);
+      setCreatedAt(transactionData?.created_at);
       setPaymentMethodId(transactionData?.paymentMethodId);
     }
   }, [transactionData]);
@@ -104,20 +110,21 @@ const EditTransaction = () => {
     event.preventDefault();
 
     const verifyData = transactionSchema.safeParse({
-      id: id,
+      id,
       userId: transactionData?.userId,
       title,
       amount,
+      fee,
       categoryId,
       currencyId,
-      created_at: transactionData?.created_at,
+      created_at,
       updated_at: new Date().toISOString(),
       note,
       paymentMethodId,
       budgetId: findBudget?.id,
       type,
       context,
-      receipt: receipt,
+      receipt,
     });
 
     if (!verifyData.success) {
@@ -190,11 +197,16 @@ const EditTransaction = () => {
         setAmount={setAmount}
         validationError={formErrors?.amount}
       />
+      <TransactionFee fee={fee} setFee={setFee} />
       <TransactionCategory
         data={transactionCategories ?? []}
         categoryId={categoryId}
         setCategoryId={setCategoryId}
         validationError={formErrors?.categoryId}
+      />
+      <TransaactionDateTime
+        created_at={created_at}
+        setCreatedAt={setCreatedAt}
       />
       <TransactionType
         type={type}
