@@ -30,10 +30,12 @@ import { useDispatch } from "react-redux";
 import { useGetPaymentMethodByIdQuery } from "./paymentMethods/api/paymentMethodsApi";
 import { useGetCategoriesQuery } from "./category/api/transactionCategories";
 import { updateUserBudget } from "../../app/authSlice";
+import TransactionFee from "./fields/TransactionFee";
 
 const TransactionAdd = () => {
   const [title, setTitle] = useState<string>("");
   const [amount, setAmount] = useState<number | "">("");
+  const [fee, setFee] = useState<number>(0);
   const [created_at, setCreatedAt] = useState<string | "">("");
   const [context, setContext] = useState<TransactionContexts | "">("");
   const [categoryId, setCategoryId] = useState<string>("");
@@ -70,6 +72,7 @@ const TransactionAdd = () => {
     const verifiedData = newTransactionSchema.safeParse({
       title,
       amount,
+      fee,
       categoryId,
       currencyId,
       created_at: created_at || new Date().toISOString(), // If empty use current date and time
@@ -119,6 +122,7 @@ const TransactionAdd = () => {
         //* Clear state as user is being kept on the same page
         setTitle("");
         setAmount("");
+        setFee(0);
         setCurrencyId("");
         setCreatedAt("");
         setNote("");
@@ -152,6 +156,8 @@ const TransactionAdd = () => {
         setAmount={setAmount}
         validationError={formErrors?.amount}
       />
+      {/* Fees */}
+      <TransactionFee fee={fee} setFee={setFee} />
       {/* Category */}
       {transactionCategoriesLoading ? (
         <DataSpinner />
