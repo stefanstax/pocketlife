@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useState } from "react";
 import {
   useDeleteCategoryMutation,
   useGetCategoriesQuery,
@@ -11,16 +11,37 @@ const IconShowcase = lazy(() =>
     default: module.IconShowcase,
   }))
 );
-import { FiDelete, FiEdit2 } from "react-icons/fi";
+import { FiEdit2 } from "react-icons/fi";
 import { PRIMARY, SHARED } from "../../../app/globalClasses";
 import Button from "../../../components/Button";
 import { Link } from "react-router";
 import DataSpinner from "../../../components/DataSpinner";
+import { FaTrash } from "@react-icons/all-files/fa/FaTrash";
+import DeleteRecordModal from "../../../components/DeleteRecordModal";
 
 const CategoryList = () => {
   const { data, isLoading } = useGetCategoriesQuery();
 
+  const [showDeleteModal, setShowDeleteModal] = useState<{
+    show: boolean;
+    itemId: string | null;
+    itemTitle: string | null;
+  }>({
+    show: false,
+    itemId: null,
+    itemTitle: "",
+  });
+
   const [deleteCategoryById] = useDeleteCategoryMutation();
+
+  const handleDelete = async (id: string) => {
+    await deleteCategoryById(id);
+    setShowDeleteModal({
+      show: false,
+      itemId: null,
+      itemTitle: null,
+    });
+  };
 
   if (isLoading) return <BlurredSpinner />;
 
@@ -56,15 +77,30 @@ const CategoryList = () => {
               </Link>
               <Button
                 ariaLabel="Delete transaction category"
-                variant="PRIMARY"
-                onClick={() => deleteCategoryById(id)}
+                variant="DANGER"
+                onClick={() =>
+                  setShowDeleteModal({
+                    show: true,
+                    itemId: id,
+                    itemTitle: name,
+                  })
+                }
               >
-                <FiDelete />
+                <FaTrash className="min-w-[16px]" />
               </Button>
             </div>
           </div>
         );
       })}
+      <DeleteRecordModal
+        itemId={showDeleteModal?.itemId}
+        itemTitle={showDeleteModal?.itemTitle}
+        showModal={showDeleteModal?.show}
+        onCancel={() =>
+          setShowDeleteModal({ show: false, itemId: null, itemTitle: null })
+        }
+        deleteFn={() => handleDelete(showDeleteModal?.itemId)}
+      />
     </div>
   );
 };

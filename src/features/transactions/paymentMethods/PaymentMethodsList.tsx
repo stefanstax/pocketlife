@@ -4,15 +4,48 @@ import Button from "../../../components/Button";
 import { PRIMARY, SHARED } from "../../../app/globalClasses";
 import NoDataFallback from "../../../components/forms/NoDataFallback";
 import { FiEdit2 } from "react-icons/fi";
-import { AiOutlineDelete } from "react-icons/ai";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../../app/store";
+import { useState } from "react";
+import DeleteRecordModal from "../../../components/DeleteRecordModal";
+import { toast } from "react-toastify";
+import { FaTrash } from "@react-icons/all-files/fa/FaTrash";
 
 const PaymentMethodsList = () => {
   const [deletePaymentMethod] = useDeletePaymentMethodMutation();
   const { user } = useSelector((state: RootState) => state.auth);
 
   const paymentMethods = user?.paymentMethods;
+
+  const [showDeleteModal, setShowDeleteModal] = useState<{
+    show: boolean;
+    itemId: string | null;
+    itemTitle: string | null;
+  }>({
+    show: false,
+    itemId: null,
+    itemTitle: "",
+  });
+
+  const handleDelete = async (id: string) => {
+    const toastId = toast.info("Transaction is being deleted...");
+    try {
+      await deletePaymentMethod(id);
+      toast.update(toastId, {
+        render: "Transaction has been deleted",
+        type: "success",
+        autoClose: 5000,
+        isLoading: false,
+      });
+    } catch (error: any) {
+      toast.update(toastId, {
+        render: error?.data?.message ?? "Uncaught error.",
+        type: "error",
+        autoClose: 5000,
+        isLoading: false,
+      });
+    }
+  };
 
   return (
     <>
@@ -51,15 +84,30 @@ const PaymentMethodsList = () => {
                   </Link>
                   <Button
                     ariaLabel="Delete payment method"
-                    variant="PRIMARY"
-                    onClick={() => deletePaymentMethod(id)}
+                    variant="DANGER"
+                    onClick={() =>
+                      setShowDeleteModal({
+                        show: true,
+                        itemId: id,
+                        itemTitle: name,
+                      })
+                    }
                   >
-                    <AiOutlineDelete />
+                    <FaTrash className="min-w-[16px]" />
                   </Button>
                 </div>
               </div>
             );
           })}
+          <DeleteRecordModal
+            itemId={showDeleteModal?.itemId}
+            itemTitle={showDeleteModal?.itemTitle}
+            showModal={showDeleteModal?.show}
+            onCancel={() =>
+              setShowDeleteModal({ show: false, itemId: null, itemTitle: null })
+            }
+            deleteFn={() => handleDelete(showDeleteModal?.itemId)}
+          />
         </div>
       ) : (
         <NoDataFallback

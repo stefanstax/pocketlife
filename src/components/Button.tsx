@@ -1,10 +1,16 @@
 import type { ReactNode } from "react";
-import { PRIMARY, SECONDARY, SHARED, TERTIARY } from "../app/globalClasses";
+import {
+  DANGER,
+  PRIMARY,
+  SECONDARY,
+  SHARED,
+  TERTIARY,
+} from "../app/globalClasses";
 
 export interface ButtonProps {
   ariaLabel: string;
   extraClasses?: string;
-  variant: "PRIMARY" | "SECONDARY" | "TERTIARY";
+  variant: "PRIMARY" | "SECONDARY" | "TERTIARY" | "DANGER";
   children: ReactNode;
   onClick?: () => void;
   type?: "button" | "submit" | "reset";
@@ -30,6 +36,8 @@ const Button = ({
           ? SECONDARY
           : variant === "TERTIARY"
           ? TERTIARY
+          : variant === "DANGER"
+          ? DANGER
           : ""
       } ${SHARED} ${extraClasses}`}
     >
