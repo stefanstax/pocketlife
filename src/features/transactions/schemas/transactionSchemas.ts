@@ -11,6 +11,7 @@ export const transactionSchema = z.object({
       .number({ message: "Please enter transaction amount" })
       .positive("Transaction amount must be higher than 0")
   ),
+  fee: z.number().min(0),
   categoryId: z.string().optional(),
   userId: z.string(),
   currencyId: z
@@ -48,6 +49,7 @@ export const newTransactionSchema = z.object({
       .number({ message: "Please enter transaction amount." })
       .positive("Transaction amount must be higher than 0")
   ),
+  fee: z.number().min(0),
   categoryId: z.string().optional(),
   userId: z.string(),
   currencyId: z.string(),

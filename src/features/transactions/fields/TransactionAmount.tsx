@@ -13,7 +13,7 @@ const TransactionAmount = ({
   return (
     <div className={formDiv}>
       <label htmlFor="amount" className={labelClasses}>
-        Amount
+        Amount you received
       </label>
       <span className="text-xs pb-2">You will select the currency later.</span>
       <input
