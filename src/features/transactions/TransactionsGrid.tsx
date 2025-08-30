@@ -1,7 +1,7 @@
 import { lazy, Suspense, useState } from "react";
 import type { EnrichedTransaction } from "./types/transactionTypes";
 import { Link } from "react-router-dom";
-import { PRIMARY, SECONDARY, SHARED, TERTIARY } from "../../app/globalClasses";
+import { PRIMARY, SECONDARY, SHARED } from "../../app/globalClasses";
 import Button from "../../components/Button";
 
 // Icons

@@ -1,4 +1,4 @@
-import { lazy, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { newTransactionSchema } from "./schemas/transactionSchemas";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../app/store";
