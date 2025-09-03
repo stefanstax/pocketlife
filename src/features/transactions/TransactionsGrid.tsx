@@ -1,7 +1,7 @@
 import { lazy, Suspense, useState } from "react";
 import type { EnrichedTransaction } from "./types/transactionTypes";
 import { Link } from "react-router-dom";
-import { PRIMARY, SECONDARY, SHARED } from "../../app/globalClasses";
+import { SECONDARY, SHARED, TERTIARY } from "../../app/globalClasses";
 import Button from "../../components/Button";
 
 // Icons
@@ -9,9 +9,9 @@ import { FaCalendar } from "@react-icons/all-files/fa/FaCalendar";
 import { FaCreditCard } from "@react-icons/all-files/fa/FaCreditCard";
 import { FaStickyNote } from "@react-icons/all-files/fa/FaStickyNote";
 import { FaReceipt } from "@react-icons/all-files/fa/FaReceipt";
-import { FaRegClone } from "@react-icons/all-files/fa/FaRegClone";
+import { FaClone } from "@react-icons/all-files/fa/FaClone";
 import { FaUserTie } from "@react-icons/all-files/fa/FaUserTie";
-import { FaEdit } from "@react-icons/all-files/fa/FaEdit";
+import { FaPen } from "@react-icons/all-files/fa/FaPen";
 import { FaTrash } from "@react-icons/all-files/fa/FaTrash";
 
 // Redux
@@ -204,12 +204,12 @@ const TransactionGrid = ({ data, paymentMethods, categories }: Props) => {
                 <FaStickyNote className="min-w-[16px]" />
                 {note?.length ? note : "Note not provided."}
               </p>
-              <div className="grid gap-4 grid-cols-4 border-t-1 border-gray-900 pt-4">
+              <div className="grid gap-4 grid-cols-2 border-t-1 border-gray-900 pt-4">
                 <Link
-                  className={`${PRIMARY} ${SHARED}`}
+                  className={`${SECONDARY} ${SHARED}`}
                   to={`/transactions/${transaction?.id}`}
                 >
-                  <FaEdit className="min-w-[16px]" />
+                  Update <FaPen className="min-w-[16px]" />
                 </Link>
                 <Button
                   type="button"
@@ -223,32 +223,31 @@ const TransactionGrid = ({ data, paymentMethods, categories }: Props) => {
                     })
                   }
                 >
-                  <FaTrash className="min-w-[16px]" />
+                  Delete <FaTrash className="min-w-[16px]" />
                 </Button>
-                <Button
-                  type="button"
-                  ariaLabel="Clone transaction"
-                  variant="SECONDARY"
-                  onClick={() => handleClone(transaction)}
-                >
-                  <FaRegClone className="min-w-[16px]" />
-                </Button>
-
                 {receipt?.url ? (
                   <Link
                     to={`${receipt?.url}`}
                     target="_blank"
-                    className={`${SECONDARY} ${SHARED}`}
+                    className={`${TERTIARY} ${SHARED}`}
                   >
-                    <FaReceipt />
+                    View <FaReceipt />
                   </Link>
                 ) : (
                   <p
-                    className={`${PRIMARY} ${SHARED} opacity-50 pointer-events-none`}
+                    className={`${TERTIARY} ${SHARED} opacity-50 pointer-events-none`}
                   >
-                    <FaReceipt className={"min-w-[16px]"} />
+                    No Receipt
                   </p>
                 )}
+                <Button
+                  type="button"
+                  ariaLabel="Clone transaction"
+                  variant="TERTIARY"
+                  onClick={() => handleClone(transaction)}
+                >
+                  Clone <FaClone className="min-w-[16px]" />
+                </Button>
               </div>
             </div>
           );

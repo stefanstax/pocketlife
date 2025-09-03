@@ -7,6 +7,7 @@ import { useSelector } from "react-redux";
 import { useState } from "react";
 import { useGetCategoriesQuery } from "./category/api/transactionCategories";
 import type { RootState } from "../../app/store";
+import CSVHandler from "../../components/CSVHandler";
 
 const TransactionList = () => {
   const { user } = useSelector((state: RootState) => state.auth);
@@ -33,6 +34,7 @@ const TransactionList = () => {
     <div className="w-full">
       {data && data?.total >= 1 ? (
         <div className="flex flex-col justify-start items-start gap-2">
+          <CSVHandler transactions={data?.data} />
           <TransactionGrid
             data={data?.data}
             paymentMethods={user?.paymentMethods}
