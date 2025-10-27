@@ -20,7 +20,7 @@ const TransactionCategory = ({
       <label htmlFor="icon" className={labelClasses}>
         Category
       </label>
-      <div className={`w-full flex gap-2 ${input} overflow-x-scroll`}>
+      <div className={`w-full flex flex-wrap gap-2 ${input}`}>
         {(data ?? [])?.map((option) => {
           const { id, icon, name } = option;
 
@@ -29,8 +29,8 @@ const TransactionCategory = ({
               key={id}
               type="button"
               className={`${
-                categoryId === id ? "bg-black text-white" : ""
-              }  flex gap-2 items-center border-1 rounded-full overflow-x-hidden min-w-fit cursor-pointer px-4 py-2 font-[600] text-sm`}
+                categoryId === id ? "bg-[#010d18] text-white" : ""
+              }  flex gap-2 items-center min-w-fit cursor-pointer px-4 py-2 text-sm`}
               onClick={() => setCategoryId(id)}
             >
               <IconShowcase pickedIcon={icon} />

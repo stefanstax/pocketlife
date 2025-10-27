@@ -4,7 +4,7 @@ import { MenuButtonActive, MenuButtonDefault } from "../app/globalClasses";
 import { useState } from "react";
 import MenuDropdown from "./MenuDropdown";
 
-const Navigation = () => {
+const MobileNavigation = () => {
   const { user, token } = useSelector((state: RootState) => state.auth);
   const [isMenuExpanded, setIsMenuExpanded] = useState(false);
   const [expandParentLink, setExpandParentLink] = useState<string | null>(null);
@@ -26,7 +26,7 @@ const Navigation = () => {
           </h1>
           <button
             onClick={() => setIsMenuExpanded(!isMenuExpanded)}
-            className={`flex lg:hidden ${
+            className={`${
               isMenuExpanded ? MenuButtonActive : MenuButtonDefault
             }`}
           >
@@ -47,4 +47,4 @@ const Navigation = () => {
   );
 };
 
-export default Navigation;
+export default MobileNavigation;

@@ -60,7 +60,7 @@ const CategoryList = () => {
         return (
           <div
             key={id}
-            className="flex flex-col gap-4 items-start gap-2 border-2 rounded-lg p-4"
+            className="flex flex-col items-start gap-2 border-2 rounded-lg p-4"
           >
             <Suspense fallback={<DataSpinner />}>
               <div className="w-fit px-4 text-[20px] py-1 border-1 rounded-full">

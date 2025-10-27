@@ -8,7 +8,7 @@ const NoDataFallback = ({
   goTo: string;
 }) => {
   return (
-    <div className="w-full flex flex-col flex gap-4 mx-auto max-w-[600px]">
+    <div className="w-full flex flex-col gap-4 mx-auto max-w-[600px]">
       <h1 className="text-2xl font-black">Oh, dang!</h1>
       <p>
         I've looked in database for {dataType}. I couldn't find a single one!
