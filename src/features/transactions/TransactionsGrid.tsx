@@ -5,9 +5,7 @@ import { Link } from "react-router-dom";
 // Icons
 import { FaCreditCard } from "@react-icons/all-files/fa/FaCreditCard";
 import { FaReceipt } from "@react-icons/all-files/fa/FaReceipt";
-import { FaRegClone } from "@react-icons/all-files/fa/FaRegClone";
 import { FaUserTie } from "@react-icons/all-files/fa/FaUserTie";
-import { FaEdit } from "@react-icons/all-files/fa/FaEdit";
 import { FaTrash } from "@react-icons/all-files/fa/FaTrash";
 
 // Redux
@@ -23,6 +21,7 @@ import DataSpinner from "../../components/DataSpinner";
 import type { CategoryType } from "./category/types/categoryType";
 import DeleteRecordModal from "../../components/DeleteRecordModal";
 import useWindowSize from "../../components/ScreenSize";
+import { FaEdit, FaRegClone } from "react-icons/fa";
 const IconShowcase = lazy(() =>
   import("../../components/IconPicker").then((module) => ({
     default: module.IconShowcase,
