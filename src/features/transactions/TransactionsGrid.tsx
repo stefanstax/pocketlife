@@ -23,7 +23,6 @@ import DataSpinner from "../../components/DataSpinner";
 import type { CategoryType } from "./category/types/categoryType";
 import DeleteRecordModal from "../../components/DeleteRecordModal";
 import useWindowSize from "../../components/ScreenSize";
-import { FaStickyNote } from "react-icons/fa";
 const IconShowcase = lazy(() =>
   import("../../components/IconPicker").then((module) => ({
     default: module.IconShowcase,
@@ -159,7 +158,7 @@ const TransactionGrid = ({ data, paymentMethods, categories }: Props) => {
           return (
             <div key={transaction?.id} className="mb-4">
               {/* Transaction Category */}
-              <div className="flex bg-[#1a2630] justify-between w-full p-4 text-xs items-center">
+              <div className="flex bg-[#17183E] justify-between w-full p-4 text-xs items-center">
                 <Suspense fallback={<DataSpinner />}>
                   {findIcon && (
                     <span className="flex gap-2 text-white items-center">
@@ -210,7 +209,7 @@ const TransactionGrid = ({ data, paymentMethods, categories }: Props) => {
                 </div>
               </div>
               {/* Main Transaction Part */}
-              <div className="flex flex-wrap justify-between items-center gap-4 bg-[#202d37] text-white p-4">
+              <div className="flex flex-wrap justify-between items-center gap-4 bg-[#1E1F52] text-white p-4">
                 {/* Transaction Who */}
                 {width > 1024 && <p>{title}</p>}
                 {/* Transaction Date */}

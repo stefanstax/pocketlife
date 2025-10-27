@@ -21,7 +21,7 @@ const Navigation = () => {
     <nav className="w-full">
       <div className="w-full mx-auto gap-4 flex flex-col items-start justify-start">
         <div className="w-full flex justify-between items-center">
-          <h1 className="text-2xl text-gray-200 font-black">
+          <h1 className="text-2xl text-[#C4C6FF] font-black">
             <a href="/">MAYPACT</a>
           </h1>
           <button

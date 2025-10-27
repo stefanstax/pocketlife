@@ -29,7 +29,7 @@ const TransactionCategory = ({
               key={id}
               type="button"
               className={`${
-                categoryId === id ? "bg-[#010d18] text-white" : ""
+                categoryId === id ? "bg-[#2A2BC9] text-white" : ""
               }  flex gap-2 items-center min-w-fit cursor-pointer px-4 py-2 text-sm`}
               onClick={() => setCategoryId(id)}
             >

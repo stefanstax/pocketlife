@@ -18,7 +18,7 @@ const TransaactionDateTime = ({
 
       <div className={`${input} flex gap-4 text-sm flex-wrap`}>
         <input
-          className={`p-2 ${created_at ? "bg-[#010d18] text-white" : ""}`}
+          className={`p-2 ${created_at ? "bg-[#2A2BC9] text-white" : ""}`}
           style={{
             appearance: "none",
             WebkitAppearance: "none" as "none",

@@ -2,7 +2,7 @@ import { type Dispatch, type SetStateAction } from "react";
 import { links } from "./navigationLinks";
 import { NavLink } from "react-router";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
-import { SECONDARY, SHARED, TERTIARY } from "../app/globalClasses";
+import { PRIMARY, SECONDARY, SHARED, TERTIARY } from "../app/globalClasses";
 import LoginButton from "./LoginButton";
 import LogoutButton from "./LogoutButton";
 
@@ -88,7 +88,7 @@ const MenuDropdown = ({
           <>
             <NavLink
               to="/authentication/registration"
-              className={`${SECONDARY} ${SHARED}`}
+              className={`${PRIMARY} ${SHARED}`}
             >
               Sign Up
             </NavLink>
@@ -98,7 +98,7 @@ const MenuDropdown = ({
         {token && <LogoutButton />}
         {token && (
           <NavLink
-            className={`${TERTIARY} ${SHARED} min-w-[100px]`}
+            className={`${SECONDARY} ${SHARED} min-w-[100px]`}
             to={`/users/${user}`}
           >
             Edit Profile

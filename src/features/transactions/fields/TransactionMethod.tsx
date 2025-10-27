@@ -26,7 +26,7 @@ const TransactionMethod = ({
               type="button"
               key={option.id}
               className={`text-sm  ${
-                option.id === paymentMethodId ? "bg-[#010d18] text-white " : ""
+                option.id === paymentMethodId ? "bg-[#2A2BC9] text-white " : ""
               } min-w-[100px] cursor-pointer p-2 `}
               onClick={() => setPaymentMethodId(option.id)}
             >

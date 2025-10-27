@@ -15,7 +15,7 @@ export const MenuButtonActive = `
 `;
 
 export const SECONDARY = `
-  bg-[#EDF0FB] text-[#4460F1] hover:bg-[#D9E0FA] font-medium py-2 px-4
+  bg-[#6B6CFF] text-white hover:bg-[#3031A4] font-medium py-2 px-4
 `;
 
 export const DANGER = `
@@ -31,7 +31,7 @@ export const labelClasses = "font-[600] mb-2 text-white";
 export const formDiv = "grid grid-cols-1 text-white";
 
 export const input = `
-  bg-[#1a2630] text-white p-4 focus:outline-none focus:ring-2 focus:ring-[#4460F1]
+  bg-[#1E1F52] text-white p-4 focus:outline-none focus:ring-2 focus:ring-[#4460F1]
 `;
 
 export const SHARED = `

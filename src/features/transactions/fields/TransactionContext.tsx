@@ -26,7 +26,7 @@ const TransactionContext = ({
               key={option.name}
               type="button"
               className={`cursor-pointer text-sm px-4  py-2 ${
-                option.name === context ? "bg-[#010d18] text-white" : ""
+                option.name === context ? "bg-[#2A2BC9] text-white" : ""
               }`}
               onClick={() => setContext(option.name as TransactionContexts)}
             >

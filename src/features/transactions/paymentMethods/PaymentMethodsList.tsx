@@ -58,7 +58,7 @@ const PaymentMethodsList = () => {
                 key={id}
                 className="bg-white border-2 rounded-lg shadow-md p-4 flex flex-col gap-4"
               >
-                <p className="text-sm text-gray-950 border-1 w-fit px-2 rounded-full">
+                <p className="text-sm text-[#C4C6FF] border-1 w-fit px-2 rounded-full">
                   {type?.toUpperCase()}
                 </p>
                 <p className="text-2xl font-bold">{name}</p>
