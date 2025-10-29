@@ -15,9 +15,6 @@ const TransactionList = lazy(
 const AddTransaction = lazy(
   () => import("./features/transactions/TransactionAdd")
 );
-const EditTransaction = lazy(
-  () => import("./features/transactions/TransactionEdit")
-);
 const CurrenciesAdd = lazy(
   () => import("./features/transactions/currency/CurrencyAdd")
 );
@@ -64,20 +61,19 @@ const App = () => {
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
           {/* Admin Routes */}
-          <Route element={<AdminRoute />}>
-            <Route path="currencies">
-              <Route index element={withSuspense(<CurrencyList />)} />
-              <Route path="add" element={withSuspense(<CurrenciesAdd />)} />
-              <Route path=":id" element={withSuspense(<CurrencyEdit />)} />
-            </Route>
-          </Route>
+          {/* <Route element={<AdminRoute />}>
+          </Route> */}
           <Route element={<ProtectedRoute />}>
             <Route path="users/:id" element={withSuspense(<UserProfile />)} />
             {/* Protected Routes */}
             <Route path="transactions">
               <Route index element={withSuspense(<TransactionList />)} />
               <Route path="add" element={withSuspense(<AddTransaction />)} />
-              <Route path=":id" element={withSuspense(<EditTransaction />)} />
+            </Route>
+            <Route path="currencies">
+              <Route index element={withSuspense(<CurrencyList />)} />
+              <Route path="add" element={withSuspense(<CurrenciesAdd />)} />
+              <Route path=":id" element={withSuspense(<CurrencyEdit />)} />
             </Route>
             <Route path="transaction-categories">
               <Route index element={withSuspense(<CategoryList />)} />

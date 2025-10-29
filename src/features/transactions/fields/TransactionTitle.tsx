@@ -13,8 +13,9 @@ const TransactionTitle = ({
   return (
     <div className={formDiv}>
       <label htmlFor="title" className={labelClasses}>
-        Title
+        Supplier/Receiver
       </label>
+
       <input
         className={input}
         type="text"

@@ -15,12 +15,15 @@ export const currenciesApi = createApi({
       return headers;
     },
   }),
+  tagTypes: ["Currencies"],
   endpoints: (builder) => ({
     getCurrencies: builder.query<CurrencyState[], void>({
       query: () => "currencies",
+      providesTags: ["Currencies"],
     }),
     getCurrencyById: builder.query<CurrencyState, string>({
       query: (id) => `currencies/${id}`,
+      providesTags: ["Currencies"],
     }),
     addCurrency: builder.mutation<CurrencyState, CurrencyState>({
       query: (data) => ({
@@ -28,6 +31,7 @@ export const currenciesApi = createApi({
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ["Currencies"],
     }),
     editCurrencyById: builder.mutation<CurrencyState, CurrencyState>({
       query: (data) => ({
@@ -35,12 +39,14 @@ export const currenciesApi = createApi({
         method: "PUT",
         body: data,
       }),
+      invalidatesTags: ["Currencies"],
     }),
     removeCurrencyById: builder.mutation<void, string>({
       query: (code) => ({
         url: `currencies/${code}`,
         method: "DELETE",
       }),
+      invalidatesTags: ["Currencies"],
     }),
   }),
 });

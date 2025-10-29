@@ -2,7 +2,7 @@ import { type Dispatch, type SetStateAction } from "react";
 import { links } from "./navigationLinks";
 import { NavLink } from "react-router";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
-import { PRIMARY, SECONDARY, SHARED, TERTIARY } from "../app/globalClasses";
+import { PRIMARY, SECONDARY, SHARED } from "../app/globalClasses";
 import LoginButton from "./LoginButton";
 import LogoutButton from "./LogoutButton";
 

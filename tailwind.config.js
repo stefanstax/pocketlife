@@ -3,12 +3,16 @@ module.exports = {
   content: ["./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
+      screens: {
+        sm: "640px",
+        md: "768px",
+        lg: "1024px",
+        xl: "1280px",
+        "2xl": "1440px",
+        "3xl": "1920px",
+      },
       colors: {
-        brand: {
-          coal: "#0f0d0e",
-          coalMuted: "#1b1918",
-          sand: "#f9f4da",
-        },
+        mute: "2A2B3D",
       },
     },
   },

@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
 import type { RootState } from "../app/store";
-import { MenuButtonActive, MenuButtonDefault } from "../app/globalClasses";
+import { PRIMARY, TERTIARY } from "../app/globalClasses";
 import { useState } from "react";
 import MenuDropdown from "./MenuDropdown";
 
@@ -26,9 +26,7 @@ const Navigation = () => {
           </h1>
           <button
             onClick={() => setIsMenuExpanded(!isMenuExpanded)}
-            className={`flex lg:hidden ${
-              isMenuExpanded ? MenuButtonActive : MenuButtonDefault
-            }`}
+            className={`flex lg:hidden ${isMenuExpanded ? PRIMARY : TERTIARY}`}
           >
             Menu
           </button>

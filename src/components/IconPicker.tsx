@@ -36,7 +36,7 @@ const IconPicker = ({
           key={name}
           onClick={() => setIcon(name)}
           className={`p-2 text-sm min-w-fit cursor-pointer flex gap-2 items-center justify-center ${
-            name === value ? "bg-[#1a2630] text-white" : ""
+            name === value ? "bg-[#1A1A2E] text-white" : ""
           }`}
           title={name}
         >

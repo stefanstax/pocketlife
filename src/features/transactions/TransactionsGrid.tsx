@@ -20,8 +20,11 @@ import type { PaymentMethod } from "./paymentMethods/types/paymentMethodsTypes";
 import DataSpinner from "../../components/DataSpinner";
 import type { CategoryType } from "./category/types/categoryType";
 import DeleteRecordModal from "../../components/DeleteRecordModal";
-import useWindowSize from "../../components/ScreenSize";
+import useWindowSize from "../../hooks/useWindowSize";
 import { FaEdit, FaRegClone } from "react-icons/fa";
+import { useDispatch } from "react-redux";
+import { openOverview } from "../../app/overviewSlice";
+
 const IconShowcase = lazy(() =>
   import("../../components/IconPicker").then((module) => ({
     default: module.IconShowcase,
@@ -33,8 +36,9 @@ type Props = {
   categories: CategoryType[];
 };
 
-const TransactionGrid = ({ data, paymentMethods, categories }: Props) => {
+const TransactionGrid = ({ data, categories }: Props) => {
   const [deleteTransaction] = useDeleteTransactionMutation();
+  const dispatch = useDispatch();
 
   const [showDeleteModal, setShowDeleteModal] = useState<{
     show: boolean;
@@ -107,39 +111,11 @@ const TransactionGrid = ({ data, paymentMethods, categories }: Props) => {
 
   return (
     <>
-      {/* <div className="w-full flex gap-4 py-4 mb-2 min-w-full overflow-x-auto">
-        {paymentMethods?.map((paymentMethod: PaymentMethod) => {
-          const mapOverBudgets = paymentMethod?.budgets?.map((budget) => {
-            return (
-              <p
-                key={budget?.id}
-                className="flex gap-2 items-center border border-gray-950 px-2 rounded-full text-black text-sm"
-              >
-                <span>{budget?.currencyId}</span>
-                <span>{budget?.amount.toFixed(2)}</span>
-              </p>
-            );
-          });
-          return (
-            <div
-              key={paymentMethod?.id}
-              className="min-w-fit border-2 rounded-lg shadow-md p-4 flex justify-between items-center gap-2 bg-[#202d37] text-white"
-            >
-              <p className="font-bold w-full min-w-[150px] mr-4">
-                {paymentMethod?.name}
-              </p>
-              {mapOverBudgets}
-            </div>
-          );
-        })}
-      </div> */}
       <div className="w-full grid grid-cols-1">
         {data.map((transaction) => {
           const {
             title,
             amount,
-            note,
-            type,
             currency,
             receipt,
             categoryId,
@@ -157,7 +133,7 @@ const TransactionGrid = ({ data, paymentMethods, categories }: Props) => {
           return (
             <div key={transaction?.id} className="mb-4">
               {/* Transaction Category */}
-              <div className="flex bg-[#17183E] justify-between w-full p-4 text-xs items-center">
+              <div className="flex bg-[#2A2B3D] justify-between w-full p-4 text-xs items-center border-b-1 border-b-[#33344A]">
                 <Suspense fallback={<DataSpinner />}>
                   {findIcon && (
                     <span className="flex gap-2 text-white items-center">
@@ -173,12 +149,22 @@ const TransactionGrid = ({ data, paymentMethods, categories }: Props) => {
                   >
                     <FaRegClone className="min-w-[16px]" />
                   </button>
-                  <Link
-                    className={`flex gap-2 items-center text-white cursor-pointer`}
-                    to={`/transactions/${transaction?.id}`}
+                  <button
+                    className="flex gap-2 items-center text-white cursor-pointer"
+                    onClick={() => {
+                      dispatch(
+                        openOverview({
+                          name: "transactionPanel",
+                          panelId: transaction?.id,
+                          transactionOverview: true,
+                          data: transaction,
+                        })
+                      );
+                    }}
                   >
                     <FaEdit className="min-w-[16px]" />
-                  </Link>
+                  </button>
+
                   <button
                     className="flex gap-2 items-center text-white hover:text-red-800 cursor-pointer"
                     onClick={() =>
@@ -208,7 +194,7 @@ const TransactionGrid = ({ data, paymentMethods, categories }: Props) => {
                 </div>
               </div>
               {/* Main Transaction Part */}
-              <div className="flex flex-wrap justify-between items-center gap-4 bg-[#1E1F52] text-white p-4">
+              <div className="flex flex-wrap justify-between items-center gap-4 bg-[#2A2B3D] text-white p-4">
                 {/* Transaction Who */}
                 {width > 1024 && <p>{title}</p>}
                 {/* Transaction Date */}
@@ -219,23 +205,13 @@ const TransactionGrid = ({ data, paymentMethods, categories }: Props) => {
                     </span>
                   </div>
                 )}
-
-                {/* Transaction Context */}
-                {width > 1024 && (
-                  <p className="text-sm font-bold flex items-center gap-2">
-                    <FaUserTie className="min-w-[16px]" />
-                    {context}
-                  </p>
-                )}
-
                 {/* Transaction Account */}
                 {width > 1024 && (
-                  <p className="flex items-center gap-2 text-sm">
-                    <FaCreditCard className="min-w-[16px]" />
+                  <p className="flex flex-col items-start gap-2 text-sm">
+                    <span className="text-xs">{context}</span>
                     {paymentMethod?.name}
                   </p>
                 )}
-
                 {width <= 1024 && (
                   <div className="flex flex-col gap-2">
                     <p className="font-bold">{title}</p>
@@ -243,19 +219,11 @@ const TransactionGrid = ({ data, paymentMethods, categories }: Props) => {
                     <p className="text-sm">{context}</p>
                   </div>
                 )}
-                {/* Transaction Note - Show in Transaction overview*/}
-                {/* {width > 1024 && (
-                  <p className="text-sm flex items-center gap-2">
-                    <FaStickyNote className="min-w-[16px]" />
-                    {note?.length ? note : "Note not provided."}
-                  </p>
-                )} */}
                 {/* Transaction Amount */}
                 <p className="text-md font-bold">
                   {currency?.symbol}
                   {amount.toFixed(2)}
                 </p>
-                {/* Actions */}
               </div>
             </div>
           );

@@ -1,4 +1,10 @@
-import { formDiv, input, labelClasses } from "../../../app/globalClasses";
+import { Link } from "react-router";
+import {
+  formDiv,
+  input,
+  inputPicked,
+  labelClasses,
+} from "../../../app/globalClasses";
 
 import FormError from "../../../components/FormError";
 import { IconShowcase } from "../../../components/IconPicker";
@@ -29,7 +35,7 @@ const TransactionCategory = ({
               key={id}
               type="button"
               className={`${
-                categoryId === id ? "bg-[#2A2BC9] text-white" : ""
+                categoryId === id ? `${inputPicked} text-white` : ""
               }  flex gap-2 items-center min-w-fit cursor-pointer px-4 py-2 text-sm`}
               onClick={() => setCategoryId(id)}
             >
@@ -38,6 +44,13 @@ const TransactionCategory = ({
             </button>
           );
         })}
+        <Link
+          to={"/transaction-categories/add"}
+          type="button"
+          className="flex gap-2 items-center min-w-fit cursor-pointer px-4 py-2 text-sm"
+        >
+          Add new
+        </Link>
       </div>
       <input type="hidden" name="categoryId" value={categoryId ?? ""} />
       {validationError && <FormError fieldError={validationError} />}

@@ -2,19 +2,15 @@ import { useState, type ChangeEvent, type FormEvent } from "react";
 import { formDiv, input, labelClasses } from "../../../app/globalClasses";
 import { currenciesSchema } from "./schemas/currenciesSchema";
 import type { CurrencyState } from "./types/currencyTypes";
-import { useSelector } from "react-redux";
-import type { RootState } from "../../../app/store";
 import { useAddCurrencyMutation } from "./api/currenciesApi";
 import SubmitButton from "../../../components/SubmitButton";
 import { toast } from "react-toastify";
 
 const CurrenciesAdd = () => {
-  const { user } = useSelector((state: RootState) => state.auth);
   const [formData, setFormData] = useState<CurrencyState>({
     code: "",
     name: "",
     symbol: "",
-    userId: user?.id,
   });
 
   const [addCurrency, { isLoading }] = useAddCurrencyMutation();

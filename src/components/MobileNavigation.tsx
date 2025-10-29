@@ -1,8 +1,8 @@
 import { useSelector } from "react-redux";
 import type { RootState } from "../app/store";
-import { MenuButtonActive, MenuButtonDefault } from "../app/globalClasses";
 import { useState } from "react";
 import MenuDropdown from "./MenuDropdown";
+import { PRIMARY, TERTIARY } from "../app/globalClasses";
 
 const MobileNavigation = () => {
   const { user, token } = useSelector((state: RootState) => state.auth);
@@ -26,9 +26,7 @@ const MobileNavigation = () => {
           </h1>
           <button
             onClick={() => setIsMenuExpanded(!isMenuExpanded)}
-            className={`${
-              isMenuExpanded ? MenuButtonActive : MenuButtonDefault
-            }`}
+            className={`${isMenuExpanded ? PRIMARY : TERTIARY}`}
           >
             Menu
           </button>

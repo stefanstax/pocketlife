@@ -26,8 +26,12 @@ import { current } from "@reduxjs/toolkit";
 
 // Currencies
 app.get("/currencies", authenticateToken, async (req, res) => {
+  const userId = req.user?.userId;
   try {
-    const { data, error } = await supabase.from("currencies").select("*");
+    const { data, error } = await supabase
+      .from("currencies")
+      .select("*")
+      .eq("userId", userId);
 
     if (error) return res.status(400).json({ message: error.message });
     res.status(200).json(data);
@@ -55,7 +59,7 @@ app.get(`/currencies/:id`, authenticateToken, async (req, res) => {
 });
 
 app.post("/currencies", authenticateToken, async (req, res) => {
-  const newCurrency = req.body;
+  const newCurrency = { ...req.body, userId: req.user.userId };
 
   try {
     const { data: existing } = await supabase
@@ -85,7 +89,7 @@ app.post("/currencies", authenticateToken, async (req, res) => {
 
 app.put("/currencies/:code", authenticateToken, async (req, res) => {
   const { code } = req.params;
-  const updatedBody = req.body;
+  const updatedBody = { ...req.body, userId: req.user.userId };
 
   try {
     const { error } = await supabase

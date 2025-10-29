@@ -144,8 +144,8 @@ const PaymentMethodEdit = () => {
             <button
               key={option.type}
               type="button"
-              className={`min-w-[100px] font-[600] rounded-full text-sm cursor-pointer p-2 border-black border-solid border-1 ${
-                type === option.type ? "bg-black text-white" : ""
+              className={`min-w-[100px] font-medium text-sm cursor-pointer p-2  ${
+                type === option.type ? "bg-[#1A1A2E] text-white" : ""
               }`}
               onClick={() => setType(option.type)}
             >
@@ -189,7 +189,7 @@ const PaymentMethodEdit = () => {
         Add Budget
       </button>
 
-      <SubmitButton aria="Update payment method" label="Update" />
+      <SubmitButton aria="Update payment method" label={`Update ${name}`} />
     </form>
   );
 };

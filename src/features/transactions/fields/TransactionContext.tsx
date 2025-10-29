@@ -1,4 +1,9 @@
-import { formDiv, input, labelClasses } from "../../../app/globalClasses";
+import {
+  formDiv,
+  input,
+  inputPicked,
+  labelClasses,
+} from "../../../app/globalClasses";
 import FormError from "../../../components/FormError";
 import {
   transactionContexts,
@@ -26,7 +31,7 @@ const TransactionContext = ({
               key={option.name}
               type="button"
               className={`cursor-pointer text-sm px-4  py-2 ${
-                option.name === context ? "bg-[#2A2BC9] text-white" : ""
+                option.name === context ? inputPicked : ""
               }`}
               onClick={() => setContext(option.name as TransactionContexts)}
             >

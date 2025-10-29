@@ -1,6 +1,5 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { transactionSchema } from "./schemas/transactionSchemas";
-import { useNavigate, useParams } from "react-router";
 import {
   type TransactionContexts,
   type TransactionTypes,
@@ -15,11 +14,7 @@ import TransactionType from "./fields/TransactionType";
 import TransactionCurrency from "./fields/TransactionCurrency";
 import TransactionContext from "./fields/TransactionContext";
 import TransactionNote from "./fields/TransactionNote";
-import {
-  useGetTransactionByIdQuery,
-  useUpdateTransactionMutation,
-} from "./api/transactionsApi";
-import BlurredSpinner from "../../components/BlurredSpinner";
+import { useUpdateTransactionMutation } from "./api/transactionsApi";
 import UploadField from "../../components/forms/UploadFile";
 import { toast } from "react-toastify";
 import TransactionMethod from "./fields/TransactionMethod";
@@ -27,11 +22,13 @@ import { useDispatch } from "react-redux";
 
 import TransactionCategory from "./fields/TransactionCategory";
 import { useGetCategoriesQuery } from "./category/api/transactionCategories";
-import { updateUserBudget } from "../../app/authSlice";
 import TransaactionDateTime from "./fields/TransaactionDateTime";
 import TransactionFee from "./fields/TransactionFee";
+import { PRIMARY, SHARED } from "../../app/globalClasses";
+import { closeOverview } from "../../app/overviewSlice";
+import { FaWindowClose } from "react-icons/fa";
 
-const EditTransaction = () => {
+const EditTransaction = ({ data }) => {
   const [title, setTitle] = useState<string>("");
   const [amount, setAmount] = useState<number | "">("");
   const [fee, setFee] = useState<number>(0);
@@ -49,11 +46,6 @@ const EditTransaction = () => {
 
   const dispatch = useDispatch();
 
-  // Transaction ID
-  const { id } = useParams();
-
-  const navigate = useNavigate();
-
   // Grab redux user data to locate paymentMethods
   const { user } = useSelector((state: RootState) => state.auth);
 
@@ -67,10 +59,12 @@ const EditTransaction = () => {
     (budgetId) => budgetId?.currencyId === currencyId
   );
 
-  // Transaction Data
-  const { data: transactionData, isLoading } = useGetTransactionByIdQuery(
-    id || ""
-  );
+  // * Transaction Data - Data now uses redux data through panel. No need to fetch a single record anymore
+  // const { data: transactionData, isLoading } = useGetTransactionByIdQuery(
+  //   id || ""
+  // );
+
+  const transactionData = data;
 
   const [updateTransaction] = useUpdateTransactionMutation();
 
@@ -79,7 +73,7 @@ const EditTransaction = () => {
   );
 
   useEffect(() => {
-    if (transactionData) {
+    if (transactionData !== null) {
       setTitle(transactionData?.title);
       setAmount(transactionData?.amount);
       setFee(transactionData?.fee);
@@ -110,7 +104,7 @@ const EditTransaction = () => {
     event.preventDefault();
 
     const verifyData = transactionSchema.safeParse({
-      id,
+      id: transactionData?.id,
       userId: transactionData?.userId,
       title,
       amount,
@@ -144,22 +138,6 @@ const EditTransaction = () => {
       const toastId = toast.info("Transaction is being updated...");
 
       try {
-        if (transactionData?.amount !== +amount) {
-          const recalculatedBudgetAmount =
-            transactionData.type === "INCOME"
-              ? findBudget.amount - transactionData.amount + +amount
-              : findBudget.amount + transactionData.amount - +amount;
-
-          dispatch(
-            updateUserBudget({
-              budgetId: findBudget?.id,
-              currencyId: findBudget?.currencyId,
-              amount: +recalculatedBudgetAmount,
-              type: "SET",
-            })
-          );
-        }
-
         await updateTransaction(verifyData?.data).unwrap();
 
         toast.update(toastId, {
@@ -168,8 +146,6 @@ const EditTransaction = () => {
           autoClose: 5000,
           isLoading: false,
         });
-
-        navigate("/transactions/");
       } catch (error: any) {
         console.log(error);
 
@@ -183,10 +159,19 @@ const EditTransaction = () => {
     }
   };
 
-  if (isLoading) return <BlurredSpinner />;
-
   return (
-    <form onSubmit={handleSubmit} className="w-full flex flex-col gap-4">
+    <form
+      onSubmit={handleSubmit}
+      className="w-full relative flex flex-col gap-4"
+    >
+      <button
+        onClick={() =>
+          dispatch(closeOverview({ panelId: transactionData?.id }))
+        }
+        className={`w-fit ml-auto sticky ${PRIMARY} ${SHARED}`}
+      >
+        Close <FaWindowClose />
+      </button>
       <TransactionTitle
         title={title}
         setTitle={setTitle}
@@ -240,12 +225,12 @@ const EditTransaction = () => {
             hasFile={
               <a
                 target="_blank"
-                className={`border-1 border-solid border-black px-4 text-white rounded-full py-2 ${
-                  receipt?.url && "bg-gray-950"
+                className={`px-4 text-white text-sm py-2 ${
+                  receipt?.url && "bg-[#1A1A2E]"
                 }`}
                 href={receipt?.url}
               >
-                View Receipt: {receipt?.name}
+                {receipt?.name}
               </a>
             }
           />

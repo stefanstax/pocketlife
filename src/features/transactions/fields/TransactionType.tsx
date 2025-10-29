@@ -1,4 +1,9 @@
-import { formDiv, input, labelClasses } from "../../../app/globalClasses";
+import {
+  formDiv,
+  input,
+  inputPicked,
+  labelClasses,
+} from "../../../app/globalClasses";
 import FormError from "../../../components/FormError";
 import {
   transactionTypes,
@@ -25,7 +30,7 @@ const TransactionType = ({
             <button
               key={option.name}
               className={`${
-                option.name === type ? "bg-[#2A2BC9] text-white " : ""
+                option.name === type ? inputPicked : ""
               } text-sm min-w-[100px] cursor-pointer p-2 `}
               type="button"
               onClick={() => setType(option.name as TransactionTypes)}

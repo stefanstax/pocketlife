@@ -20,7 +20,7 @@ export const links = [
     label: "Currencies",
     icon: "FaGear",
     hasChildren: true,
-    admin: true,
+    admin: false,
     parent: "",
   },
   {

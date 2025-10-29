@@ -24,7 +24,7 @@ const SensitiveBlock = ({
       <div
         className={`${
           privacy ? "absolute" : "hidden"
-        } w-full h-full flex justify-center items-center bg-gray-950 text-white rounded-lg`}
+        } w-full h-full flex justify-center items-center bg-[#2A2B3D] text-white`}
       >
         <FiEyeOff onClick={togglePrivacy} />
       </div>

@@ -1,4 +1,9 @@
-import { formDiv, input, labelClasses } from "../../../app/globalClasses";
+import {
+  formDiv,
+  input,
+  inputPicked,
+  labelClasses,
+} from "../../../app/globalClasses";
 import FormError from "../../../components/FormError";
 import type { CurrencyState } from "../currency/types/currencyTypes";
 import type { Budget } from "../paymentMethods/types/paymentMethodsTypes";
@@ -37,7 +42,7 @@ const TransactionCurrency = ({
                 key={curr?.code}
                 type="button"
                 className={`text-sm ${
-                  currencyId === curr?.code ? "bg-[#2A2BC9] text-white " : ""
+                  currencyId === curr?.code ? "bg-[#1A1A2E] text-white " : ""
                 } min-w-[100px] cursor-pointer p-2`}
                 onClick={() => setCurrencyId(curr?.code)}
               >
@@ -52,9 +57,7 @@ const TransactionCurrency = ({
                 key={curr?.id}
                 type="button"
                 className={`text-sm font-[600] ${
-                  currencyId === curr?.currencyId
-                    ? "bg-[#2A2BC9] text-white"
-                    : ""
+                  currencyId === curr?.currencyId ? inputPicked : ""
                 } min-w-[100px] cursor-pointer p-2 `}
                 onClick={() => setCurrencyId(curr?.currencyId)}
               >

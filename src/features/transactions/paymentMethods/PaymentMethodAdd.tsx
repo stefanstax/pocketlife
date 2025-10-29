@@ -46,6 +46,7 @@ const PaymentMethodAdd = () => {
     event?.preventDefault();
 
     const verifyData = paymentMethodCreationSchema.safeParse({
+      id: nanoid(),
       name,
       type,
       budgets,
@@ -144,9 +145,9 @@ const PaymentMethodAdd = () => {
                   type="button"
                   className={`${
                     type === paymentMethod?.type
-                      ? "bg-gray-950 text-white border-black"
+                      ? "bg-[#1A1A2E] text-white "
                       : ""
-                  } min-w-[100px] font-[600] rounded-full text-sm cursor-pointer p-2 border-solid border-1`}
+                  } min-w-[100px] font-medium text-sm cursor-pointer p-2`}
                   onClick={() => setType(paymentMethod?.type)}
                 >
                   {paymentMethod?.name.toUpperCase()}

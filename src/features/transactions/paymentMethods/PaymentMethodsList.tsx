@@ -1,21 +1,22 @@
-import { useDeletePaymentMethodMutation } from "./api/paymentMethodsApi";
+import {
+  useDeletePaymentMethodMutation,
+  useGetPaymentMethodsQuery,
+} from "./api/paymentMethodsApi";
 import { Link } from "react-router";
 import Button from "../../../components/Button";
 import { PRIMARY, SHARED } from "../../../app/globalClasses";
 import NoDataFallback from "../../../components/forms/NoDataFallback";
-import { FiEdit2 } from "react-icons/fi";
-import { useSelector } from "react-redux";
-import type { RootState } from "../../../app/store";
 import { useState } from "react";
 import DeleteRecordModal from "../../../components/DeleteRecordModal";
 import { toast } from "react-toastify";
-import { FaTrash } from "@react-icons/all-files/fa/FaTrash";
+import BlurredSpinner from "../../../components/BlurredSpinner";
 
 const PaymentMethodsList = () => {
   const [deletePaymentMethod] = useDeletePaymentMethodMutation();
-  const { user } = useSelector((state: RootState) => state.auth);
+  // const { user } = useSelector((state: RootState) => state.auth);
 
-  const paymentMethods = user?.paymentMethods;
+  // const paymentMethods = user?.paymentMethods;
+  const { data: paymentMethods, isLoading } = useGetPaymentMethodsQuery();
 
   const [showDeleteModal, setShowDeleteModal] = useState<{
     show: boolean;
@@ -28,11 +29,18 @@ const PaymentMethodsList = () => {
   });
 
   const handleDelete = async (id: string) => {
-    const toastId = toast.info("Transaction is being deleted...");
+    const toastId = toast.info(
+      `${showDeleteModal?.itemTitle} is being deleted...`
+    );
     try {
       await deletePaymentMethod(id);
+      setShowDeleteModal({
+        show: false,
+        itemId: null,
+        itemTitle: null,
+      });
       toast.update(toastId, {
-        render: "Transaction has been deleted",
+        render: `${showDeleteModal?.itemTitle} has been deleted`,
         type: "success",
         autoClose: 5000,
         isLoading: false,
@@ -47,6 +55,8 @@ const PaymentMethodsList = () => {
     }
   };
 
+  if (isLoading) return <BlurredSpinner />;
+
   return (
     <>
       {paymentMethods && paymentMethods?.length > 0 ? (
@@ -56,11 +66,9 @@ const PaymentMethodsList = () => {
             return (
               <div
                 key={id}
-                className="bg-white border-2 rounded-lg shadow-md p-4 flex flex-col gap-4"
+                className="bg-[#2A2B3D] text-white p-4 flex flex-col gap-4"
               >
-                <p className="text-sm text-[#C4C6FF] border-1 w-fit px-2 rounded-full">
-                  {type?.toUpperCase()}
-                </p>
+                <p className="text-xs w-fit">{type?.toUpperCase()}</p>
                 <p className="text-2xl font-bold">{name}</p>
                 {budgets && (
                   <div className="flex items-center gap-2">
@@ -75,12 +83,12 @@ const PaymentMethodsList = () => {
                     })}
                   </div>
                 )}
-                <div className="w-full grid grid-cols-2 gap-4 border-t border-gray-800 pt-4">
+                <div className="w-full grid grid-cols-2 gap-4">
                   <Link
                     className={`${PRIMARY} ${SHARED}`}
                     to={`/payment-methods/${id}`}
                   >
-                    <FiEdit2 />
+                    Edit
                   </Link>
                   <Button
                     ariaLabel="Delete payment method"
@@ -93,7 +101,7 @@ const PaymentMethodsList = () => {
                       })
                     }
                   >
-                    <FaTrash className="min-w-[16px]" />
+                    Delete
                   </Button>
                 </div>
               </div>

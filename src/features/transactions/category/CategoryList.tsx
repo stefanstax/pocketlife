@@ -54,44 +54,52 @@ const CategoryList = () => {
     );
 
   return (
-    <div className="w-full grid grid-cols-1 lg:grid-cols-4 gap-4">
-      {data?.map((category: CategoryType) => {
-        const { name, id, icon } = category;
-        return (
-          <div
-            key={id}
-            className="flex flex-col items-start gap-2 border-2 rounded-lg p-4"
-          >
-            <Suspense fallback={<DataSpinner />}>
-              <div className="w-fit px-4 text-[20px] py-1 border-1 rounded-full">
-                <IconShowcase pickedIcon={icon} />
+    <>
+      <div className="w-full grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {data?.map((category: CategoryType) => {
+          const { name, id, icon } = category;
+          return (
+            <div
+              key={id}
+              className="bg-[#2A2B3D] text-white flex flex-col items-start gap-2 p-4"
+            >
+              <div className="flex gap-2 items-center justify-between">
+                <Suspense fallback={<DataSpinner />}>
+                  <IconShowcase pickedIcon={icon} />
+                </Suspense>
+                <p className="font-bold">{name}</p>
               </div>
-            </Suspense>
-            <p className="text-2xl font-bold">{name}</p>
-            <div className="w-full grid grid-cols-2 gap-4 border-t border-gray-800 pt-4">
-              <Link
-                className={`${PRIMARY} ${SHARED}`}
-                to={`/transaction-categories/${id}`}
-              >
-                <FiEdit2 />
-              </Link>
-              <Button
-                ariaLabel="Delete transaction category"
-                variant="DANGER"
-                onClick={() =>
-                  setShowDeleteModal({
-                    show: true,
-                    itemId: id,
-                    itemTitle: name,
-                  })
-                }
-              >
-                <FaTrash className="min-w-[16px]" />
-              </Button>
+              <div className="w-full grid grid-cols-2 gap-4 pt-4">
+                <Link
+                  className={`${PRIMARY} ${SHARED}`}
+                  to={`/transaction-categories/${id}`}
+                >
+                  Edit
+                </Link>
+                <Button
+                  ariaLabel="Delete transaction category"
+                  variant="DANGER"
+                  onClick={() =>
+                    setShowDeleteModal({
+                      show: true,
+                      itemId: id,
+                      itemTitle: name,
+                    })
+                  }
+                >
+                  Delete
+                </Button>
+              </div>
             </div>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
+      {!data?.length && (
+        <NoDataFallback
+          dataType="Transaction categories"
+          goTo="/transaction-categories/add"
+        />
+      )}
       <DeleteRecordModal
         itemId={showDeleteModal?.itemId}
         itemTitle={showDeleteModal?.itemTitle}
@@ -101,7 +109,7 @@ const CategoryList = () => {
         }
         deleteFn={() => handleDelete(showDeleteModal?.itemId)}
       />
-    </div>
+    </>
   );
 };
 

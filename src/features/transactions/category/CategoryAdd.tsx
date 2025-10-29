@@ -7,16 +7,12 @@ import { categorySchemas } from "./schemas/categorySchemas";
 import { toast } from "react-toastify";
 import FormError from "../../../components/FormError";
 import { useAddCategoryMutation } from "./api/transactionCategories";
-import { useSelector } from "react-redux";
-import type { RootState } from "../../../app/store";
 import DataSpinner from "../../../components/DataSpinner";
 
 const CategoryAdd = () => {
-  const { user } = useSelector((state: RootState) => state.auth);
   const [formData, setFormData] = useState<AddCategoryType>({
     name: "",
     icon: "",
-    user_id: user?.id ?? "",
   });
   const [formDataErrors, setFormDataErrors] = useState<
     Partial<Record<string, string>>
@@ -79,14 +75,16 @@ const CategoryAdd = () => {
         <label htmlFor="icon" className={labelClasses}>
           Icon
         </label>
-        <Suspense fallback={<DataSpinner />}>
-          <IconPicker
-            value={formData?.icon}
-            setIcon={(value: string) =>
-              setFormData((prev) => ({ ...prev, icon: value }))
-            }
-          />
-        </Suspense>
+        <div className={input}>
+          <Suspense fallback={<DataSpinner />}>
+            <IconPicker
+              value={formData?.icon}
+              setIcon={(value: string) =>
+                setFormData((prev) => ({ ...prev, icon: value }))
+              }
+            />
+          </Suspense>
+        </div>
       </div>
       <SubmitButton aria="Create" label={`Create ${formData?.name}`} />
     </form>
