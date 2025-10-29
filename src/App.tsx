@@ -44,11 +44,8 @@ const CategoryAdd = lazy(
 const CategoryEdit = lazy(
   () => import("./features/transactions/category/CategoryEdit")
 );
-const ComingSoon = lazy(() => import("./pages/ComingSoon"));
-
 // Route guards (keep eager)
 import ProtectedRoute from "./components/ProtectedRoute";
-import AdminRoute from "./components/AdminRoute";
 import GuestRoute from "./components/GuestRoute";
 
 const App = () => {
@@ -87,8 +84,6 @@ const App = () => {
             </Route>
           </Route>
           {/* Guest Routes */}
-          <Route path="links" element={withSuspense(<ComingSoon />)} />
-          <Route path="storage" element={withSuspense(<ComingSoon />)} />
           <Route element={<GuestRoute />}>
             <Route path="authentication">
               <Route index element={<Authentication />} />

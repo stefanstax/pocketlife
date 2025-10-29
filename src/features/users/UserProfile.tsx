@@ -74,7 +74,7 @@ const UserProfile = () => {
   };
 
   return (
-    <div className="w-full rounded-lg p-4 lg:p-10 grid grid-cols-1 gap-4">
+    <div className="w-full rounded-lg grid grid-cols-1 gap-4">
       <div className="grid grid-cols-1 gap-4">
         <form className="grid grid-cols-1 gap-4" onSubmit={handleSubmit}>
           <div className={formDiv}>

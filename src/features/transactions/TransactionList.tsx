@@ -17,7 +17,7 @@ const TransactionList = () => {
     isLoading: transactionCategoriesLoading,
   } = useGetCategoriesQuery();
   const [page, setPage] = useState(1);
-  const limit = 30;
+  const limit = 10;
 
   const { data, isLoading: transactionsLoading } = useGetTransactionsQuery({
     userId: user?.id ?? "",

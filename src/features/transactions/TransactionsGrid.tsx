@@ -3,9 +3,7 @@ import type { EnrichedTransaction } from "./types/transactionTypes";
 import { Link } from "react-router-dom";
 
 // Icons
-import { FaCreditCard } from "@react-icons/all-files/fa/FaCreditCard";
 import { FaReceipt } from "@react-icons/all-files/fa/FaReceipt";
-import { FaUserTie } from "@react-icons/all-files/fa/FaUserTie";
 import { FaTrash } from "@react-icons/all-files/fa/FaTrash";
 
 // Redux

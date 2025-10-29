@@ -6,22 +6,24 @@ import MobileNavigation from "./MobileNavigation";
 import { useSelector } from "react-redux";
 import { transactionPanelData } from "../app/overviewSlice";
 import TransactionPanel from "../features/transactions/TransactionPanel";
+import type { RootState } from "../app/store";
 
 const Layout = () => {
+  const user = useSelector((state: RootState) => state.auth);
   const { width } = useWindowSize();
   const transactionPanel = useSelector(transactionPanelData);
   return (
-    <main className="w-full h-full bg-[#1A1A2E]">
+    <main className="w-full h-full">
       <div className="flex flex-col lg:flex-row max-w-11/12 lg:max-w-9/12 mx-auto py-10 gap-10">
-        <div className="w-full lg:w-3/12">
-          {width < 1024 && <MobileNavigation />}
-          {width >= 1024 && <Navigation />}
-        </div>
-        <div className="w-full">
-          <Page>
-            <Outlet />
-          </Page>
-        </div>
+        {user?.token !== null && (
+          <div className="w-full lg:w-3/12">
+            {width < 1024 && <MobileNavigation />}
+            {width >= 1024 && <Navigation />}
+          </div>
+        )}
+        <Page>
+          <Outlet />
+        </Page>
         {/* // todo  Transaction Overview will go here */}
 
         {transactionPanel?.data && (

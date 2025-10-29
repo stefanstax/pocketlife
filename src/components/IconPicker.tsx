@@ -29,7 +29,7 @@ const IconPicker = ({
   setIcon: (value: string) => void;
 }) => {
   return (
-    <div className="w-full flex flex-wrap gap-2 pb-4">
+    <div className="w-full flex flex-wrap gap-2 p-2 bg-[#2A2B3D]">
       {ICON_OPTIONS.map(({ name, icon }) => (
         <button
           type="button"

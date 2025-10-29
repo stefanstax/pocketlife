@@ -2,7 +2,7 @@ import { type ReactNode } from "react";
 
 const Page = ({ children }: { children: ReactNode }) => {
   return (
-    <div className="w-full min-h-[600px] flex flex-col justify-start items-start">
+    <div className="w-full flex flex-col justify-start items-start">
       {children}
     </div>
   );
