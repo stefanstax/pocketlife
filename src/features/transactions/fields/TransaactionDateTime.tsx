@@ -1,4 +1,9 @@
-import { formDiv, input, labelClasses } from "../../../app/globalClasses";
+import {
+  formDiv,
+  input,
+  inputPicked,
+  labelClasses,
+} from "../../../app/globalClasses";
 
 const TransaactionDateTime = ({
   created_at,
@@ -16,11 +21,9 @@ const TransaactionDateTime = ({
         Skip if you want to use to use current date and time.
       </span>
 
-      <div className={`${input} flex gap-4 font-[600] text-sm flex-wrap`}>
+      <div className={`${input} flex gap-4 text-sm flex-wrap`}>
         <input
-          className={`border-1 rounded-full p-2 ${
-            created_at ? "bg-black text-white" : ""
-          }`}
+          className={`p-2 ${created_at ? inputPicked : ""} `}
           style={{
             appearance: "none",
             WebkitAppearance: "none" as "none",

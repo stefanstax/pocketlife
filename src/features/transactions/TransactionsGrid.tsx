@@ -1,17 +1,9 @@
 import { lazy, Suspense, useState } from "react";
 import type { EnrichedTransaction } from "./types/transactionTypes";
 import { Link } from "react-router-dom";
-import { PRIMARY, SECONDARY, SHARED } from "../../app/globalClasses";
-import Button from "../../components/Button";
 
 // Icons
-import { FaCalendar } from "@react-icons/all-files/fa/FaCalendar";
-import { FaCreditCard } from "@react-icons/all-files/fa/FaCreditCard";
-import { FaStickyNote } from "@react-icons/all-files/fa/FaStickyNote";
 import { FaReceipt } from "@react-icons/all-files/fa/FaReceipt";
-import { FaRegClone } from "@react-icons/all-files/fa/FaRegClone";
-import { FaUserTie } from "@react-icons/all-files/fa/FaUserTie";
-import { FaEdit } from "@react-icons/all-files/fa/FaEdit";
 import { FaTrash } from "@react-icons/all-files/fa/FaTrash";
 
 // Redux
@@ -26,6 +18,11 @@ import type { PaymentMethod } from "./paymentMethods/types/paymentMethodsTypes";
 import DataSpinner from "../../components/DataSpinner";
 import type { CategoryType } from "./category/types/categoryType";
 import DeleteRecordModal from "../../components/DeleteRecordModal";
+import useWindowSize from "../../hooks/useWindowSize";
+import { FaEdit, FaRegClone } from "react-icons/fa";
+import { useDispatch } from "react-redux";
+import { openOverview } from "../../app/overviewSlice";
+
 const IconShowcase = lazy(() =>
   import("../../components/IconPicker").then((module) => ({
     default: module.IconShowcase,
@@ -37,8 +34,9 @@ type Props = {
   categories: CategoryType[];
 };
 
-const TransactionGrid = ({ data, paymentMethods, categories }: Props) => {
+const TransactionGrid = ({ data, categories }: Props) => {
   const [deleteTransaction] = useDeleteTransactionMutation();
+  const dispatch = useDispatch();
 
   const [showDeleteModal, setShowDeleteModal] = useState<{
     show: boolean;
@@ -111,39 +109,11 @@ const TransactionGrid = ({ data, paymentMethods, categories }: Props) => {
 
   return (
     <>
-      <div className="w-full flex gap-4 py-4 mb-2 min-w-full overflow-x-auto">
-        {paymentMethods?.map((paymentMethod: PaymentMethod) => {
-          const mapOverBudgets = paymentMethod?.budgets?.map((budget) => {
-            return (
-              <p
-                key={budget?.id}
-                className="flex gap-2 items-center border border-gray-950 px-2 rounded-full text-black text-sm"
-              >
-                <span>{budget?.currencyId}</span>
-                <span>{budget?.amount.toFixed(2)}</span>
-              </p>
-            );
-          });
-          return (
-            <div
-              key={paymentMethod?.id}
-              className="min-w-fit border-2 rounded-lg shadow-md p-4 flex justify-between items-center gap-2 bg-white"
-            >
-              <p className="font-bold w-full min-w-[150px] mr-4">
-                {paymentMethod?.name}
-              </p>
-              {mapOverBudgets}
-            </div>
-          );
-        })}
-      </div>
-      <div className="w-full gap-4 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4">
+      <div className="w-full grid grid-cols-1">
         {data.map((transaction) => {
           const {
             title,
             amount,
-            note,
-            type,
             currency,
             receipt,
             categoryId,
@@ -152,108 +122,112 @@ const TransactionGrid = ({ data, paymentMethods, categories }: Props) => {
             context,
           } = transaction;
 
-          const createdDate = new Date(created_at).toLocaleDateString();
-          const createdTime = new Date(created_at).toLocaleTimeString();
+          const createdDate = new Date(created_at).toDateString();
           const findIcon = categories?.find(
             (category) => category?.id === categoryId
           );
+
+          const { width } = useWindowSize();
           return (
-            <div
-              key={transaction?.id}
-              className="flex flex-1 border-2 flex-col justify-between items-stretch gap-4 bg-white rounded-lg p-4 shadow-md"
-            >
-              <div className="flex items-center gap-2">
-                <span className="text-sm flex items-center gap-2">
-                  <FaCalendar className="min-w-[16px]" />
-                  {createdDate} - {createdTime}
-                </span>
-              </div>
-              <div className="flex flex-wrap font-[600] gap-2 items-center">
-                <p>{title}</p>
+            <div key={transaction?.id} className="mb-4">
+              {/* Transaction Category */}
+              <div className="flex bg-[#2A2B3D] justify-between w-full p-4 text-xs items-center border-b-1 border-b-[#33344A]">
                 <Suspense fallback={<DataSpinner />}>
                   {findIcon && (
-                    <span
-                      className="flex gap-2 items-center text-xs border-1
-                  rounded-full 
-                  px-2
-                  py-1"
-                    >
+                    <span className="flex gap-2 text-white items-center">
                       <IconShowcase pickedIcon={findIcon?.icon ?? ""} />
                       <span>{findIcon?.name}</span>
                     </span>
                   )}
                 </Suspense>
-              </div>
-              <p
-                className={`inline-block ${
-                  type === "EXPENSE" ? "text-red-600" : "text-green-600"
-                } font-bold`}
-              >
-                {currency?.symbol}
-                {amount.toFixed(2)}
-              </p>
-              <p className="text-sm font-bold flex items-center gap-2">
-                <FaUserTie className="min-w-[16px]" />
-                {context}
-              </p>
-              <p className="flex items-center gap-2 text-sm">
-                <FaCreditCard className="min-w-[16px]" />
-                {paymentMethod?.name}
-              </p>
-              <p className="text-sm flex items-center gap-2">
-                <FaStickyNote className="min-w-[16px]" />
-                {note?.length ? note : "Note not provided."}
-              </p>
-              <div className="grid gap-4 grid-cols-4 border-t-1 border-gray-900 pt-4">
-                <Link
-                  className={`${PRIMARY} ${SHARED}`}
-                  to={`/transactions/${transaction?.id}`}
-                >
-                  <FaEdit className="min-w-[16px]" />
-                </Link>
-                <Button
-                  type="button"
-                  ariaLabel="Delete transaction"
-                  variant="DANGER"
-                  onClick={() =>
-                    setShowDeleteModal({
-                      show: true,
-                      itemId: transaction?.id,
-                      itemTitle: transaction?.title,
-                    })
-                  }
-                >
-                  <FaTrash className="min-w-[16px]" />
-                </Button>
-                <Button
-                  type="button"
-                  ariaLabel="Clone transaction"
-                  variant="SECONDARY"
-                  onClick={() => handleClone(transaction)}
-                >
-                  <FaRegClone className="min-w-[16px]" />
-                </Button>
+                <div className="flex gap-2 lg:gap-6 items-center">
+                  <button
+                    className="flex gap-2 items-center text-white cursor-pointer"
+                    onClick={() => handleClone(transaction)}
+                  >
+                    <FaRegClone className="min-w-[16px]" />
+                  </button>
+                  <button
+                    className="flex gap-2 items-center text-white cursor-pointer"
+                    onClick={() => {
+                      dispatch(
+                        openOverview({
+                          name: "transactionPanel",
+                          panelId: transaction?.id,
+                          transactionOverview: true,
+                          data: transaction,
+                        })
+                      );
+                    }}
+                  >
+                    <FaEdit className="min-w-[16px]" />
+                  </button>
 
-                {receipt?.url ? (
-                  <Link
-                    to={`${receipt?.url}`}
-                    target="_blank"
-                    className={`${SECONDARY} ${SHARED}`}
+                  <button
+                    className="flex gap-2 items-center text-white hover:text-red-800 cursor-pointer"
+                    onClick={() =>
+                      setShowDeleteModal({
+                        show: true,
+                        itemId: transaction?.id,
+                        itemTitle: transaction?.title,
+                      })
+                    }
                   >
-                    <FaReceipt />
-                  </Link>
-                ) : (
-                  <p
-                    className={`${PRIMARY} ${SHARED} opacity-50 pointer-events-none`}
-                  >
-                    <FaReceipt className={"min-w-[16px]"} />
+                    <FaTrash className="min-w-[16px]" />
+                  </button>
+
+                  {receipt?.url ? (
+                    <Link
+                      to={`${receipt?.url}`}
+                      target="_blank"
+                      className="text-white"
+                    >
+                      <FaReceipt />
+                    </Link>
+                  ) : (
+                    <p className="text-white">
+                      <FaReceipt className={"min-w-[16px]"} />
+                    </p>
+                  )}
+                </div>
+              </div>
+              {/* Main Transaction Part */}
+              <div className="flex flex-wrap justify-between items-center gap-4 bg-[#2A2B3D] text-white p-4">
+                {/* Transaction Who */}
+                {width > 1024 && <p>{title}</p>}
+                {/* Transaction Date */}
+                {width > 1024 && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm flex items-center gap-2">
+                      {createdDate}
+                    </span>
+                  </div>
+                )}
+                {/* Transaction Account */}
+                {width > 1024 && (
+                  <p className="flex flex-col items-start gap-2 text-sm">
+                    <span className="text-xs">{context}</span>
+                    {paymentMethod?.name}
                   </p>
                 )}
+                {width <= 1024 && (
+                  <div className="flex flex-col gap-2">
+                    <p className="font-bold">{title}</p>
+                    <p className="text-sm">{createdDate}</p>
+                    <p className="text-sm">{context}</p>
+                  </div>
+                )}
+                {/* Transaction Amount */}
+                <p className="text-md font-bold">
+                  {currency?.symbol}
+                  {amount.toFixed(2)}
+                </p>
               </div>
             </div>
           );
         })}
       </div>
+
       <DeleteRecordModal
         itemId={showDeleteModal?.itemId}
         itemTitle={showDeleteModal?.itemTitle}

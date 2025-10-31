@@ -1,4 +1,4 @@
-import { PRIMARY, SHARED } from "../app/globalClasses";
+import { SECONDARY, SHARED } from "../app/globalClasses";
 
 interface PaginationProps {
   page: number;
@@ -23,16 +23,16 @@ const Pagination = ({
     if (page < totalPages) onPageChange(page + 1);
   };
   return (
-    <div className="grid grid-cols-3 gap-2 items-center">
+    <div className="w-fit grid grid-cols-3 gap-2 text-white font-medium items-center">
       <button
-        className={`${PRIMARY} ${SHARED}`}
+        className={`${SECONDARY} ${SHARED}`}
         onClick={handlePrev}
         disabled={page <= 1}
       >
         Previous
       </button>
       <button
-        className={`${PRIMARY} ${SHARED}`}
+        className={`${SECONDARY} ${SHARED}`}
         onClick={handleNext}
         disabled={page >= totalPages}
       >

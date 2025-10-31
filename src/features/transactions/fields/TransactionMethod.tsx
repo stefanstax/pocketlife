@@ -1,4 +1,9 @@
-import { formDiv, input, labelClasses } from "../../../app/globalClasses";
+import {
+  formDiv,
+  input,
+  inputPicked,
+  labelClasses,
+} from "../../../app/globalClasses";
 import FormError from "../../../components/FormError";
 import { useGetPaymentMethodsQuery } from "../paymentMethods/api/paymentMethodsApi";
 
@@ -25,11 +30,9 @@ const TransactionMethod = ({
             <button
               type="button"
               key={option.id}
-              className={`text-sm font-[600] ${
-                option.id === paymentMethodId
-                  ? "bg-gray-950 text-white border-black"
-                  : ""
-              } min-w-[100px] rounded-full cursor-pointer p-2 border-black border-solid border-1`}
+              className={`text-sm  ${
+                option.id === paymentMethodId ? inputPicked : ""
+              } min-w-[100px] cursor-pointer p-2 `}
               onClick={() => setPaymentMethodId(option.id)}
             >
               {option.name.toUpperCase()}

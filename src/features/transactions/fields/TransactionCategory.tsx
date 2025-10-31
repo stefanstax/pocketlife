@@ -1,4 +1,10 @@
-import { formDiv, input, labelClasses } from "../../../app/globalClasses";
+import { Link } from "react-router";
+import {
+  formDiv,
+  input,
+  inputPicked,
+  labelClasses,
+} from "../../../app/globalClasses";
 
 import FormError from "../../../components/FormError";
 import { IconShowcase } from "../../../components/IconPicker";
@@ -20,7 +26,7 @@ const TransactionCategory = ({
       <label htmlFor="icon" className={labelClasses}>
         Category
       </label>
-      <div className={`w-full flex gap-2 ${input} overflow-x-scroll`}>
+      <div className={`w-full flex flex-wrap gap-2 ${input}`}>
         {(data ?? [])?.map((option) => {
           const { id, icon, name } = option;
 
@@ -29,8 +35,8 @@ const TransactionCategory = ({
               key={id}
               type="button"
               className={`${
-                categoryId === id ? "bg-black text-white" : ""
-              }  flex gap-2 items-center border-1 rounded-full overflow-x-hidden min-w-fit cursor-pointer px-4 py-2 font-[600] text-sm`}
+                categoryId === id ? `${inputPicked} text-white` : ""
+              }  flex gap-2 items-center min-w-fit cursor-pointer px-4 py-2 text-sm`}
               onClick={() => setCategoryId(id)}
             >
               <IconShowcase pickedIcon={icon} />
@@ -38,6 +44,13 @@ const TransactionCategory = ({
             </button>
           );
         })}
+        <Link
+          to={"/transaction-categories/add"}
+          type="button"
+          className="flex gap-2 items-center min-w-fit cursor-pointer px-4 py-2 text-sm"
+        >
+          Add new
+        </Link>
       </div>
       <input type="hidden" name="categoryId" value={categoryId ?? ""} />
       {validationError && <FormError fieldError={validationError} />}

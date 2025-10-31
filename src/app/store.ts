@@ -18,6 +18,7 @@ import { paymentMethodsApi } from "../features/transactions/paymentMethods/api/p
 import { recoveryApi } from "../features/recovery/api/recoveryApi";
 import { usersApi } from "../features/users/api/usersApi";
 import { transactionCategoriesApi } from "../features/transactions/category/api/transactionCategories";
+import overviewReducer from "./overviewSlice";
 
 const authPersistConfig = {
   key: "auth",
@@ -35,6 +36,7 @@ const rootReducer = combineReducers({
   [recoveryApi.reducerPath]: recoveryApi.reducer,
   [usersApi.reducerPath]: usersApi.reducer,
   [transactionCategoriesApi.reducerPath]: transactionCategoriesApi.reducer,
+  overview: overviewReducer,
 });
 
 // Configure store

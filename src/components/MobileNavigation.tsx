@@ -1,10 +1,10 @@
 import { useSelector } from "react-redux";
 import type { RootState } from "../app/store";
-import { PRIMARY, TERTIARY } from "../app/globalClasses";
 import { useState } from "react";
 import MenuDropdown from "./MenuDropdown";
+import { PRIMARY, TERTIARY } from "../app/globalClasses";
 
-const Navigation = () => {
+const MobileNavigation = () => {
   const { user, token } = useSelector((state: RootState) => state.auth);
   const [isMenuExpanded, setIsMenuExpanded] = useState(false);
   const [expandParentLink, setExpandParentLink] = useState<string | null>(null);
@@ -26,7 +26,7 @@ const Navigation = () => {
           </h1>
           <button
             onClick={() => setIsMenuExpanded(!isMenuExpanded)}
-            className={`flex lg:hidden ${isMenuExpanded ? PRIMARY : TERTIARY}`}
+            className={`${isMenuExpanded ? PRIMARY : TERTIARY}`}
           >
             Menu
           </button>
@@ -45,4 +45,4 @@ const Navigation = () => {
   );
 };
 
-export default Navigation;
+export default MobileNavigation;

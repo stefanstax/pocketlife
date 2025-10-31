@@ -12,7 +12,7 @@ const TransactionFee = ({
       <label htmlFor="fees" className={labelClasses}>
         Fee
       </label>
-      <span className="text-xs pb-2">Default is 0, Use comma.</span>
+      <span className="text-xs pb-2">Leave 0 if no fee was included.</span>
       <input
         type="number"
         className={input}

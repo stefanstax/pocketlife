@@ -8,23 +8,53 @@ import { PRIMARY, SHARED } from "../../../app/globalClasses";
 import BlurredSpinner from "../../../components/BlurredSpinner";
 import { toast } from "react-toastify";
 import NoDataFallback from "../../../components/forms/NoDataFallback";
-import { FiEdit2 } from "react-icons/fi";
-import { FaTrash } from "@react-icons/all-files/fa/FaTrash";
+import Button from "../../../components/Button";
+import DeleteRecordModal from "../../../components/DeleteRecordModal";
+import { useState } from "react";
 
 const CurrencyList = () => {
-  const { data } = useGetCurrenciesQuery();
+  const { data, isLoading: fetchinCurrencies } = useGetCurrenciesQuery();
   const [removeCurrencyById, { isLoading: loadingCurrencies }] =
     useRemoveCurrencyByIdMutation();
 
-  const handleDelete = async (code: string) => {
-    await toast.promise(removeCurrencyById(code).unwrap(), {
-      pending: "Currency is being removed.",
-      success: "Currency has been removed.",
-      error: "Currency could not be removed.",
-    });
+  const handleDelete = async (id: string) => {
+    const toastId = toast.info(
+      `${showDeleteModal?.itemTitle} is being deleted...`
+    );
+    try {
+      await removeCurrencyById(id);
+      setShowDeleteModal({
+        show: false,
+        itemId: null,
+        itemTitle: null,
+      });
+      toast.update(toastId, {
+        render: `${showDeleteModal?.itemTitle} has been deleted`,
+        type: "success",
+        autoClose: 5000,
+        isLoading: false,
+      });
+    } catch (error: any) {
+      toast.update(toastId, {
+        render: error?.data?.message ?? "Uncaught error.",
+        type: "error",
+        autoClose: 5000,
+        isLoading: false,
+      });
+    }
   };
 
-  if (loadingCurrencies) return <BlurredSpinner />;
+  const [showDeleteModal, setShowDeleteModal] = useState<{
+    show: boolean;
+    itemId: string | null;
+    itemTitle: string | null;
+  }>({
+    show: false,
+    itemId: null,
+    itemTitle: "",
+  });
+
+  if (loadingCurrencies || fetchinCurrencies) return <BlurredSpinner />;
 
   return (
     <>
@@ -34,26 +64,33 @@ const CurrencyList = () => {
           return (
             <div
               key={code}
-              className="bg-white shadow-md border-2 rounded-lg p-4 flex flex-col gap-4"
+              className="bg-[#2A2B3D] text-white p-4 flex flex-col justify-between gap-4"
             >
-              <div className="flex items-center gap-2 border-1 rounded-full w-fit px-2">
-                <p>{symbol}</p>
+              <div className="flex items-center gap-2 w-fit">
+                <p>({symbol})</p>
                 <p>{code}</p>
               </div>
-              <p className="font-bold">{name}</p>
+              <p className="font-bold text-2xl">{name}</p>
               <div className="grid grid-cols-2 gap-4">
                 <Link
                   className={`${PRIMARY} ${SHARED}`}
                   to={`/currencies/${code}`}
                 >
-                  <FiEdit2 />
+                  Edit
                 </Link>
-                <button
-                  className={`${PRIMARY} ${SHARED}`}
-                  onClick={() => handleDelete(code)}
+                <Button
+                  ariaLabel="Delete currency"
+                  variant="DANGER"
+                  onClick={() =>
+                    setShowDeleteModal({
+                      show: true,
+                      itemId: code,
+                      itemTitle: name,
+                    })
+                  }
                 >
-                  <FaTrash className="min-w-[16px]" />
-                </button>
+                  Delete
+                </Button>
               </div>
             </div>
           );
@@ -62,6 +99,20 @@ const CurrencyList = () => {
       {!data?.length && (
         <NoDataFallback dataType="Currencies" goTo="/currencies/add" />
       )}
+
+      <DeleteRecordModal
+        showModal={showDeleteModal?.show}
+        itemId={showDeleteModal?.itemId}
+        itemTitle={showDeleteModal?.itemTitle}
+        onCancel={() =>
+          setShowDeleteModal({
+            show: false,
+            itemId: null,
+            itemTitle: null,
+          })
+        }
+        deleteFn={() => handleDelete(showDeleteModal?.itemId)}
+      />
     </>
   );
 };

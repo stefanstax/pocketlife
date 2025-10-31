@@ -29,14 +29,14 @@ const IconPicker = ({
   setIcon: (value: string) => void;
 }) => {
   return (
-    <div className="w-full flex gap-2 overflow-x-scroll pb-4">
+    <div className="w-full flex flex-wrap gap-2 p-2 bg-[#2A2B3D]">
       {ICON_OPTIONS.map(({ name, icon }) => (
         <button
           type="button"
           key={name}
           onClick={() => setIcon(name)}
-          className={`p-2 border-1 text-xs font-bold rounded-full min-w-fit cursor-pointer flex gap-2 items-center justify-center ${
-            name === value ? "bg-black text-white" : ""
+          className={`p-2 text-sm min-w-fit cursor-pointer flex gap-2 items-center justify-center ${
+            name === value ? "bg-[#1A1A2E] text-white" : ""
           }`}
           title={name}
         >
