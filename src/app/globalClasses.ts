@@ -1,4 +1,4 @@
-export const PRIMARY = `w-full lg:w-fit bg-[#5152fb] text-white hover:bg-[#3D3EE2] font-medium py-2 px-4`;
+export const PRIMARY = `w-fit bg-[#5152fb] text-white hover:bg-[#3D3EE2] font-medium py-2 px-4`;
 
 export const SECONDARY = `bg-transparent border border-[#5152fb] text-[#5152fb] hover:bg-[#5152fb1A] hover-text[#5152fb1A] font-medium py-2 px-4`;
 

@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { lazy, useState, type FormEvent } from "react";
 import { newTransactionSchema } from "./schemas/transactionSchemas";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../app/store";
@@ -31,8 +31,11 @@ import { useGetPaymentMethodByIdQuery } from "./paymentMethods/api/paymentMethod
 import { useGetCategoriesQuery } from "./category/api/transactionCategories";
 import { updateUserBudget } from "../../app/authSlice";
 import TransactionFee from "./fields/TransactionFee";
+import TransactionInvoiceNumber from "./fields/TransactionInvoiceNumber";
 
 const TransactionAdd = () => {
+  const [type, setType] = useState<TransactionTypes | "">("");
+  const [invoiceNumber, setInvoiceNumber] = useState<string | "">("");
   const [title, setTitle] = useState<string>("");
   const [amount, setAmount] = useState<number | "">("");
   const [fee, setFee] = useState<number>(0);
@@ -41,7 +44,6 @@ const TransactionAdd = () => {
   const [categoryId, setCategoryId] = useState<string>("");
   const [currencyId, setCurrencyId] = useState<string | "">("");
   const [note, setNote] = useState<string>("");
-  const [type, setType] = useState<TransactionTypes | "">("");
   const [receipt, setReceipt] = useState<Receipt | null>(null);
   const [paymentMethodId, setPaymentMethodId] = useState<string | "">("");
   const [formErrors, setFormErrors] = useState<Partial<Record<string, string>>>(
@@ -57,10 +59,14 @@ const TransactionAdd = () => {
   const { data: paymentMethod, isLoading: paymentMethodLoading } =
     useGetPaymentMethodByIdQuery(paymentMethodId ?? "");
 
+  const isExpense = type === "EXPENSE";
+
   const {
     data: transactionCategories,
     isLoading: transactionCategoriesLoading,
-  } = useGetCategoriesQuery();
+  } = useGetCategoriesQuery(undefined, {
+    skip: !isExpense,
+  });
 
   const findBudget = paymentMethod?.budgets?.find(
     (budgetId) => budgetId?.currencyId === currencyId
@@ -70,6 +76,8 @@ const TransactionAdd = () => {
     event.preventDefault();
 
     const verifiedData = newTransactionSchema.safeParse({
+      type,
+      invoiceNumber,
       title,
       amount,
       fee,
@@ -77,7 +85,6 @@ const TransactionAdd = () => {
       currencyId,
       created_at: created_at || new Date().toISOString(), // If empty use current date and time
       note,
-      type,
       paymentMethodId,
       budgetId: findBudget?.id,
       context,
@@ -120,13 +127,14 @@ const TransactionAdd = () => {
         });
 
         //* Clear state as user is being kept on the same page
+        setType("");
+        setInvoiceNumber("");
         setTitle("");
         setAmount("");
         setFee(0);
         setCurrencyId("");
         setCreatedAt("");
         setNote("");
-        setType("");
         setContext("");
         setCategoryId("");
         setPaymentMethodId("");
@@ -144,16 +152,32 @@ const TransactionAdd = () => {
 
   return (
     <form onSubmit={handleSubmit} className="w-full grid grid-cols-1 gap-4">
+      {/* Type */}
+      <TransactionType
+        type={type}
+        setType={setType}
+        validationError={formErrors?.type}
+      />
+      {/* Invoice Number */}
+      <TransactionInvoiceNumber
+        invoiceNumber={invoiceNumber}
+        setInvoiceNumber={setInvoiceNumber}
+        validationError={formErrors?.invoiceNumber}
+      />
       {/* Title */}
       <TransactionTitle
         title={title}
         setTitle={setTitle}
+        labelType={type}
         validationError={formErrors?.title}
       />
+      {/* Note */}
+      <TransactionNote note={note} setNote={setNote} labelType={type} />
       {/* Amount */}
       <TransactionAmount
         amount={amount}
         setAmount={setAmount}
+        labelType={type}
         validationError={formErrors?.amount}
       />
       {/* Fees */}
@@ -173,12 +197,7 @@ const TransactionAdd = () => {
         created_at={created_at}
         setCreatedAt={setCreatedAt}
       />
-      {/* Type */}
-      <TransactionType
-        type={type}
-        setType={setType}
-        validationError={formErrors?.type}
-      />
+
       {/* Method */}
       {paymentMethodLoading ? (
         <DataSpinner />
@@ -210,8 +229,6 @@ const TransactionAdd = () => {
         setReceipt={setReceipt}
         username={user?.username as string}
       />
-      {/* Note */}
-      <TransactionNote note={note} setNote={setNote} />
 
       <SubmitButton
         aria="Create transaction"

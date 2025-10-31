@@ -4,6 +4,9 @@ export const transactionSchema = z.object({
   id: z.string(),
   created_at: z.string(),
   updated_at: z.string().nullable(),
+  invoiceNumber: z
+    .string()
+    .nonempty({ message: "Please enter invoice number from the receipt" }),
   title: z.string().nonempty({ message: "Please enter transaction title" }),
   amount: z.preprocess(
     (val) => parseFloat(String(val)),
@@ -42,6 +45,9 @@ export const newTransactionSchema = z.object({
   created_at: z
     .string()
     .min(5, { message: "Business transactions must include date and time." }),
+  invoiceNumber: z
+    .string()
+    .nonempty({ message: "Please enter invoice number from the receipt" }),
   title: z.string().nonempty({ message: "Please enter transaction title." }),
   amount: z.preprocess(
     (val) => parseFloat(String(val)),

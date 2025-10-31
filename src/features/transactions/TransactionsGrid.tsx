@@ -112,8 +112,10 @@ const TransactionGrid = ({ data, categories }: Props) => {
       <div className="w-full grid grid-cols-1">
         {data.map((transaction) => {
           const {
+            invoiceNumber,
             title,
             amount,
+            fee,
             currency,
             receipt,
             categoryId,
@@ -194,7 +196,12 @@ const TransactionGrid = ({ data, categories }: Props) => {
               {/* Main Transaction Part */}
               <div className="flex flex-wrap justify-between items-center gap-4 bg-[#2A2B3D] text-white p-4">
                 {/* Transaction Who */}
-                {width > 1024 && <p>{title}</p>}
+                {width > 1024 && (
+                  <p className="flex flex-col">
+                    <span className="text-xs">{invoiceNumber}</span>
+                    {title}
+                  </p>
+                )}
                 {/* Transaction Date */}
                 {width > 1024 && (
                   <div className="flex items-center gap-2">
@@ -211,16 +218,25 @@ const TransactionGrid = ({ data, categories }: Props) => {
                   </p>
                 )}
                 {width <= 1024 && (
-                  <div className="flex flex-col gap-2">
-                    <p className="font-bold">{title}</p>
+                  <div className="flex flex-col gap-2 flex-1">
+                    <p className="flex flex-col">
+                      <span className="text-xs">{invoiceNumber}</span>
+                      {title}
+                    </p>
                     <p className="text-sm">{createdDate}</p>
                     <p className="text-sm">{context}</p>
                   </div>
                 )}
                 {/* Transaction Amount */}
-                <p className="text-md font-bold">
-                  {currency?.symbol}
-                  {amount.toFixed(2)}
+                <p className="text-sm">
+                  <span className="flex justify-end">
+                    Net {currency?.symbol}
+                    {amount.toFixed(2)}
+                  </span>
+                  <span className="flex justify-end">
+                    Gross {currency?.symbol}
+                    {(amount + fee).toFixed(2)}
+                  </span>
                 </p>
               </div>
             </div>

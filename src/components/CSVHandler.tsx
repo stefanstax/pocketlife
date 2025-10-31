@@ -28,22 +28,33 @@ const CSVHandler = ({ transactions }) => {
 
     try {
       let csvContent =
-        "Title,Date,Type,Receipt Link,Card on File,Category,Note,Amount,Fee\n";
+        "Date,Type,Invoice Number,Supplier/Customer Name,Note,Gross Amount,Net Amount,Fee,Payment Method,Category,Receipt URL\n";
 
       for (const transaction of transactions) {
         if (transaction.amount > 0) {
           const row = [
+            // Invoice Date
+            escapeCSV(new Date(transaction.created_at).toLocaleDateString()),
+            // Transaction Type
+            escapeCSV(transaction.type),
+            // Invoice Number
+            escapeCSV(transaction.invoiceNumber),
             // Title
             escapeCSV(transaction.title),
-            // Date
-            escapeCSV(new Date(transaction.created_at).toLocaleDateString()),
-            // Type
-            escapeCSV(transaction.type),
-            // Receipt Url
+            // Note
+            escapeCSV(transaction.note || "No note provided."),
+            // Amount Gross
             escapeCSV(
-              transaction.receipt
-                ? transaction?.receipt?.url
-                : "No receipt provided."
+              `${transaction?.currency?.code} ${
+                transaction.amount + transaction.fee
+              }`
+            ),
+            // Amount Net
+            escapeCSV(`${transaction?.currency?.code} ${transaction.amount}`),
+            // Incurred Fee
+            escapeCSV(
+              `${transaction?.currency?.code} ${transaction.fee}` ||
+                `${transaction?.currency?.code} 0.00`
             ),
             // Payment Method
             escapeCSV(
@@ -57,14 +68,11 @@ const CSVHandler = ({ transactions }) => {
                 (category) => category?.id == transaction?.categoryId
               )?.name || "No category provided"
             ),
-            // Note
-            escapeCSV(transaction.note || "No note provided."),
-            // Amount
-            escapeCSV(`${transaction?.currency?.code} ${transaction.amount}`),
-            // Fee
+            // Receipt Url
             escapeCSV(
-              `${transaction?.currency?.code} ${transaction.fee}` ||
-                `${transaction?.currency?.code} 0.00`
+              transaction.receipt
+                ? transaction?.receipt?.url
+                : "No receipt provided."
             ),
           ].join(",");
 
@@ -107,7 +115,8 @@ const CSVHandler = ({ transactions }) => {
       disabled={isExporting || !transactions?.length}
       className={`${PRIMARY} ${SHARED}`}
     >
-      {isExporting ? "Exporting" : "Export"} Transactions <FaFileDownload />
+      {isExporting ? "Exporting" : "Export"} Transactions <FaFileDownload /> (in
+      Beta)
     </button>
   );
 };
