@@ -11,12 +11,10 @@ const IconShowcase = lazy(() =>
     default: module.IconShowcase,
   }))
 );
-import { FiEdit2 } from "react-icons/fi";
 import { PRIMARY, SHARED } from "../../../app/globalClasses";
 import Button from "../../../components/Button";
 import { Link } from "react-router";
 import DataSpinner from "../../../components/DataSpinner";
-import { FaTrash } from "@react-icons/all-files/fa/FaTrash";
 import DeleteRecordModal from "../../../components/DeleteRecordModal";
 
 const CategoryList = () => {
