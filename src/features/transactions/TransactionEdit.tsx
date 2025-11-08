@@ -4,6 +4,7 @@ import {
   type TransactionContexts,
   type TransactionTypes,
   type Receipt,
+  type TransactionVATOption,
 } from "./types/transactionTypes";
 import SubmitButton from "../../components/SubmitButton";
 import { useSelector } from "react-redux";
@@ -29,12 +30,14 @@ import { closeOverview } from "../../app/overviewSlice";
 import { FaWindowClose } from "react-icons/fa";
 import TransactionInvoiceNumber from "./fields/TransactionInvoiceNumber";
 import DataSpinner from "../../components/DataSpinner";
+import TransactionVAT from "./fields/TransactionVAT";
 
 const EditTransaction = ({ data }) => {
   const [invoiceNumber, setInvoiceNumber] = useState<string>("");
   const [title, setTitle] = useState<string>("");
   const [amount, setAmount] = useState<number | "">("");
   const [fee, setFee] = useState<number>(0);
+  const [vat, setVat] = useState<TransactionVATOption>("0%");
   const [currencyId, setCurrencyId] = useState<string | "">("");
   const [categoryId, setCategoryId] = useState<string>("");
   const [created_at, setCreatedAt] = useState<string | "">("");
@@ -80,6 +83,7 @@ const EditTransaction = ({ data }) => {
         setCategoryId(transactionData?.categoryId);
       }
       setType(transactionData?.type);
+      setVat(transactionData?.vat);
       setNote(transactionData?.note);
       setContext(transactionData?.context);
       setCreatedAt(transactionData?.created_at);
@@ -103,6 +107,7 @@ const EditTransaction = ({ data }) => {
       title,
       amount,
       fee,
+      vat,
       categoryId,
       currencyId,
       created_at,
@@ -127,8 +132,6 @@ const EditTransaction = ({ data }) => {
       setFormErrors(fieldErrors);
       return;
     }
-
-    console.log(verifyData?.error);
 
     if (verifyData.success) {
       const toastId = toast.info("Transaction is being updated...");
@@ -189,6 +192,11 @@ const EditTransaction = ({ data }) => {
         setNote={setNote}
         labelType={type}
         validationError={formErrors?.note}
+      />
+      <TransactionVAT
+        vat={vat}
+        setVat={setVat}
+        validationError={formErrors.vat}
       />
       <TransactionAmount
         amount={amount}

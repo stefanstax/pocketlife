@@ -57,7 +57,6 @@ const LoginForm = () => {
 
         dispatch(loginSuccess({ token, user }));
         const paymentMethods = await getPaymentMethods().unwrap();
-        console.log(paymentMethods);
 
         const enrichedUser = { ...user, paymentMethods: paymentMethods };
         // Send another update to fill user's data

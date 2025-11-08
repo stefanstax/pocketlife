@@ -5,17 +5,17 @@
 - Create payment methods
 - Create transactions
 - Create budgets under payment methods
-- [New] Create transaction categories
-- [New] Pincode registration
-- [New] Secret profile update capabilities
+- Create transaction categories
+- Pincode registration
+- Secret profile update capabilities
 - Upload receipts from device or take with a device camera
 - All data has been protected by your own device keys upon registration and login which prevents any malicious use from third party
 - Coming soon:
-  -- Ability to export to xlsx file
-  -- Ability to send transactions to your google xlsx file of choice
-  -- Email authentication
-  -- File Storage
-  -- Account sharing with an accountant
+  -- [x] Ability to export to xlsx file
+  -- [x] Account sharing with an accountant
+  -- [TBD] Ability to send transactions to your google xlsx file of choice
+  -- [TBD] Email authentication
+  -- [TBD] File Storage
 
 ### Future Expansion Ideas
 

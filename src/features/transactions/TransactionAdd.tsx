@@ -1,4 +1,4 @@
-import { lazy, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { newTransactionSchema } from "./schemas/transactionSchemas";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../app/store";
@@ -6,6 +6,7 @@ import {
   type Receipt,
   type TransactionContexts,
   type TransactionTypes,
+  type TransactionVATOption,
 } from "./types/transactionTypes";
 import SubmitButton from "../../components/SubmitButton";
 // Form Fields
@@ -32,9 +33,11 @@ import { useGetCategoriesQuery } from "./category/api/transactionCategories";
 import { updateUserBudget } from "../../app/authSlice";
 import TransactionFee from "./fields/TransactionFee";
 import TransactionInvoiceNumber from "./fields/TransactionInvoiceNumber";
+import TransactionVAT from "./fields/TransactionVAT";
 
 const TransactionAdd = () => {
   const [type, setType] = useState<TransactionTypes | "">("");
+  const [vat, setVat] = useState<TransactionVATOption>("0%");
   const [invoiceNumber, setInvoiceNumber] = useState<string | "">("");
   const [title, setTitle] = useState<string>("");
   const [amount, setAmount] = useState<number | "">("");
@@ -77,6 +80,7 @@ const TransactionAdd = () => {
 
     const verifiedData = newTransactionSchema.safeParse({
       type,
+      vat,
       invoiceNumber,
       title,
       amount,
@@ -128,6 +132,7 @@ const TransactionAdd = () => {
 
         //* Clear state as user is being kept on the same page
         setType("");
+        setVat("0%");
         setInvoiceNumber("");
         setTitle("");
         setAmount("");
@@ -157,6 +162,12 @@ const TransactionAdd = () => {
         type={type}
         setType={setType}
         validationError={formErrors?.type}
+      />
+      {/* VAT */}
+      <TransactionVAT
+        vat={vat}
+        setVat={setVat}
+        validationError={formErrors?.vat}
       />
       {/* Invoice Number */}
       <TransactionInvoiceNumber

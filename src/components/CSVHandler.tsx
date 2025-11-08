@@ -3,12 +3,34 @@ import { useGetPaymentMethodsQuery } from "../features/transactions/paymentMetho
 import { useGetCategoriesQuery } from "../features/transactions/category/api/transactionCategories";
 import { FaFileDownload } from "@react-icons/all-files/fa/FaFileDownload";
 import { PRIMARY, SHARED } from "../app/globalClasses";
+import { useGetTransactionsQuery } from "../features/transactions/api/transactionsApi";
 
-const CSVHandler = ({ transactions }) => {
+const CSVHandler = ({
+  userId,
+  fetchAllTransactions,
+}: {
+  userId: string;
+  fetchAllTransactions: boolean;
+  setFetchAllTransactions: (fetchAllTransactions: boolean) => void;
+}) => {
   const [isExporting, setIsExporting] = useState(false);
 
-  const { data: paymentMethods } = useGetPaymentMethodsQuery();
-  const { data: categories } = useGetCategoriesQuery();
+  const { data: paymentMethods } = useGetPaymentMethodsQuery(undefined, {
+    skip: !fetchAllTransactions,
+  });
+  const { data: categories } = useGetCategoriesQuery(undefined, {
+    skip: !fetchAllTransactions,
+  });
+  const { data: allTransactions } = useGetTransactionsQuery(
+    {
+      userId,
+      page: 1,
+      limit: 100,
+      sortBy: "created_at",
+      order: "desc",
+    },
+    { skip: !fetchAllTransactions }
+  );
 
   const escapeCSV = (value) => {
     if (value === null || value === undefined) return "";
@@ -28,9 +50,11 @@ const CSVHandler = ({ transactions }) => {
 
     try {
       let csvContent =
-        "Date,Type,Invoice Number,Supplier/Customer Name,Note,Gross Amount,Net Amount,Fee,Payment Method,Category,Receipt URL\n";
+        "Date,Type,Invoice Number,Supplier/Customer Name,Note,VAT,Gross Amount,Net Amount,Fee,Payment Method,Category,Receipt URL\n";
 
-      for (const transaction of transactions) {
+      for (const transaction of allTransactions?.data) {
+        const vatAmount =
+          transaction?.amount / +transaction.vat.replace("%", "");
         if (transaction.amount > 0) {
           const row = [
             // Invoice Date
@@ -43,6 +67,18 @@ const CSVHandler = ({ transactions }) => {
             escapeCSV(transaction.title),
             // Note
             escapeCSV(transaction.note || "No note provided."),
+            // VAT
+            escapeCSV(
+              `${
+                transaction.vat === "20%"
+                  ? `${transaction.vat} | ${
+                      transaction.currency.code
+                    }${vatAmount.toFixed(2)}`
+                  : transaction.vat == "0%"
+                  ? "0%"
+                  : "No VAT"
+              }`
+            ),
             // Amount Gross
             escapeCSV(
               `${transaction?.currency?.code} ${
@@ -50,10 +86,12 @@ const CSVHandler = ({ transactions }) => {
               }`
             ),
             // Amount Net
-            escapeCSV(`${transaction?.currency?.code} ${transaction.amount}`),
+            escapeCSV(
+              `${transaction?.currency?.code} ${transaction.amount.toFixed(2)}`
+            ),
             // Incurred Fee
             escapeCSV(
-              `${transaction?.currency?.code} ${transaction.fee}` ||
+              `${transaction?.currency?.code} ${transaction.fee.toFixed(2)}` ||
                 `${transaction?.currency?.code} 0.00`
             ),
             // Payment Method
@@ -112,7 +150,7 @@ const CSVHandler = ({ transactions }) => {
   return (
     <button
       onClick={downloadCSV}
-      disabled={isExporting || !transactions?.length}
+      disabled={isExporting || !allTransactions?.data?.length}
       className={`${PRIMARY} ${SHARED}`}
     >
       {isExporting ? "Exporting" : "Export"} Transactions <FaFileDownload /> (in

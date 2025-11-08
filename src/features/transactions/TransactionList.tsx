@@ -7,10 +7,14 @@ import { useSelector } from "react-redux";
 import { useState } from "react";
 import { useGetCategoriesQuery } from "./category/api/transactionCategories";
 import type { RootState } from "../../app/store";
-import CSVHandler from "../../components/CSVHandler";
+import CSVHandler from "../../components/CSVHandler.tsx";
+import { PRIMARY, SHARED } from "../../app/globalClasses.ts";
+import DefaultModal from "../../components/DefaultModal.tsx";
 
 const TransactionList = () => {
   const { user } = useSelector((state: RootState) => state.auth);
+  const [fetchAllTransactions, setFetchAllTransactions] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   const {
     data: transactionCategories,
@@ -34,7 +38,29 @@ const TransactionList = () => {
     <div className="w-full">
       {data && data?.total >= 1 ? (
         <div className="flex flex-col justify-start items-start gap-2">
-          <CSVHandler transactions={data?.data} />
+          <button
+            className={`${PRIMARY} ${SHARED}`}
+            onClick={() => {
+              setShowModal(!showModal);
+              setFetchAllTransactions(!fetchAllTransactions);
+            }}
+          >
+            Export All Transactions
+          </button>
+          <DefaultModal
+            showModal={showModal}
+            onCancel={() => setShowModal(!showModal)}
+          >
+            <p>
+              You have a total of {data?.total} transactions available to
+              download.
+            </p>
+            <CSVHandler
+              userId={user?.id}
+              setFetchAllTransactions={setFetchAllTransactions}
+              fetchAllTransactions={fetchAllTransactions}
+            />
+          </DefaultModal>
           <TransactionGrid
             data={data?.data}
             paymentMethods={user?.paymentMethods}

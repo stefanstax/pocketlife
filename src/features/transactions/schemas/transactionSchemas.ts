@@ -24,6 +24,9 @@ export const transactionSchema = z.object({
   type: z.enum(["INCOME", "EXPENSE"], {
     message: "Please select transaction type",
   }),
+  vat: z.enum(["0%", "20%", "No VAT"], {
+    message: "Please select vat option",
+  }),
   context: z.enum(["PERSONAL", "BUSINESS"], {
     message: "Please select transaction context",
   }),
@@ -62,6 +65,9 @@ export const newTransactionSchema = z.object({
   note: z.string(),
   type: z.enum(["INCOME", "EXPENSE"], {
     message: "Please select transaction type",
+  }),
+  vat: z.enum(["0%", "20%", "No VAT"], {
+    message: "Please select vat option",
   }),
   context: z.enum(["PERSONAL", "BUSINESS"], {
     message: "Please select transaction context",
