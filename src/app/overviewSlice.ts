@@ -32,8 +32,6 @@ const overviewSlice = createSlice({
       }
     },
     closeOverview: (state, action: PayloadAction<ClosePanelProps>) => {
-      console.log(state.panelId);
-
       if (state.panelId === action.payload.panelId) {
         state.transactionOverview = false;
         state.panelId = null;
@@ -41,9 +39,16 @@ const overviewSlice = createSlice({
         state.name = "";
       }
     },
+    closeAllOverviews: (state) => {
+      state.data = null;
+      state.name = "";
+      state.panelId = null;
+      state.transactionOverview = false;
+    },
   },
 });
 
-export const { openOverview, closeOverview } = overviewSlice.actions;
+export const { openOverview, closeOverview, closeAllOverviews } =
+  overviewSlice.actions;
 export const transactionPanelData = (state: RootState) => state.overview;
 export default overviewSlice.reducer;

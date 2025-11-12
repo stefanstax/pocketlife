@@ -4,6 +4,9 @@ export const transactionSchema = z.object({
   id: z.string(),
   created_at: z.string(),
   updated_at: z.string().nullable(),
+  invoiceNumber: z
+    .string()
+    .nonempty({ message: "Please enter invoice number from the receipt" }),
   title: z.string().nonempty({ message: "Please enter transaction title" }),
   amount: z.preprocess(
     (val) => parseFloat(String(val)),
@@ -20,6 +23,9 @@ export const transactionSchema = z.object({
   note: z.string(),
   type: z.enum(["INCOME", "EXPENSE"], {
     message: "Please select transaction type",
+  }),
+  vat: z.enum(["0%", "20%", "No VAT"], {
+    message: "Please select vat option",
   }),
   context: z.enum(["PERSONAL", "BUSINESS"], {
     message: "Please select transaction context",
@@ -42,6 +48,9 @@ export const newTransactionSchema = z.object({
   created_at: z
     .string()
     .min(5, { message: "Business transactions must include date and time." }),
+  invoiceNumber: z
+    .string()
+    .nonempty({ message: "Please enter invoice number from the receipt" }),
   title: z.string().nonempty({ message: "Please enter transaction title." }),
   amount: z.preprocess(
     (val) => parseFloat(String(val)),
@@ -56,6 +65,9 @@ export const newTransactionSchema = z.object({
   note: z.string(),
   type: z.enum(["INCOME", "EXPENSE"], {
     message: "Please select transaction type",
+  }),
+  vat: z.enum(["0%", "20%", "No VAT"], {
+    message: "Please select vat option",
   }),
   context: z.enum(["PERSONAL", "BUSINESS"], {
     message: "Please select transaction context",

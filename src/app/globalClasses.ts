@@ -1,4 +1,4 @@
-export const PRIMARY = `w-full lg:w-fit bg-[#5152fb] text-white hover:bg-[#3D3EE2] font-medium py-2 px-4`;
+export const PRIMARY = `bg-[#5152fb] text-white hover:bg-[#3D3EE2] font-medium py-2 px-4`;
 
 export const SECONDARY = `bg-transparent border border-[#5152fb] text-[#5152fb] hover:bg-[#5152fb1A] hover-text[#5152fb1A] font-medium py-2 px-4`;
 
@@ -14,4 +14,4 @@ export const input = `bg-[#2A2B3D] text-white p-4 focus:outline-none focus:ring-
 
 export const inputPicked = `bg-[#1A1A2E] border-[#1A1A2E] text-white`;
 
-export const SHARED = `cursor-pointer flex min-w-full gap-2 items-center justify-center`;
+export const SHARED = `cursor-pointer flex gap-2 items-center justify-center`;

@@ -4,6 +4,7 @@ import {
   type TransactionContexts,
   type TransactionTypes,
   type Receipt,
+  type TransactionVATOption,
 } from "./types/transactionTypes";
 import SubmitButton from "../../components/SubmitButton";
 import { useSelector } from "react-redux";
@@ -27,11 +28,16 @@ import TransactionFee from "./fields/TransactionFee";
 import { PRIMARY, SHARED } from "../../app/globalClasses";
 import { closeOverview } from "../../app/overviewSlice";
 import { FaWindowClose } from "react-icons/fa";
+import TransactionInvoiceNumber from "./fields/TransactionInvoiceNumber";
+import DataSpinner from "../../components/DataSpinner";
+import TransactionVAT from "./fields/TransactionVAT";
 
 const EditTransaction = ({ data }) => {
+  const [invoiceNumber, setInvoiceNumber] = useState<string>("");
   const [title, setTitle] = useState<string>("");
   const [amount, setAmount] = useState<number | "">("");
   const [fee, setFee] = useState<number>(0);
+  const [vat, setVat] = useState<TransactionVATOption>("0%");
   const [currencyId, setCurrencyId] = useState<string | "">("");
   const [categoryId, setCategoryId] = useState<string>("");
   const [created_at, setCreatedAt] = useState<string | "">("");
@@ -48,32 +54,16 @@ const EditTransaction = ({ data }) => {
 
   // Grab redux user data to locate paymentMethods
   const { user } = useSelector((state: RootState) => state.auth);
-
-  const { data: transactionCategories } = useGetCategoriesQuery();
-
-  const findPaymentMethod = user?.paymentMethods?.find(
-    (paymentMethod) => paymentMethod?.id === paymentMethodId
-  );
-
-  const findBudget = findPaymentMethod?.budgets?.find(
+  const transactionData = data;
+  const findBudget = transactionData?.paymentMethod?.budgets?.find(
     (budgetId) => budgetId?.currencyId === currencyId
   );
-
-  // * Transaction Data - Data now uses redux data through panel. No need to fetch a single record anymore
-  // const { data: transactionData, isLoading } = useGetTransactionByIdQuery(
-  //   id || ""
-  // );
-
-  const transactionData = data;
-
-  const [updateTransaction] = useUpdateTransactionMutation();
-
-  const currenciesMatch = user?.currencies?.includes(
-    transactionData?.currencyId ?? ""
-  );
+  const { data: transactionCategories, isLoading: categoriesFetcing } =
+    useGetCategoriesQuery();
 
   useEffect(() => {
     if (transactionData !== null) {
+      setInvoiceNumber(transactionData?.invoiceNumber);
       setTitle(transactionData?.title);
       setAmount(transactionData?.amount);
       setFee(transactionData?.fee);
@@ -93,6 +83,7 @@ const EditTransaction = ({ data }) => {
         setCategoryId(transactionData?.categoryId);
       }
       setType(transactionData?.type);
+      setVat(transactionData?.vat);
       setNote(transactionData?.note);
       setContext(transactionData?.context);
       setCreatedAt(transactionData?.created_at);
@@ -100,15 +91,23 @@ const EditTransaction = ({ data }) => {
     }
   }, [transactionData]);
 
+  const [updateTransaction] = useUpdateTransactionMutation();
+
+  const currenciesMatch = user?.currencies?.includes(
+    transactionData?.currencyId ?? ""
+  );
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const verifyData = transactionSchema.safeParse({
       id: transactionData?.id,
       userId: transactionData?.userId,
+      invoiceNumber,
       title,
       amount,
       fee,
+      vat,
       categoryId,
       currencyId,
       created_at,
@@ -172,32 +171,55 @@ const EditTransaction = ({ data }) => {
       >
         Close <FaWindowClose />
       </button>
-      <TransactionTitle
-        title={title}
-        setTitle={setTitle}
-        validationError={formErrors?.title}
-      />
-      <TransactionAmount
-        amount={amount}
-        setAmount={setAmount}
-        validationError={formErrors?.amount}
-      />
-      <TransactionFee fee={fee} setFee={setFee} />
-      <TransactionCategory
-        data={transactionCategories ?? []}
-        categoryId={categoryId}
-        setCategoryId={setCategoryId}
-        validationError={formErrors?.categoryId}
-      />
-      <TransaactionDateTime
-        created_at={created_at}
-        setCreatedAt={setCreatedAt}
-      />
       <TransactionType
         type={type}
         setType={setType}
         validationError={formErrors?.type}
       />
+      <TransactionInvoiceNumber
+        invoiceNumber={invoiceNumber}
+        setInvoiceNumber={setInvoiceNumber}
+        validationError={formErrors?.invoiceNumber}
+      />
+      <TransactionTitle
+        title={title}
+        setTitle={setTitle}
+        labelType={type}
+        validationError={formErrors?.title}
+      />
+      <TransactionNote
+        note={note}
+        setNote={setNote}
+        labelType={type}
+        validationError={formErrors?.note}
+      />
+      <TransactionVAT
+        vat={vat}
+        setVat={setVat}
+        validationError={formErrors.vat}
+      />
+      <TransactionAmount
+        amount={amount}
+        setAmount={setAmount}
+        labelType={type}
+        validationError={formErrors?.amount}
+      />
+      <TransactionFee fee={fee} setFee={setFee} />
+      {categoriesFetcing ? (
+        <DataSpinner />
+      ) : (
+        <TransactionCategory
+          data={transactionCategories ?? []}
+          categoryId={categoryId}
+          setCategoryId={setCategoryId}
+          validationError={formErrors?.categoryId}
+        />
+      )}
+      <TransaactionDateTime
+        created_at={created_at}
+        setCreatedAt={setCreatedAt}
+      />
+
       <TransactionMethod
         userId={user?.id ?? ""}
         paymentMethodId={paymentMethodId as string}
@@ -205,7 +227,7 @@ const EditTransaction = ({ data }) => {
         validationError={formErrors?.method}
       />
       <TransactionCurrency
-        currencies={findPaymentMethod?.budgets ?? []}
+        currencies={transactionData?.paymentMethod?.budgets ?? []}
         currencyId={currencyId as string}
         setCurrencyId={setCurrencyId}
         validationError={formErrors?.currencyId}
@@ -240,12 +262,6 @@ const EditTransaction = ({ data }) => {
           )}
         </>
       )}
-
-      <TransactionNote
-        note={note}
-        setNote={setNote}
-        validationError={formErrors?.note}
-      />
 
       <SubmitButton aria="Update transaction" label="Update Transaction" />
     </form>

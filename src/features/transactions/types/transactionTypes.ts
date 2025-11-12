@@ -22,9 +22,15 @@ export interface PaginatatedTransactions {
 }
 
 export type TransactionTypes = "INCOME" | "EXPENSE";
+export type TransactionVATOption = "0%" | "20%" | "No VAT";
 export type TransactionContexts = "PERSONAL" | "BUSINESS";
 
 export const transactionTypes = [{ name: "EXPENSE" }, { name: "INCOME" }];
+export const transactionVATOption = [
+  { name: "0%" },
+  { name: "20%" },
+  { name: "No VAT" },
+];
 export const transactionContexts = [{ name: "BUSINESS" }, { name: "PERSONAL" }];
 export interface Receipt {
   id: string;

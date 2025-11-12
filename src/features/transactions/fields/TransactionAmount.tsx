@@ -4,16 +4,18 @@ import FormError from "../../../components/FormError";
 const TransactionAmount = ({
   amount,
   setAmount,
+  labelType,
   validationError,
 }: {
   amount: number | "";
   setAmount: (amount: number) => void;
+  labelType?: string;
   validationError?: string;
 }) => {
   return (
     <div className={formDiv}>
       <label htmlFor="amount" className={labelClasses}>
-        Amount you paid/received
+        Gross amount {labelType === "EXPENSE" ? "with" : "without"} VAT
       </label>
       <span className="text-xs pb-2">You will select the currency later.</span>
       <input

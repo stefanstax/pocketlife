@@ -828,10 +828,13 @@ app.get("/transaction-categories/:id", authenticateToken, async (req, res) => {
 });
 
 app.post("/transaction-categories", authenticateToken, async (req, res) => {
+  const userId = req.user.userId;
+  const combineData = { ...req.body, user_id: userId };
+
   try {
     const { data, error } = await supabase
       .from("transaction-categories")
-      .insert(req.body)
+      .insert(combineData)
       .select("*")
       .single();
 

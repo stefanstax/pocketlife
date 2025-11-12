@@ -7,6 +7,7 @@ import { FaServer } from "@react-icons/all-files/fa/FaServer";
 import { MdEmail } from "@react-icons/all-files/md/MdEmail";
 import { FaBook } from "@react-icons/all-files/fa/FaBook";
 import { FaRobot } from "@react-icons/all-files/fa/FaRobot";
+import { FaHandshake } from "@react-icons/all-files/fa/FaHandshake";
 
 const ICON_OPTIONS = [
   { name: "SERVERS", icon: <FaServer /> },
@@ -19,6 +20,7 @@ const ICON_OPTIONS = [
   { name: "FEES", icon: <FaMoneyBillWave /> },
   { name: "EDUCATION", icon: <FaGraduationCap /> },
   { name: "SOFTWARE", icon: <FaStore /> },
+  { name: "CLIENT RELATIONS", icon: <FaHandshake /> },
 ];
 
 const IconPicker = ({
