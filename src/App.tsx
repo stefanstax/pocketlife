@@ -52,6 +52,7 @@ const App = () => {
   const withSuspense = (Component: JSX.Element) => (
     <Suspense fallback={<BlurredSpinner />}>{Component}</Suspense>
   );
+
   return (
     <BrowserRouter>
       <Routes>

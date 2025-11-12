@@ -9,7 +9,7 @@ const TransactionAmount = ({
 }: {
   amount: number | "";
   setAmount: (amount: number) => void;
-  labelType: string;
+  labelType?: string;
   validationError?: string;
 }) => {
   return (
