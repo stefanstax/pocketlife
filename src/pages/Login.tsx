@@ -4,9 +4,8 @@ import LoginForm from "../features/authentication/login/LoginForm";
 
 const Login = () => {
   return (
-    <section className="w-full h-full flex justify-center items-center flex-col text-white gap-4">
-      <div className="min-w-full lg:min-w-[800px] flex flex-col items-start justify-start gap-4">
-        <h1 className="text-2xl font-black">Login</h1>
+    <section className="w-full flex justify-center items-center flex-col text-white gap-4">
+      <div className="min-w-full lg:min-w-[600px] flex flex-col items-start justify-start gap-4">
         <LoginForm />
         <p className="text-sm">Forgot passcode: /recovery/YOUR-SECRET-URL</p>
         <p>OR</p>

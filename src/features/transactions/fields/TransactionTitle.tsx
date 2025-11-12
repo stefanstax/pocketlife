@@ -5,9 +5,11 @@ const TransactionTitle = ({
   title,
   setTitle,
   validationError,
+  labelType,
 }: {
   title: string;
   setTitle: (title: string) => void;
+  labelType: string;
   validationError?: string;
 }) => {
   return (
@@ -15,7 +17,10 @@ const TransactionTitle = ({
       <label htmlFor="title" className={labelClasses}>
         Supplier/Receiver
       </label>
-
+      <span className="text-xs mb-2">
+        Please enter {labelType === "EXPENSE" ? "business's" : "customer's"}{" "}
+        full name
+      </span>
       <input
         className={input}
         type="text"

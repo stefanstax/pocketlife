@@ -72,7 +72,6 @@ const RegistrationForm = () => {
 
   return (
     <form onSubmit={handleSubmit} className="w-full grid grid-cols-1 gap-6">
-      <h1 className="text-2xl font-black">Registration</h1>
       {/* Name */}
       <div className={formDiv}>
         <label className={labelClasses}>Name</label>

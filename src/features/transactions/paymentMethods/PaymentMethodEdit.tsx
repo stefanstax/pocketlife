@@ -165,6 +165,7 @@ const PaymentMethodEdit = () => {
             validationError={formErrors?.currencyId}
           />
           <TransactionAmount
+            labelType="Amount"
             amount={budget.amount}
             setAmount={(val) => updateBudget(budget.id, "amount", val)}
             validationError={formErrors?.amount}

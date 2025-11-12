@@ -1,0 +1,11 @@
+What to fix/add:
+- Remove budgets, useless piece of information to have and for some not one to freely give out;
+- Add a general files tab where user can upload pfs and later pick those pdfs in the transactions; 
+    - Ability to name the file before upload;
+    - Ability to delete | removes from the cloud the copy of the receipt;
+    - Ability to edit | upload -> remoe old -> attach new;
+    - Link transaction and a file via url;
+    - Double check should uploads still go to bunny or private gdrive folder of user's choice;
+    - Deleting a transaction which holds a receipt also deletes a receipt IF CHECKMARK IS ✅;
+- Disallow payment method removal if any transactions are tied to it;
+- Disallow category removal if any transactions are tied to it;

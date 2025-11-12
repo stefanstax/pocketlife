@@ -15,10 +15,11 @@ const TransaactionDateTime = ({
   return (
     <div className={formDiv}>
       <label htmlFor="dateTime" className={labelClasses}>
-        Date & Time
+        Payment received date
       </label>
       <span className="text-xs pb-2">
-        Skip if you want to use to use current date and time.
+        Skip if you want to use to use current date and time. Usually not
+        recommended for business transactions.
       </span>
 
       <div className={`${input} flex gap-4 text-sm flex-wrap`}>
